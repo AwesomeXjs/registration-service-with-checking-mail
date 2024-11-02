@@ -19,14 +19,9 @@ jobs:
           go-version: '1.22.2'
           cache: false
 
-      - name: Install golangci-lint
-        run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
-          echo "${GOPATH}/bin" >> $GITHUB_PATH
-
-      - name: golangci-lint
-        run: |
-          cd server/auth-service
-          golangci-lint run --timeout=30m --config=.golangci.pipeline.yaml ./...
-          env:
-          GOLANGCI_LINT_VERSION: v1.60
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+            version: v1.60.3
+            args: run --timeout=30m --config=.golangci.pipeline.yaml ./...
+            working-directory: ./server/auth-service
