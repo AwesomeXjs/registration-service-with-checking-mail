@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+// ValidateToken checks the validity of the provided access token and returns an empty response.
 func (c *Controller) ValidateToken(ctx context.Context, req *authService.ValidateTokenRequest) (*emptypb.Empty, error) {
 
 	return nil, nil

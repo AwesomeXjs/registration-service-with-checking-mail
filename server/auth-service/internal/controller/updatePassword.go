@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+// UpdatePassword processes requests to update a user's password and returns an empty response.
 func (c *Controller) UpdatePassword(ctx context.Context, req *authService.UpdatePasswordRequest) (*emptypb.Empty, error) {
 
 	return nil, nil
