@@ -24,4 +24,4 @@ jobs:
         with:
             version: v1.60.3
             args: run --timeout=30m --config=.golangci.pipeline.yaml ./...
-            working-directory: ./server/auth-service
+            working-directory: server/auth-service
