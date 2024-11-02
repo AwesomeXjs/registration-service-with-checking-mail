@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package auth_v1;
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1;auth_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Registration Service",
+    version: "1.0.0"
+    contact: {
+      name: "AwesomeXjs"
+      email: "bestawes0mex@gmail.com"
+      url: "https://github.com/AwesomeXjs"
+    }
+  };
+  host: "localhost:8080";
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+};
+
+
+service AuthV1 {
+  // Register new user with email and password, returns access token, refresh token and user id
+  rpc Registration(RegistrationRequest) returns (RegistrationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/registration"
+      body: "*"
+    };
+  };
+
+  // Login with email and password
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/login"
+      body: "*"
+    };
+  };
+
+  // Validate access token for authentication
+  rpc ValidateToken(ValidateTokenRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/validate"
+      body: "*"
+    };
+  };
+
+  // Get access token from refresh token
+  rpc GetAccessToken(GetAccessTokenRequest) returns (GetAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/token"
+      body: "*"
+    };
+  };
+
+  rpc UpdatePassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/password"
+      body: "*"
+    };
+  }
+}
+
+message RegistrationRequest {
+  string email = 1;
+  string password = 2;
+  string name = 3;
+  string surname = 4;
+}
+
+message RegistrationResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+  string userId = 3;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+  string userId = 3;
+}
+
+message ValidateTokenRequest {
+  string accessToken = 1;
+}
+
+message GetAccessTokenRequest {
+  string refreshToken = 1;
+}
+
+message GetAccessTokenResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+
+message UpdatePasswordRequest {
+  string password = 1;
+}
+
