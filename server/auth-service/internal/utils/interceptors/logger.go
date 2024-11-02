@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// LogInterceptor is a gRPC interceptor that logs the details of incoming requests and their processing time.
 func LogInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	start := time.Now()
 
