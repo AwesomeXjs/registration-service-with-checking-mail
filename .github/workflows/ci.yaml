@@ -23,5 +23,5 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
             version: v1.60.3
-            args: run --timeout=30m --config=.golangci.pipeline.yaml ./...
+            args: run --timeout=30m --config=./server/auth-service/.golangci.pipeline.yaml ./...
             working-directory: ./server/auth-service
