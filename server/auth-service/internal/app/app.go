@@ -9,6 +9,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/configs"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/interceptors"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
 	"go.uber.org/zap"
@@ -93,7 +94,10 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
 
-	a.grpcServer = grpc.NewServer()
+	a.grpcServer = grpc.NewServer(
+		grpc.UnaryInterceptor(
+			interceptors.LogInterceptor,
+		))
 	reflection.Register(a.grpcServer)
 	authService.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.Controller(ctx))
 

@@ -59,6 +59,39 @@
         ]
       }
     },
+    "/api/v1/password": {
+      "post": {
+        "operationId": "AuthV1_UpdatePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth_v1UpdatePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthV1"
+        ]
+      }
+    },
     "/api/v1/registration": {
       "post": {
         "summary": "Register new user with email and password, returns access token, refresh token and user id",
@@ -232,6 +265,14 @@
           "type": "string"
         },
         "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "auth_v1UpdatePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
           "type": "string"
         }
       }
