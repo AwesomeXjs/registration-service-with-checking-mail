@@ -2,3 +2,4 @@
 bin
 /coverage.out
 vendor.protogen
+logs
