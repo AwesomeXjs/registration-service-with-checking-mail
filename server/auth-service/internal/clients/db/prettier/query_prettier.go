@@ -6,11 +6,14 @@ import (
 	"strings"
 )
 
+// Placeholder constants for query parameter formatting.
 const (
 	PlaceholderDollar   = "$"
 	PlaceholderQuestion = "?"
 )
 
+// Pretty formats the query string by replacing placeholders with provided argument values.
+// It also removes tabs and newlines for cleaner output.
 func Pretty(query string, placeholder string, args ...any) string {
 	for i, param := range args {
 		var value string

@@ -6,6 +6,9 @@ run:
 debug:
 	go run cmd/auth/main.go -l debug
 
+lint:
+	$(LOCAL_BIN)/golangci-lint run ./... --config .golangci.pipeline.yaml
+
 install-deps:
 	mkdir -p $(LOCAL_BIN)
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 # protofiles
@@ -15,6 +18,7 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 #gateway
 	GOBIN=$(LOCAL_BIN) go install github.com/bojand/ghz/cmd/ghz@latest # для нагрузки по grpc
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 # swagger
+	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
 
 
 get-deps:

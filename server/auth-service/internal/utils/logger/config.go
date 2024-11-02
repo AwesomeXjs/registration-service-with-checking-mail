@@ -2,17 +2,19 @@ package logger
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
-	"os"
 )
 
+// GetCore creates and returns a zapcore.Core that writes logs to both stdout and a file.
+// It configures log formats for production and development environments.
 func GetCore(level zap.AtomicLevel) zapcore.Core {
 	stdout := zapcore.AddSync(os.Stdout)
 
-	// настраиваем куда мы будем писать логи
 	file := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   "logs/app.log",
 		MaxSize:    10, // megabytes
@@ -20,14 +22,13 @@ func GetCore(level zap.AtomicLevel) zapcore.Core {
 		MaxAge:     1, // days
 	})
 
-	// берем за основу дефолтный прод конфиг и его настраиваем
+	// Set up encoder configurations for production and development.
 	productionCfg := zap.NewProductionEncoderConfig()
 	productionCfg.TimeKey = "timestamp"
 	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 
-	// делаем еще один конфиг
 	developmentCfg := zap.NewDevelopmentEncoderConfig()
-	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder // делает цветным уровень логирования в логе
+	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder // Colorizes log levels in console
 
 	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
 	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
@@ -38,7 +39,8 @@ func GetCore(level zap.AtomicLevel) zapcore.Core {
 	)
 }
 
-// getAtomicLevel - парсим с входных параметров при запуске лог левел и приводим его к нужному значению
+// GetAtomicLevel returns a zap.AtomicLevel based on the provided log level string.
+// It sets the log level and logs an error if the level is invalid.
 func GetAtomicLevel(logLevel *string) zap.AtomicLevel {
 	var level zapcore.Level
 	fmt.Println("logger level: ", *logLevel)
