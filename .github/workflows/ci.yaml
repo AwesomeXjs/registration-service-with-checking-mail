@@ -19,9 +19,9 @@ jobs:
           go-version: '1.22.2'
           cache: false
 
-      - name: Run golangci-lint
+      - name: Run golangci-lint for Auth service
         uses: golangci/golangci-lint-action@v6
         with:
             version: v1.60.3
-            args: --config=${{ github.workspace }}/server/auth-service/.golangci.pipeline.yaml ./...
+            args: --config=${{ github.workspace }}/.golangci.pipeline.yaml ./...
             working-directory: server/auth-service
