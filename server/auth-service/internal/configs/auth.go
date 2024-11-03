@@ -12,7 +12,7 @@ import (
 )
 
 type AuthConfig struct {
-	secretKey            string
+	secretKey            []byte
 	refreshTokenDuration time.Duration
 	accessTokenDuration  time.Duration
 }
@@ -36,13 +36,13 @@ func NewAuthConfig() (*AuthConfig, error) {
 	}
 
 	return &AuthConfig{
-		secretKey:            secretKey,
+		secretKey:            []byte(secretKey),
 		refreshTokenDuration: time.Duration(refreshTokenDuration) * time.Hour,
 		accessTokenDuration:  time.Duration(accessTokenDuration) * time.Hour,
 	}, nil
 }
 
-func (a *AuthConfig) GetSecretKey() string {
+func (a *AuthConfig) GetSecretKey() []byte {
 	return a.secretKey
 }
 func (a *AuthConfig) GetRefreshTokenDuration() time.Duration {

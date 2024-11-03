@@ -30,6 +30,9 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (m
 		return model.RegistrationResponse{}, fmt.Errorf("failed to registration: %v", err)
 	}
 
+	// ТУТ ОТПРАВЛЯЕМ СНАЧАЛО СОЗДАНИЕ В СЕРВИСЕ ЮЗЕРОВ
+	// ПОТОМ ОТПРАВЛЯЕМ ПИСЬМО В КАФКУ
+
 	accessToken, err := s.authHelper.GenerateAccessToken(user)
 	if err != nil {
 		logger.Error("failed to generate access token", zap.Error(err))

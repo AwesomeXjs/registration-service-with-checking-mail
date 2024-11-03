@@ -13,3 +13,11 @@ services:
       - postgres_volume:/var/lib/postgresql/data
     env_file:
       - ./server/auth-service/.env
+
+  migrator:
+    build:
+      context: ./server/auth-service
+      dockerfile: migrator.Dockerfile
+    restart: on-failure
+    environment:
+      DB_HOST: pg-auth-service

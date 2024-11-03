@@ -17,9 +17,9 @@ type AuthClient struct {
 	accessTokenDuration  time.Duration
 }
 
-func New(secretKey string, refreshTokenDuration time.Duration, accessTokenDuration time.Duration) AuthHelper {
+func New(secretKey []byte, refreshTokenDuration time.Duration, accessTokenDuration time.Duration) AuthHelper {
 	return &AuthClient{
-		secretKey:            []byte(secretKey),
+		secretKey:            secretKey,
 		refreshTokenDuration: refreshTokenDuration,
 		accessTokenDuration:  accessTokenDuration,
 	}
