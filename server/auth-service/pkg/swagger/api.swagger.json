@@ -192,6 +192,12 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "refreshToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

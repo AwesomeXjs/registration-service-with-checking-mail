@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
@@ -14,6 +15,7 @@ func (c *Controller) Registration(ctx context.Context, req *authService.Registra
 	res, err := c.svc.Registration(ctx, converter.ToInfoFromProto(req))
 	if err != nil {
 		logger.Error(err.Error(), zap.Any("req", req))
+		return nil, fmt.Errorf("failed to registration: %v", err)
 	}
 
 	return converter.ToProtoFromRegResponse(res), nil

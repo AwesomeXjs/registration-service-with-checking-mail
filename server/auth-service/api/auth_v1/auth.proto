@@ -92,6 +92,7 @@ message LoginResponse {
 
 message ValidateTokenRequest {
   string accessToken = 1;
+  string refreshToken = 2;
 }
 
 message GetAccessTokenRequest {

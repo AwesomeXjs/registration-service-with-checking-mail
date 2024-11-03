@@ -15,7 +15,7 @@ func ToInfoFromProto(info *authService.RegistrationRequest) *model.UserInfo {
 	}
 }
 
-func ToProtoFromRegResponse(resp model.RegistrationResponse) *authService.RegistrationResponse {
+func ToProtoFromRegResponse(resp *model.RegistrationResponse) *authService.RegistrationResponse {
 	return &authService.RegistrationResponse{
 		AccessToken:  resp.AccessToken,
 		RefreshToken: resp.RefreshToken,

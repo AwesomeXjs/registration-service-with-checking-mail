@@ -9,5 +9,5 @@ import (
 // IService defines the interface for the Service,
 // representing business logic operations.
 type IService interface {
-	Registration(ctx context.Context, registrationRequest *model.UserInfo) (model.RegistrationResponse, error)
+	Registration(ctx context.Context, registrationRequest *model.UserInfo) (*model.RegistrationResponse, error)
 }
