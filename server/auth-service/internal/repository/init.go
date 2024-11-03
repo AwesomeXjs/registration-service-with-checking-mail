@@ -8,7 +8,7 @@ type Repository struct {
 }
 
 // New creates a new Repository instance with the given database client.
-func New(db db.Client) *Repository {
+func New(db db.Client) IRepository {
 	return &Repository{
 		db: db,
 	}

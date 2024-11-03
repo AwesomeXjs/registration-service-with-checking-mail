@@ -9,6 +9,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/authHelper"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
 	"go.uber.org/zap"
@@ -19,7 +20,8 @@ type serviceProvider struct {
 	pgConfig   configs.PGConfig
 	grpcConfig configs.GRPCConfig
 
-	dbClient db.Client
+	dbClient   db.Client
+	authHelper authHelper.AuthHelper
 
 	controller *controller.Controller
 	service    service.IService
@@ -76,6 +78,19 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
+func (s *serviceProvider) AuthHelper() authHelper.AuthHelper {
+	if s.authHelper == nil {
+		cfg, err := configs.NewAuthConfig()
+		if err != nil {
+			logger.Fatal("failed to get auth config", zap.Error(err))
+		}
+
+		s.authHelper = authHelper.New(cfg.GetSecretKey(), cfg.GetRefreshTokenDuration(), cfg.GetAccessTokenDuration())
+
+	}
+	return s.authHelper
+}
+
 // Repository initializes and returns the repository layer for database operations.
 func (s *serviceProvider) Repository(ctx context.Context) repository.IRepository {
 	if s.repository == nil {
@@ -87,7 +102,7 @@ func (s *serviceProvider) Repository(ctx context.Context) repository.IRepository
 // Service initializes and returns the service layer for core business logic.
 func (s *serviceProvider) Service(ctx context.Context) service.IService {
 	if s.service == nil {
-		s.service = service.New(s.Repository(ctx))
+		s.service = service.New(s.Repository(ctx), s.AuthHelper())
 	}
 	return s.service
 }

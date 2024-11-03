@@ -46,22 +46,20 @@ service AuthV1 {
   // Validate access token for authentication
   rpc ValidateToken(ValidateTokenRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/validate"
-      body: "*"
+      get: "/api/v1/validate/{accessToken}"
     };
   };
 
   // Get access token from refresh token
   rpc GetAccessToken(GetAccessTokenRequest) returns (GetAccessTokenResponse) {
     option (google.api.http) = {
-      post: "/api/v1/token"
-      body: "*"
+      get: "/api/v1/token/{refreshToken}"
     };
   };
 
   rpc UpdatePassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/password"
+      patch: "/api/v1/password/{email}"
       body: "*"
     };
   }
@@ -72,6 +70,7 @@ message RegistrationRequest {
   string password = 2;
   string name = 3;
   string surname = 4;
+  string role = 5;
 }
 
 message RegistrationResponse {
@@ -105,6 +104,7 @@ message GetAccessTokenResponse {
 }
 
 message UpdatePasswordRequest {
-  string password = 1;
+  string email = 1;
+  string password = 2;
 }
 

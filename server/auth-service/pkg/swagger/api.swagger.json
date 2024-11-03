@@ -59,8 +59,8 @@
         ]
       }
     },
-    "/api/v1/password": {
-      "post": {
+    "/api/v1/password/{email}": {
+      "patch": {
         "operationId": "AuthV1_UpdatePassword",
         "responses": {
           "200": {
@@ -79,11 +79,22 @@
         },
         "parameters": [
           {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/auth_v1UpdatePasswordRequest"
+              "type": "object",
+              "properties": {
+                "password": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -125,8 +136,8 @@
         ]
       }
     },
-    "/api/v1/token": {
-      "post": {
+    "/api/v1/token/{refreshToken}": {
+      "get": {
         "summary": "Get access token from refresh token",
         "operationId": "AuthV1_GetAccessToken",
         "responses": {
@@ -145,12 +156,10 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "refreshToken",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/auth_v1GetAccessTokenRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
@@ -158,8 +167,8 @@
         ]
       }
     },
-    "/api/v1/validate": {
-      "post": {
+    "/api/v1/validate/{accessToken}": {
+      "get": {
         "summary": "Validate access token for authentication",
         "operationId": "AuthV1_ValidateToken",
         "responses": {
@@ -179,12 +188,10 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "accessToken",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/auth_v1ValidateTokenRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
@@ -194,14 +201,6 @@
     }
   },
   "definitions": {
-    "auth_v1GetAccessTokenRequest": {
-      "type": "object",
-      "properties": {
-        "refreshToken": {
-          "type": "string"
-        }
-      }
-    },
     "auth_v1GetAccessTokenResponse": {
       "type": "object",
       "properties": {
@@ -252,6 +251,9 @@
         },
         "surname": {
           "type": "string"
+        },
+        "role": {
+          "type": "string"
         }
       }
     },
@@ -265,22 +267,6 @@
           "type": "string"
         },
         "userId": {
-          "type": "string"
-        }
-      }
-    },
-    "auth_v1UpdatePasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "auth_v1ValidateTokenRequest": {
-      "type": "object",
-      "properties": {
-        "accessToken": {
           "type": "string"
         }
       }

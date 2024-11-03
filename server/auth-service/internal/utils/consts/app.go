@@ -14,4 +14,8 @@ const (
 	// GrpcPort is the environment variable key for the gRPC server port number.
 	// It indicates the port on which the gRPC server listens for connections, also set in the .env file.
 	GrpcPort = "GRPC_PORT"
+
+	SecretKey            = "SECRET_KEY"
+	AccessTokenDuration  = "ACCESS_TOKEN_DURATION"
+	RefreshTokenDuration = "REFRESH_TOKEN_DURATION"
 )
