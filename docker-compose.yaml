@@ -14,7 +14,7 @@ services:
     env_file:
       - ./server/auth-service/.env
 
-  migrator:
+  migrator-auth-service:
     build:
       context: ./server/auth-service
       dockerfile: migrator.Dockerfile

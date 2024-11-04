@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"net"
-	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/configs"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/closer"
@@ -12,6 +11,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/interceptors"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -44,17 +44,11 @@ func (a *App) Run() error {
 		closer.CloseAll()
 		closer.Wait()
 	}()
-	wg := &sync.WaitGroup{}
+	err := a.RunGRPSServer()
+	if err != nil {
+		logger.Fatal("failed to run grpc server", zap.Error(err))
+	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := a.RunGRPSServer()
-		if err != nil {
-			logger.Fatal("failed to run grpc server", zap.Error(err))
-		}
-	}()
-	wg.Wait()
 	return nil
 }
 
@@ -96,7 +90,8 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 
 	a.grpcServer = grpc.NewServer(
 		grpc.UnaryInterceptor(
-			interceptors.LogInterceptor,
+			grpc_middleware.ChainUnaryServer(
+				interceptors.LogInterceptor),
 		))
 	reflection.Register(a.grpcServer)
 	authService.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.Controller(ctx))

@@ -24,7 +24,7 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 		Role:         userInfo.Role,
 	}
 
-	res, err := s.repo.Registration(ctx, user)
+	userID, err := s.repo.Registration(ctx, user)
 	if err != nil {
 		logger.Error("failed to registration", zap.Error(err))
 		return nil, fmt.Errorf("failed to registration: %v", err)
@@ -48,6 +48,6 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 	return &model.RegistrationResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		UserId:       res,
+		UserId:       userID,
 	}, nil
 }
