@@ -2,6 +2,7 @@ version: "3"
 
 volumes:
   postgres_volume:
+  redis-data:
 
 services:
   pg-auth-service:
@@ -21,3 +22,11 @@ services:
     restart: on-failure
     environment:
       DB_HOST: pg-auth-service
+
+  redis-auth-service:
+    image: redis:7.2.5-alpine3.20
+    container_name: redis-auth-service
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data

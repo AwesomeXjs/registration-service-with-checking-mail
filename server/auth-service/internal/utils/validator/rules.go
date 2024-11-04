@@ -6,8 +6,10 @@ import (
 	"unicode/utf8"
 )
 
+// ValidateName checks the validity of a name string.
+// It ensures that the name is not empty and has a length between 3 and 64 characters.
 func ValidateName(name string) Condition {
-	return func(ctx context.Context) error {
+	return func(_ context.Context) error {
 		if name == "" {
 			return NewValidationErrors("empty name")
 		}
@@ -18,8 +20,10 @@ func ValidateName(name string) Condition {
 	}
 }
 
+// ValidateRole checks if the provided role is valid.
+// It only allows "admin" or "user" as acceptable roles.
 func ValidateRole(role string) Condition {
-	return func(ctx context.Context) error {
+	return func(_ context.Context) error {
 		if role != "admin" && role != "user" {
 			return NewValidationErrors("Only 'admin' and 'user' roles are allowed")
 		}
@@ -27,8 +31,10 @@ func ValidateRole(role string) Condition {
 	}
 }
 
+// ValidateEmail checks if the given email string is in a valid format.
+// It uses a regular expression to ensure the email is correctly structured.
 func ValidateEmail(email string) Condition {
-	return func(ctx context.Context) error {
+	return func(_ context.Context) error {
 		const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 		re := regexp.MustCompile(emailRegex)
 		result := re.MatchString(email)
@@ -39,17 +45,21 @@ func ValidateEmail(email string) Condition {
 	}
 }
 
+// ValidatePassword checks if the provided password meets the length requirement.
+// It ensures the password length is between 8 and 20 characters.
 func ValidatePassword(password string) Condition {
-	return func(ctx context.Context) error {
-		if utf8.RuneCountInString(password) < 5 || utf8.RuneCountInString(password) > 20 {
+	return func(_ context.Context) error {
+		if utf8.RuneCountInString(password) < 8 || utf8.RuneCountInString(password) > 20 {
 			return NewValidationErrors("password length must be between 8 and 20 characters")
 		}
 		return nil
 	}
 }
 
+// ValidateSurname checks the validity of a surname string.
+// It ensures that the surname is not empty and has a length between 3 and 64 characters.
 func ValidateSurname(surname string) Condition {
-	return func(ctx context.Context) error {
+	return func(_ context.Context) error {
 		if surname == "" {
 			return NewValidationErrors("empty surname")
 		}

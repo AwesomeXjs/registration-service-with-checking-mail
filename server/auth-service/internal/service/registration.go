@@ -10,6 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// Registration handles the registration of a new user, hashes their password,
+// and generates access and refresh tokens upon successful registration.
 func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*model.AuthResponse, error) {
 	HashedPassword, err := s.authHelper.HashPassword(userInfo.Password)
 	if err != nil {
@@ -51,6 +53,6 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 	return &model.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		UserId:       userID,
+		UserID:       userID,
 	}, nil
 }

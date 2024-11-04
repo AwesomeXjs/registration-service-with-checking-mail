@@ -5,6 +5,8 @@ import (
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
 )
 
+// ToInfoFromProto converts a RegistrationRequest from the authService to a UserInfo model.
+// This is used to transform incoming registration data into a format suitable for further processing.
 func ToInfoFromProto(info *authService.RegistrationRequest) *model.UserInfo {
 	return &model.UserInfo{
 		Email:    info.GetEmail(),
@@ -15,14 +17,8 @@ func ToInfoFromProto(info *authService.RegistrationRequest) *model.UserInfo {
 	}
 }
 
-func ToProtoFromRegResponse(resp *model.AuthResponse) *authService.RegistrationResponse {
-	return &authService.RegistrationResponse{
-		AccessToken:  resp.AccessToken,
-		RefreshToken: resp.RefreshToken,
-		UserId:       resp.UserId,
-	}
-}
-
+// ToLoginInfoFromProto converts a LoginRequest from the authService to a LoginInfo model.
+// This function maps login details from the incoming request to the model structure used in the application.
 func ToLoginInfoFromProto(info *authService.LoginRequest) *model.LoginInfo {
 	return &model.LoginInfo{
 		Email:    info.GetEmail(),
@@ -30,21 +26,8 @@ func ToLoginInfoFromProto(info *authService.LoginRequest) *model.LoginInfo {
 	}
 }
 
-func ToProtoFromLoginResponse(resp *model.AuthResponse) *authService.LoginResponse {
-	return &authService.LoginResponse{
-		AccessToken:  resp.AccessToken,
-		RefreshToken: resp.RefreshToken,
-		UserId:       resp.UserId,
-	}
-}
-
-func ToProtoFromNewPairTokens(resp *model.NewPairTokens) *authService.GetAccessTokenResponse {
-	return &authService.GetAccessTokenResponse{
-		AccessToken:  resp.AccessToken,
-		RefreshToken: resp.RefreshToken,
-	}
-}
-
+// ToUpdatePassFromProto converts an UpdatePasswordRequest from the authService to an UpdatePassInfo model.
+// It is used to extract and prepare email and new password information for updating user credentials.
 func ToUpdatePassFromProto(info *authService.UpdatePasswordRequest) *model.UpdatePassInfo {
 	return &model.UpdatePassInfo{
 		Email:       info.GetEmail(),

@@ -7,6 +7,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
 )
 
+// Login authenticates a user with the provided login information and generates access and refresh tokens.
 func (s *Service) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model.AuthResponse, error) {
 	result, err := s.repo.Login(ctx, loginInfo.Email)
 	if err != nil {
@@ -34,6 +35,6 @@ func (s *Service) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model
 	return &model.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		UserId:       result.UserID,
+		UserID:       result.UserID,
 	}, nil
 }

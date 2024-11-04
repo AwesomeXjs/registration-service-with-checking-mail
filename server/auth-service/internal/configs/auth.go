@@ -6,33 +6,34 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
 	"go.uber.org/zap"
 )
 
+// AuthConfig holds the configuration for authentication tokens.
 type AuthConfig struct {
 	secretKey            []byte
 	refreshTokenDuration time.Duration
 	accessTokenDuration  time.Duration
 }
 
+// NewAuthConfig creates a new AuthConfig instance by reading environment variables.
 func NewAuthConfig() (*AuthConfig, error) {
-	secretKey := os.Getenv(consts.SecretKey)
+	secretKey := os.Getenv("SECRET_KEY")
 	if len(secretKey) == 0 {
-		logger.Error("failed to get secret key", zap.String("secret key", consts.SecretKey))
-		return nil, fmt.Errorf("env %s is empty", consts.SecretKey)
+		logger.Error("failed to get secret key", zap.String("secret key", "SECRET_KEY"))
+		return nil, fmt.Errorf("env %s is empty", "SECRET_KEY")
 	}
 
-	refreshTokenDuration, err := strconv.Atoi(os.Getenv(consts.RefreshTokenDuration))
+	refreshTokenDuration, err := strconv.Atoi(os.Getenv("REFRESH_TOKEN_DURATION"))
 	if err != nil {
 		logger.Error("failed to get refresh token duration", zap.Error(err))
-		return nil, fmt.Errorf("env %s is empty", consts.RefreshTokenDuration)
+		return nil, fmt.Errorf("env %s is empty", "REFRESH_TOKEN_DURATION")
 	}
-	accessTokenDuration, err := strconv.Atoi(os.Getenv(consts.AccessTokenDuration))
+	accessTokenDuration, err := strconv.Atoi(os.Getenv("ACCESS_TOKEN_DURATION"))
 	if err != nil {
 		logger.Error("failed to get access token duration", zap.Error(err))
-		return nil, fmt.Errorf("env %s is empty", consts.AccessTokenDuration)
+		return nil, fmt.Errorf("env %s is empty", "ACCESS_TOKEN_DURATION")
 	}
 
 	return &AuthConfig{
@@ -42,12 +43,17 @@ func NewAuthConfig() (*AuthConfig, error) {
 	}, nil
 }
 
+// GetSecretKey returns the secret key for token generation.
 func (a *AuthConfig) GetSecretKey() []byte {
 	return a.secretKey
 }
+
+// GetRefreshTokenDuration returns the duration for refresh tokens.
 func (a *AuthConfig) GetRefreshTokenDuration() time.Duration {
 	return a.refreshTokenDuration
 }
+
+// GetAccessTokenDuration returns the duration for access tokens.
 func (a *AuthConfig) GetAccessTokenDuration() time.Duration {
 	return a.accessTokenDuration
 }

@@ -13,7 +13,10 @@ import (
 
 // Login processes user login requests and returns a login response.
 func (c *Controller) Login(ctx context.Context, req *authService.LoginRequest) (*authService.LoginResponse, error) {
-	err := validator.Validate(ctx, validator.ValidateEmail(req.GetEmail()), validator.ValidatePassword(req.GetPassword()))
+	err := validator.Validate(
+		ctx,
+		validator.ValidateEmail(req.GetEmail()),
+		validator.ValidatePassword(req.GetPassword()))
 	if err != nil {
 		logger.Error(err.Error(), zap.Any("validate", err.Error()))
 		return nil, err

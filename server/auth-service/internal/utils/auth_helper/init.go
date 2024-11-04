@@ -1,4 +1,4 @@
-package authHelper
+package auth_helper
 
 import (
 	"fmt"
@@ -11,12 +11,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// AuthClient implements the AuthHelper interface and provides methods for
+// managing authentication tasks, including token generation and password handling.
 type AuthClient struct {
-	secretKey            []byte
-	refreshTokenDuration time.Duration
-	accessTokenDuration  time.Duration
+	secretKey            []byte        // Secret key used for signing tokens
+	refreshTokenDuration time.Duration // Duration for which the refresh token is valid
+	accessTokenDuration  time.Duration // Duration for which the access token is valid
 }
 
+// New creates a new AuthClient instance with the provided secret key and token durations.
+// It returns an AuthHelper interface implementation for managing authentication tasks.
 func New(secretKey []byte, refreshTokenDuration time.Duration, accessTokenDuration time.Duration) AuthHelper {
 	return &AuthClient{
 		secretKey:            secretKey,
@@ -25,6 +29,8 @@ func New(secretKey []byte, refreshTokenDuration time.Duration, accessTokenDurati
 	}
 }
 
+// GenerateAccessToken creates a new access token for a user based on the provided access token information.
+// It sets the expiration time for the token and returns the signed token as a string.
 func (a *AuthClient) GenerateAccessToken(info *model.AccessTokenInfo) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
@@ -37,6 +43,8 @@ func (a *AuthClient) GenerateAccessToken(info *model.AccessTokenInfo) (string, e
 	return token.SignedString(a.secretKey)
 }
 
+// GenerateRefreshToken creates a new refresh token for a user identified by their user ID.
+// The token will have an expiration time set according to the specified duration.
 func (a *AuthClient) GenerateRefreshToken(userID string) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
@@ -48,6 +56,8 @@ func (a *AuthClient) GenerateRefreshToken(userID string) (string, error) {
 	return token.SignedString(a.secretKey)
 }
 
+// VerifyToken checks the validity of the provided JWT token. It parses the token and extracts the claims,
+// returning them if the token is valid. An error is returned if the token is invalid or expired.
 func (a *AuthClient) VerifyToken(token string) (*model.UserClaims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &model.UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
@@ -66,6 +76,8 @@ func (a *AuthClient) VerifyToken(token string) (*model.UserClaims, error) {
 	return claims, nil
 }
 
+// HashPassword generates a hashed version of the provided password using bcrypt.
+// It returns the hashed password as a string or an error if the hashing fails.
 func (a *AuthClient) HashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -75,6 +87,8 @@ func (a *AuthClient) HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
+// ValidatePassword compares a hashed password with a candidate password to verify their equality.
+// It returns true if they match, or false otherwise.
 func (a *AuthClient) ValidatePassword(hashedPassword, candidatePassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(candidatePassword))
 	return err == nil

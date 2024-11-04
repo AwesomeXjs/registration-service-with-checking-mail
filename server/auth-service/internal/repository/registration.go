@@ -13,10 +13,11 @@ import (
 	"go.uber.org/zap"
 )
 
+// Registration inserts a new user into the database and returns the user ID.
 func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb) (string, error) {
 	builderInsert := squirrel.Insert(consts.TableName).
 		PlaceholderFormat(squirrel.Dollar).
-		Columns(consts.IdColumn, consts.EmailColumn, consts.HashPasswordColumn, consts.RoleColumn).
+		Columns(consts.IDColumn, consts.EmailColumn, consts.HashPasswordColumn, consts.RoleColumn).
 		Values(infoToDb.ID, infoToDb.Email, infoToDb.HashPassword, infoToDb.Role).
 		Suffix(consts.ReturningID)
 

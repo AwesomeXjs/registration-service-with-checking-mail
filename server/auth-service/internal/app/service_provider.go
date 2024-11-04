@@ -5,11 +5,13 @@ import (
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db/pg"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis/go_redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/configs"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/authHelper"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
 	"go.uber.org/zap"
@@ -18,12 +20,14 @@ import (
 // serviceProvider struct holds configurations and instances needed to set up and manage services.
 type serviceProvider struct {
 	// configs
-	pgConfig   configs.PGConfig
-	grpcConfig configs.GRPCConfig
+	pgConfig    configs.PGConfig
+	grpcConfig  configs.GRPCConfig
+	redisConfig configs.RedisConfig
 
 	// clients
-	dbClient   db.Client
-	authHelper authHelper.AuthHelper
+	dbClient    db.Client
+	authHelper  auth_helper.AuthHelper
+	redisClient redis.IRedis
 
 	// layers
 	controller *controller.Controller
@@ -60,6 +64,18 @@ func (s *serviceProvider) GRPCConfig() configs.GRPCConfig {
 	return s.grpcConfig
 }
 
+// RedisConfig retrieves the Redis configuration, initializing it if necessary.
+func (s *serviceProvider) RedisConfig() configs.RedisConfig {
+	if s.redisConfig == nil {
+		cfg, err := configs.NewRedisConfig()
+		if err != nil {
+			logger.Fatal("failed to get redis config", zap.Error(err))
+		}
+		s.redisConfig = cfg
+	}
+	return s.redisConfig
+}
+
 // DBClient initializes and returns the database client if not already created.
 // It also pings the database to ensure the connection is valid.
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
@@ -81,15 +97,32 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
-func (s *serviceProvider) AuthHelper() authHelper.AuthHelper {
+// RedisClient initializes and returns the Redis client if not already created.
+// It also pings Redis to ensure the connection is valid.
+func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
+	if s.redisClient == nil {
+		redisClient := go_redis.NewGoRedisClient(s.RedisConfig())
+		closer.Add(redisClient.Client.Close)
+
+		err := redisClient.Client.Ping(ctx).Err()
+		if err != nil {
+			logger.Error("Failed to connect to redis", zap.Error(err))
+		}
+
+		s.redisClient = redisClient
+	}
+	return s.redisClient
+}
+
+// AuthHelper initializes and returns the authentication helper if not already created.
+func (s *serviceProvider) AuthHelper() auth_helper.AuthHelper {
 	if s.authHelper == nil {
 		cfg, err := configs.NewAuthConfig()
 		if err != nil {
 			logger.Fatal("failed to get auth config", zap.Error(err))
 		}
 
-		s.authHelper = authHelper.New(cfg.GetSecretKey(), cfg.GetRefreshTokenDuration(), cfg.GetAccessTokenDuration())
-
+		s.authHelper = auth_helper.New(cfg.GetSecretKey(), cfg.GetRefreshTokenDuration(), cfg.GetAccessTokenDuration())
 	}
 	return s.authHelper
 }
@@ -97,7 +130,7 @@ func (s *serviceProvider) AuthHelper() authHelper.AuthHelper {
 // Repository initializes and returns the repository layer for database operations.
 func (s *serviceProvider) Repository(ctx context.Context) repository.IRepository {
 	if s.repository == nil {
-		s.repository = repository.New(s.DBClient(ctx))
+		s.repository = repository.New(s.DBClient(ctx), s.RedisClient(ctx))
 	}
 	return s.repository
 }

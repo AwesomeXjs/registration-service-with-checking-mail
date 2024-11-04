@@ -12,10 +12,12 @@ import (
 	"go.uber.org/zap"
 )
 
+// UpdatePassword updates the user's password in the database based on the provided email.
 func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error {
 	queryBuilder := squirrel.Update(consts.TableName).
 		PlaceholderFormat(squirrel.Dollar).
 		Set(consts.HashPasswordColumn, updatePassDb.HashPassword).
+		Set(consts.UpdatedAtColumn, updatePassDb.UpdatedAt).
 		Where(squirrel.Eq{consts.EmailColumn: updatePassDb.Email})
 
 	query, args, err := queryBuilder.ToSql()

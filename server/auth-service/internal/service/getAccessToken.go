@@ -7,13 +7,13 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
 )
 
+// GetAccessToken generates a new access token and refresh token based on the provided refresh token.
 func (s *Service) GetAccessToken(ctx context.Context, refreshToken string) (*model.NewPairTokens, error) {
 	claims, err := s.authHelper.VerifyToken(refreshToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify token: %v", err)
 	}
 
-	fmt.Println(claims.ID)
 	info, err := s.repo.GetAccessToken(ctx, claims.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get access token: %v", err)
