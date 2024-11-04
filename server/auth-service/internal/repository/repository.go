@@ -12,4 +12,5 @@ type IRepository interface {
 	Registration(ctx context.Context, registrationRequest *model.InfoToDb) (string, error)
 	Login(ctx context.Context, email string) (*model.LoginResponse, error)
 	GetAccessToken(ctx context.Context, userID string) (*model.AccessTokenInfo, error)
+	UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error
 }

@@ -12,4 +12,6 @@ type IService interface {
 	Registration(ctx context.Context, registrationRequest *model.UserInfo) (*model.AuthResponse, error)
 	Login(ctx context.Context, loginRequest *model.LoginInfo) (*model.AuthResponse, error)
 	GetAccessToken(ctx context.Context, refreshToken string) (*model.NewPairTokens, error)
+	ValidateToken(ctx context.Context, accessToken string) (bool, error)
+	UpdatePassword(ctx context.Context, updatePassInfo *model.UpdatePassInfo) error
 }

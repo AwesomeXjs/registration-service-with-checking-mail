@@ -44,3 +44,10 @@ func ToProtoFromNewPairTokens(resp *model.NewPairTokens) *authService.GetAccessT
 		RefreshToken: resp.RefreshToken,
 	}
 }
+
+func ToUpdatePassFromProto(info *authService.UpdatePasswordRequest) *model.UpdatePassInfo {
+	return &model.UpdatePassInfo{
+		Email:       info.GetEmail(),
+		NewPassword: info.GetNewPassword(),
+	}
+}

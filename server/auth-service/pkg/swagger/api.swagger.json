@@ -91,7 +91,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "password": {
+                "newPassword": {
                   "type": "string"
                 }
               }

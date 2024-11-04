@@ -38,3 +38,13 @@ type InfoToUserService struct {
 	Name    string
 	Surname string
 }
+
+type UpdatePassInfo struct {
+	Email       string
+	NewPassword string
+}
+
+type UpdatePassDb struct {
+	Email        string `db:"email"`
+	HashPassword string `db:"hash_password"`
+}

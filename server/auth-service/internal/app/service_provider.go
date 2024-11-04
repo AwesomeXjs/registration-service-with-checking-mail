@@ -17,12 +17,15 @@ import (
 
 // serviceProvider struct holds configurations and instances needed to set up and manage services.
 type serviceProvider struct {
+	// configs
 	pgConfig   configs.PGConfig
 	grpcConfig configs.GRPCConfig
 
+	// clients
 	dbClient   db.Client
 	authHelper authHelper.AuthHelper
 
+	// layers
 	controller *controller.Controller
 	service    service.IService
 	repository repository.IRepository

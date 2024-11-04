@@ -105,6 +105,6 @@ message GetAccessTokenResponse {
 
 message UpdatePasswordRequest {
   string email = 1;
-  string password = 2;
+  string newPassword = 2;
 }
 
