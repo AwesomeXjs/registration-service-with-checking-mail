@@ -15,6 +15,11 @@ type UserInfo struct {
 	Role     string
 }
 
+type LoginInfo struct {
+	Email    string
+	Password string
+}
+
 type InfoToDb struct {
 	ID           string       `db:"id" json:"id"`
 	Email        string       `db:"email" json:"email"`
@@ -24,10 +29,21 @@ type InfoToDb struct {
 	UpdatedAt    sql.NullTime `db:"updated_at" json:"updated_at"`
 }
 
-type RegistrationResponse struct {
+type AccessTokenInfo struct {
+	ID   string
+	Role string
+}
+
+type AuthResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 	UserId       string `json:"userId"`
+}
+
+type LoginResponse struct {
+	UserID       string `db:"id"`
+	HashPassword string `db:"hash_password"`
+	Role         string `db:"role"`
 }
 
 type InfoToUserService struct {

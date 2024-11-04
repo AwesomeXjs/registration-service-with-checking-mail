@@ -15,8 +15,23 @@ func ToInfoFromProto(info *authService.RegistrationRequest) *model.UserInfo {
 	}
 }
 
-func ToProtoFromRegResponse(resp *model.RegistrationResponse) *authService.RegistrationResponse {
+func ToProtoFromRegResponse(resp *model.AuthResponse) *authService.RegistrationResponse {
 	return &authService.RegistrationResponse{
+		AccessToken:  resp.AccessToken,
+		RefreshToken: resp.RefreshToken,
+		UserId:       resp.UserId,
+	}
+}
+
+func ToLoginInfoFromProto(info *authService.LoginRequest) *model.LoginInfo {
+	return &model.LoginInfo{
+		Email:    info.GetEmail(),
+		Password: info.GetPassword(),
+	}
+}
+
+func ToProtoFromLoginResponse(resp *model.AuthResponse) *authService.LoginResponse {
+	return &authService.LoginResponse{
 		AccessToken:  resp.AccessToken,
 		RefreshToken: resp.RefreshToken,
 		UserId:       resp.UserId,

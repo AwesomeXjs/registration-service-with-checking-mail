@@ -15,7 +15,12 @@ import (
 func (c *Controller) Registration(ctx context.Context, req *authService.RegistrationRequest) (*authService.RegistrationResponse, error) {
 	logger.Debug("registration", zap.Any("req", req))
 
-	err := Validate(ctx, req)
+	err := validator.Validate(ctx,
+		validator.ValidateName(req.GetName()),
+		validator.ValidateRole(req.GetRole()),
+		validator.ValidateEmail(req.GetEmail()),
+		validator.ValidatePassword(req.GetPassword()),
+		validator.ValidateSurname(req.GetSurname()))
 	if err != nil {
 		return nil, err
 	}
@@ -27,13 +32,4 @@ func (c *Controller) Registration(ctx context.Context, req *authService.Registra
 	}
 
 	return converter.ToProtoFromRegResponse(res), nil
-}
-
-func Validate(ctx context.Context, req *authService.RegistrationRequest) error {
-	return validator.Validate(ctx,
-		validator.ValidateName(req.GetName()),
-		validator.ValidateRole(req.GetRole()),
-		validator.ValidateEmail(req.GetEmail()),
-		validator.ValidatePassword(req.GetPassword()),
-		validator.ValidateSurname(req.GetSurname()))
 }

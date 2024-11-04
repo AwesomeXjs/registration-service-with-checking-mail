@@ -41,7 +41,7 @@ func ValidateEmail(email string) Condition {
 
 func ValidatePassword(password string) Condition {
 	return func(ctx context.Context) error {
-		if utf8.RuneCountInString(password) < 8 || utf8.RuneCountInString(password) > 20 {
+		if utf8.RuneCountInString(password) < 5 || utf8.RuneCountInString(password) > 20 {
 			return NewValidationErrors("password length must be between 8 and 20 characters")
 		}
 		return nil

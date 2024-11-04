@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
@@ -33,8 +34,13 @@ func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb)
 	var ID string
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&ID)
 	if err != nil {
-		logger.Error("failed to get user from db", zap.Error(err))
-		return "", fmt.Errorf("failed to get user from db: %v", err)
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			logger.Warn("email already registered", zap.Error(err))
+			return "", fmt.Errorf("email already registered")
+		}
+
+		logger.Error("failed to register user", zap.Error(err))
+		return "", fmt.Errorf("failed to register user: %v", err)
 	}
 
 	return ID, nil

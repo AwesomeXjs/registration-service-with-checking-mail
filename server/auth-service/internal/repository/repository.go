@@ -10,4 +10,5 @@ import (
 // representing data access methods.
 type IRepository interface {
 	Registration(ctx context.Context, registrationRequest *model.InfoToDb) (string, error)
+	Login(ctx context.Context, email string) (*model.LoginResponse, error)
 }

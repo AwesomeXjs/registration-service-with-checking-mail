@@ -25,7 +25,7 @@ func New(secretKey []byte, refreshTokenDuration time.Duration, accessTokenDurati
 	}
 }
 
-func (a *AuthClient) GenerateAccessToken(info *model.InfoToDb) (string, error) {
+func (a *AuthClient) GenerateAccessToken(info *model.AccessTokenInfo) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(a.accessTokenDuration).Unix(),
@@ -37,12 +37,12 @@ func (a *AuthClient) GenerateAccessToken(info *model.InfoToDb) (string, error) {
 	return token.SignedString(a.secretKey)
 }
 
-func (a *AuthClient) GenerateRefreshToken(info *model.InfoToDb) (string, error) {
+func (a *AuthClient) GenerateRefreshToken(userID string) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(a.refreshTokenDuration).Unix(),
 		},
-		ID: info.ID,
+		ID: userID,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(a.secretKey)
