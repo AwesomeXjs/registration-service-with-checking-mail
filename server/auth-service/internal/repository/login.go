@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
@@ -15,11 +14,6 @@ import (
 
 // Login retrieves the user's login information by email, checking Redis first for cached data.
 func (r *Repository) Login(ctx context.Context, email string) (*model.LoginResponse, error) {
-	var loginResponse model.LoginResponse
-	err := r.redisClient.GetObject(ctx, email+"_login_response", &loginResponse)
-	if nil == err {
-		return &loginResponse, nil
-	}
 
 	queryBuilder := squirrel.Select(consts.IDColumn, consts.HashPasswordColumn, consts.RoleColumn).
 		From(consts.TableName).
@@ -39,17 +33,11 @@ func (r *Repository) Login(ctx context.Context, email string) (*model.LoginRespo
 		Name:     "Login",
 		QueryRaw: query,
 	}
-
+	var loginResponse model.LoginResponse
 	err = r.db.DB().ScanOneContext(ctx, &loginResponse, q, args...)
 	if err != nil {
 		logger.Error("failed to get user from db", zap.Error(err))
 		return nil, fmt.Errorf("failed to get user from db: %v", err)
-	}
-
-	err = r.redisClient.SetObject(ctx, email+"_login_response", loginResponse, 24*time.Hour)
-	if err != nil {
-		logger.Error("failed to set role in redis", zap.Error(err))
-		return nil, fmt.Errorf("failed to set role in redis: %v", err)
 	}
 
 	return &loginResponse, nil

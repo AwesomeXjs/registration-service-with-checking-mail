@@ -23,7 +23,7 @@ type LoginInfo struct {
 }
 
 // InfoToDb represents the structure used for interacting with the database for user records.
-// It includes fields for the user's ID, email, hashed password, role, and timestamps for record creation and updates.
+// It includes fields for the user's ID, Email, HashPassword, Role, and timestamps for record creation and updates.
 type InfoToDb struct {
 	ID           string       `db:"id" json:"id"`
 	Email        string       `db:"email" json:"email"`

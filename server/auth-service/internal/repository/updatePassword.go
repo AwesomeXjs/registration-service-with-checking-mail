@@ -14,6 +14,7 @@ import (
 
 // UpdatePassword updates the user's password in the database based on the provided email.
 func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error {
+	fmt.Println(updatePassDb)
 	queryBuilder := squirrel.Update(consts.TableName).
 		PlaceholderFormat(squirrel.Dollar).
 		Set(consts.HashPasswordColumn, updatePassDb.HashPassword).
@@ -31,10 +32,17 @@ func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.Upd
 		QueryRaw: query,
 	}
 
-	_, err = r.db.DB().ExecContext(ctx, q, args...)
+	res, err := r.db.DB().ExecContext(ctx, q, args...)
+	fmt.Println(res)
 	if err != nil {
 		logger.Error("failed to update password", zap.Error(err))
 		return fmt.Errorf("failed to update password: %v", err)
+	}
+
+	rowsAffected := res.RowsAffected()
+	if rowsAffected == 0 {
+		logger.Warn("пользователь с таким email не найден", zap.String("email", updatePassDb.Email))
+		return fmt.Errorf("пользователь с таким email не найден")
 	}
 
 	return nil
