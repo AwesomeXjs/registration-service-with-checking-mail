@@ -37,3 +37,10 @@ func ToProtoFromLoginResponse(resp *model.AuthResponse) *authService.LoginRespon
 		UserId:       resp.UserId,
 	}
 }
+
+func ToProtoFromNewPairTokens(resp *model.NewPairTokens) *authService.GetAccessTokenResponse {
+	return &authService.GetAccessTokenResponse{
+		AccessToken:  resp.AccessToken,
+		RefreshToken: resp.RefreshToken,
+	}
+}

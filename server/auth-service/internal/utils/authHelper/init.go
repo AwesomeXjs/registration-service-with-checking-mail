@@ -60,8 +60,8 @@ func (a *AuthClient) VerifyToken(token string) (*model.UserClaims, error) {
 		return nil, err
 	}
 	claims, ok := tokenClaims.Claims.(*model.UserClaims)
-	if !ok {
-		return nil, err
+	if !ok || !tokenClaims.Valid {
+		return nil, fmt.Errorf("invalid token")
 	}
 	return claims, nil
 }

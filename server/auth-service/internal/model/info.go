@@ -3,8 +3,6 @@ package model
 import (
 	"database/sql"
 	"time"
-
-	"github.com/golang-jwt/jwt"
 )
 
 type UserInfo struct {
@@ -29,17 +27,6 @@ type InfoToDb struct {
 	UpdatedAt    sql.NullTime `db:"updated_at" json:"updated_at"`
 }
 
-type AccessTokenInfo struct {
-	ID   string
-	Role string
-}
-
-type AuthResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	UserId       string `json:"userId"`
-}
-
 type LoginResponse struct {
 	UserID       string `db:"id"`
 	HashPassword string `db:"hash_password"`
@@ -50,10 +37,4 @@ type InfoToUserService struct {
 	ID      string
 	Name    string
 	Surname string
-}
-
-type UserClaims struct {
-	jwt.StandardClaims
-	Role string
-	ID   string
 }
