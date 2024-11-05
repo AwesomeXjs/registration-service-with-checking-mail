@@ -12,7 +12,12 @@ import (
 	"go.uber.org/zap"
 )
 
-// UpdatePassword updates the user's password in the database based on the provided email.
+// UpdatePassword updates the password of a user in the database based on their email address.
+// The function builds an SQL update query to set the new hashed password and updated timestamp.
+// If the query fails to build, an error is logged and returned. After executing the query,
+// if no rows are affected, it logs a warning indicating the user was not found.
+// If the update is successful, it attempts to delete the user’s cached data from Redis.
+// Any errors encountered while interacting with Redis are logged but not returned.
 func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error {
 	queryBuilder := squirrel.Update(consts.TableName).
 		PlaceholderFormat(squirrel.Dollar).
