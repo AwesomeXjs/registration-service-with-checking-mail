@@ -41,8 +41,8 @@ func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.Upd
 
 	rowsAffected := res.RowsAffected()
 	if rowsAffected == 0 {
-		logger.Warn("пользователь с таким email не найден", zap.String("email", updatePassDb.Email))
-		return fmt.Errorf("пользователь с таким email не найден")
+		logger.Warn("user not found", zap.String("email", updatePassDb.Email))
+		return fmt.Errorf("user not found")
 	}
 
 	return nil

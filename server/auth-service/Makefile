@@ -104,3 +104,10 @@ local-migration-down:
 
 init-migration:
 	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create create_users_table sql
+
+
+# mocks
+mocks:
+	rm -rf tests/mocks && mkdir -p tests/mocks
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/mocks -s "_minimock.go"

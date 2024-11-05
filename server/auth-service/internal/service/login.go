@@ -11,7 +11,7 @@ import (
 func (s *Service) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model.AuthResponse, error) {
 	result, err := s.repo.Login(ctx, loginInfo.Email)
 	if err != nil {
-		return nil, fmt.Errorf("failed to login: %v", err)
+		return nil, err
 	}
 
 	ok := s.authHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
@@ -29,7 +29,7 @@ func (s *Service) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model
 
 	refreshToken, err := s.authHelper.GenerateRefreshToken(result.UserID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate refresh token: %v", err)
+		return nil, err
 	}
 
 	return &model.AuthResponse{

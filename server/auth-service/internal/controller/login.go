@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
@@ -24,8 +23,7 @@ func (c *Controller) Login(ctx context.Context, req *authService.LoginRequest) (
 
 	result, err := c.svc.Login(ctx, converter.ToLoginInfoFromProto(req))
 	if err != nil {
-		logger.Error(err.Error(), zap.Any("login", err.Error()))
-		return nil, fmt.Errorf("failed to login: %v", err)
+		return nil, err
 	}
 
 	return converter.ToProtoFromLoginResponse(result), nil

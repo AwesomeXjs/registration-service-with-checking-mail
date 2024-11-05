@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
@@ -36,6 +37,9 @@ func (r *Repository) Login(ctx context.Context, email string) (*model.LoginRespo
 	var loginResponse model.LoginResponse
 	err = r.db.DB().ScanOneContext(ctx, &loginResponse, q, args...)
 	if err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return nil, fmt.Errorf("user not found")
+		}
 		logger.Error("failed to get user from db", zap.Error(err))
 		return nil, fmt.Errorf("failed to get user from db: %v", err)
 	}
