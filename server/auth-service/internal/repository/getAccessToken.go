@@ -18,9 +18,10 @@ import (
 // If the role is not found in Redis, it queries the database to retrieve it.
 // The role is then cached in Redis for future access.
 func (r *Repository) GetAccessToken(ctx context.Context, userID string) (*model.AccessTokenInfo, error) {
+	logger.Debug("getting userID in repository", zap.String("USER_ID", userID))
+
 	val, err := r.redisClient.Get(ctx, userID+" for role")
 	if nil == err {
-		logger.Warn("get role from redis", zap.String("val", val))
 		return &model.AccessTokenInfo{
 			ID:   userID,
 			Role: val,
@@ -56,6 +57,8 @@ func (r *Repository) GetAccessToken(ctx context.Context, userID string) (*model.
 		logger.Error("failed to set role in redis", zap.Error(err))
 		return nil, fmt.Errorf("failed to set role in redis: %v", err)
 	}
+
+	logger.Debug("getting user role from database", zap.String("User role", role))
 
 	return &model.AccessTokenInfo{
 		ID:   userID,

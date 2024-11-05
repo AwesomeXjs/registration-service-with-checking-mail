@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
@@ -12,10 +11,14 @@ import (
 
 // GetAccessToken handles the request for generating an access token.
 func (c *Controller) GetAccessToken(ctx context.Context, req *authService.GetAccessTokenRequest) (*authService.GetAccessTokenResponse, error) {
+	logger.Debug("getting refresh token", zap.String("REFRESH_TOKEN", req.GetRefreshToken()))
+
 	res, err := c.svc.GetAccessToken(ctx, req.GetRefreshToken())
 	if err != nil {
-		logger.Error(err.Error(), zap.Any("req", req))
-		return nil, fmt.Errorf("failed to get access token: %v", err)
+		logger.Error("failed to get access token", zap.Error(err))
+		return nil, err
 	}
+
+	logger.Debug("new pair tokens: ", zap.Any("tokens", res))
 	return converter.ToProtoFromNewPairTokens(res), nil
 }

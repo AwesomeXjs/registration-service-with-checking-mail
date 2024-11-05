@@ -14,7 +14,6 @@ import (
 
 // UpdatePassword updates the user's password in the database based on the provided email.
 func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error {
-	fmt.Println(updatePassDb)
 	queryBuilder := squirrel.Update(consts.TableName).
 		PlaceholderFormat(squirrel.Dollar).
 		Set(consts.HashPasswordColumn, updatePassDb.HashPassword).
@@ -43,6 +42,11 @@ func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.Upd
 	if rowsAffected == 0 {
 		logger.Warn("user not found", zap.String("email", updatePassDb.Email))
 		return fmt.Errorf("user not found")
+	}
+
+	err = r.redisClient.Delete(ctx, updatePassDb.Email)
+	if err != nil {
+		logger.Error("failed to delete user from redis", zap.Error(err))
 	}
 
 	return nil

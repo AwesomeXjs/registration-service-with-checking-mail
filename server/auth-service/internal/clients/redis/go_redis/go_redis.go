@@ -75,3 +75,9 @@ func (g *GoRedisClient) GetObject(ctx context.Context, key string, value any) er
 	logger.Debug("unmarshal note", zap.Any("value", value)) // Log the unmarshaled value for debugging
 	return nil
 }
+
+// Delete removes the specified key and its associated value from Redis.
+// It returns an error if the deletion fails.
+func (g *GoRedisClient) Delete(ctx context.Context, key string) error {
+	return g.Client.Del(ctx, key).Err()
+}

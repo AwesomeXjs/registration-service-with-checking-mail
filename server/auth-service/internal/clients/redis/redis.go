@@ -24,4 +24,8 @@ type IRedis interface {
 	// The retrieved data is deserialized into the provided value parameter,
 	// and an error is returned if the key does not exist or deserialization fails.
 	GetObject(ctx context.Context, key string, value any) error
+
+	// Delete removes the specified key and its associated value from Redis.
+	// If the key does not exist or an error occurs during the deletion, an error is returned.
+	Delete(ctx context.Context, key string) error
 }

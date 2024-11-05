@@ -62,7 +62,6 @@ func (a *App) InitDeps(ctx context.Context) error {
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
 			logger.Fatal("failed to init deps", zap.Error(err))
-			return err
 		}
 	}
 	return nil
@@ -72,7 +71,6 @@ func (a *App) InitDeps(ctx context.Context) error {
 func (a *App) InitConfig(_ context.Context) error {
 	if err := configs.LoadEnv(consts.EnvPath); err != nil {
 		logger.Fatal("failed to load env", zap.Error(err))
-		return err
 	}
 	return nil
 }
@@ -105,13 +103,11 @@ func (a *App) RunGRPSServer() error {
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().GetAddress())
 	if err != nil {
 		logger.Fatal("failed to listen grpc", zap.Error(err))
-		return err
 	}
 
 	err = a.grpcServer.Serve(list)
 	if err != nil {
 		logger.Fatal("failed to serve grpc", zap.Error(err))
-		return err
 	}
 
 	return nil

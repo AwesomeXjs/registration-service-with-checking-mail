@@ -12,6 +12,8 @@ import (
 
 // Login processes user login requests and returns a login response.
 func (c *Controller) Login(ctx context.Context, req *authService.LoginRequest) (*authService.LoginResponse, error) {
+	logger.Debug("get user data in controller", zap.Any("req", req))
+
 	err := validator.Validate(
 		ctx,
 		validator.ValidateEmail(req.GetEmail()),
@@ -23,8 +25,11 @@ func (c *Controller) Login(ctx context.Context, req *authService.LoginRequest) (
 
 	result, err := c.svc.Login(ctx, converter.ToLoginInfoFromProto(req))
 	if err != nil {
+		logger.Error("failed to login", zap.Error(err))
 		return nil, err
 	}
+
+	logger.Debug("new pair tokens: ", zap.Any("tokens", result))
 
 	return converter.ToProtoFromLoginResponse(result), nil
 }

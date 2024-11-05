@@ -22,6 +22,7 @@ func (c *Controller) Registration(ctx context.Context, req *authService.Registra
 		validator.ValidatePassword(req.GetPassword()),
 		validator.ValidateSurname(req.GetSurname()))
 	if err != nil {
+		logger.Info("failed to validate", zap.Error(err))
 		return nil, err
 	}
 
@@ -30,6 +31,8 @@ func (c *Controller) Registration(ctx context.Context, req *authService.Registra
 		logger.Error(err.Error(), zap.Any("req", req))
 		return nil, fmt.Errorf("failed to registration: %v", err)
 	}
+
+	logger.Debug("new pair tokens: ", zap.Any("tokens", res))
 
 	return converter.ToProtoFromRegResponse(res), nil
 }
