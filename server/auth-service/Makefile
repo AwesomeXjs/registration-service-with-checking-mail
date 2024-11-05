@@ -42,7 +42,7 @@ get-deps:
 	go get github.com/golang-jwt/jwt # jwt
 	go get go.uber.org/zap # logger
 	go get go.uber.org/zap/zapcore # logger
-	go get github.com/natefinch/lumberjack # logger (for Zap)
+	go get github.com/natefinch/lumberjack # logger config (for Zap)
 	go get github.com/prometheus/client_golang/prometheus # prometheus
 	go get github.com/prometheus/client_golang/prometheus/promauto # prometheus
 	go get github.com/prometheus/client_golang/prometheus/promhttp@v1.20.4 # prometheus
@@ -111,3 +111,8 @@ mocks:
 	rm -rf tests/mocks && mkdir -p tests/mocks
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/mocks -s "_minimock.go"
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/mocks -s "_minimock.go"
+
+test:
+	go test ./tests/...
+	rm -r tests/unit/controller/logs
+	rm -r tests/unit/service/logs
