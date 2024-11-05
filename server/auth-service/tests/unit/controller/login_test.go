@@ -127,7 +127,7 @@ func TestLogin(t *testing.T) {
 				},
 			},
 			want: nil,
-			err:  validator.NewValidationErrors("[\"password length must be between 8 and 20 characters\"]"),
+			err:  validator.NewValidationErrors("[\"password length must be between 5 and 20 characters\"]"),
 			IServiceMock: func(mc *minimock.Controller) service.IService {
 				mock := mocks.NewIServiceMock(mc)
 				return mock
@@ -143,7 +143,7 @@ func TestLogin(t *testing.T) {
 				},
 			},
 			want: nil,
-			err:  validator.NewValidationErrors("[\"invalid email\"]", "[\"password length must be between 8 and 20 characters\"]"),
+			err:  validator.NewValidationErrors("[\"invalid email\"]", "[\"password length must be between 5 and 20 characters\"]"),
 			IServiceMock: func(mc *minimock.Controller) service.IService {
 				mock := mocks.NewIServiceMock(mc)
 				return mock

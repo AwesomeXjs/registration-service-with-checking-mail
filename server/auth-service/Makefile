@@ -15,10 +15,8 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 # protofiles
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0 # migrations
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.4.0 # mocks
-	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 #gateway
 	GOBIN=$(LOCAL_BIN) go install github.com/bojand/ghz/cmd/ghz@latest # для нагрузки по grpc
-	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 # swagger
-	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
+	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3 # lint
 
 
 get-deps:
@@ -82,10 +80,6 @@ generate-auth-api:
     --plugin=protoc-get-go=bin/protoc-gen-go \
     --go-grpc_out=pkg/auth_v1 --go-grpc_opt=paths=source_relative \
     --plugin=protoc-get-go-grpc=bin/protoc-gen-go-grpc \
-	--grpc-gateway_out=pkg/auth_v1 --grpc-gateway_opt=paths=source_relative \
-	--plugin=protoc-gen-grpc-gateway=bin/protoc-gen-grpc-gateway \
-	--openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
-    --plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
     api/auth_v1/auth.proto
 
 
@@ -109,8 +103,9 @@ init-migration:
 # mocks
 mocks:
 	rm -rf tests/mocks && mkdir -p tests/mocks
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/mocks -s "_minimock.go"
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
 
 test:
 	go test ./tests/...
