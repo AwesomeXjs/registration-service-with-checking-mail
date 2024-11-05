@@ -108,6 +108,18 @@ mocks:
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
 
 test:
-	go test ./tests/...
+	go clean -testcache
+	go test ./... -covermode count -coverpkg=github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/tests/... -count 5
+	rm -r tests/unit/controller/logs
+	rm -r tests/unit/service/logs
+
+coverage:
+	go clean -testcache
+	go test ./tests/... -coverprofile=coverage.tmp.out -covermode count  -coverpkg=github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/... -count 5
+	grep -v 'mocks\|config' coverage.tmp.out > coverage.out
+	rm coverage.tmp.out
+	go tool cover -html=coverage.out -o coverage.html;
+	go tool cover -func=./coverage.out | grep "total";
+	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
 	rm -r tests/unit/controller/logs
 	rm -r tests/unit/service/logs

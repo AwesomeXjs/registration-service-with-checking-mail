@@ -1,0 +1,1201 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>controller: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller/getAccessToken.go (0.0%)</option>
+				
+				<option value="file1">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller/init.go (100.0%)</option>
+				
+				<option value="file2">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller/login.go (100.0%)</option>
+				
+				<option value="file3">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller/registration.go (0.0%)</option>
+				
+				<option value="file4">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller/updatePassword.go (0.0%)</option>
+				
+				<option value="file5">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller/validate.go (0.0%)</option>
+				
+				<option value="file6">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository/getAccessToken.go (0.0%)</option>
+				
+				<option value="file7">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository/init.go (0.0%)</option>
+				
+				<option value="file8">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository/login.go (0.0%)</option>
+				
+				<option value="file9">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository/registration.go (0.0%)</option>
+				
+				<option value="file10">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository/updatePassword.go (0.0%)</option>
+				
+				<option value="file11">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service/getAccessToken.go (0.0%)</option>
+				
+				<option value="file12">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service/init.go (100.0%)</option>
+				
+				<option value="file13">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service/login.go (78.9%)</option>
+				
+				<option value="file14">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service/registration.go (0.0%)</option>
+				
+				<option value="file15">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service/updatePassword.go (0.0%)</option>
+				
+				<option value="file16">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service/validate.go (0.0%)</option>
+				
+				<option value="file17">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper/init.go (0.0%)</option>
+				
+				<option value="file18">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter/fromProto.go (33.3%)</option>
+				
+				<option value="file19">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter/toProto.go (33.3%)</option>
+				
+				<option value="file20">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger/logger.go (42.9%)</option>
+				
+				<option value="file21">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/validator/errors.go (87.5%)</option>
+				
+				<option value="file22">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/validator/rules.go (40.7%)</option>
+				
+				<option value="file23">github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/validator/validator.go (90.9%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package controller
+
+import (
+        "context"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+        "go.uber.org/zap"
+)
+
+// GetAccessToken handles the request for generating an access token.
+func (c *Controller) GetAccessToken(ctx context.Context, req *authService.GetAccessTokenRequest) (*authService.GetAccessTokenResponse, error) <span class="cov0" title="0">{
+        logger.Debug("getting refresh token", zap.String("REFRESH_TOKEN", req.GetRefreshToken()))
+
+        res, err := c.svc.GetAccessToken(ctx, req.GetRefreshToken())
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to get access token", zap.Error(err))
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">logger.Debug("new pair tokens: ", zap.Any("tokens", res))
+        return converter.ToProtoFromNewPairTokens(res), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package controller
+
+import (
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+)
+
+// Controller handles gRPC requests for the authentication service.
+// It embeds UnimplementedAuthV1Server to provide default implementations
+// for the gRPC server methods, allowing customization where needed.
+type Controller struct {
+        authService.UnimplementedAuthV1Server
+        svc service.IService
+}
+
+// New creates a new instance of Controller with the provided service.
+// The service is used to manage authentication-related operations.
+func New(svc service.IService) *Controller <span class="cov10" title="25">{
+        return &amp;Controller{
+                svc: svc,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package controller
+
+import (
+        "context"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/validator"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+        "go.uber.org/zap"
+)
+
+// Login processes user login requests and returns a login response.
+func (c *Controller) Login(ctx context.Context, req *authService.LoginRequest) (*authService.LoginResponse, error) <span class="cov10" title="25">{
+        logger.Debug("get user data in controller", zap.Any("req", req))
+
+        err := validator.Validate(
+                ctx,
+                validator.ValidateEmail(req.GetEmail()),
+                validator.ValidatePassword(req.GetPassword()))
+        if err != nil </span><span class="cov8" title="15">{
+                logger.Error(err.Error(), zap.Any("validate", err.Error()))
+                return nil, err
+        }</span>
+
+        <span class="cov7" title="10">result, err := c.svc.Login(ctx, converter.ToLoginInfoFromProto(req))
+        if err != nil </span><span class="cov5" title="5">{
+                logger.Error("failed to login", zap.Error(err))
+                return nil, err
+        }</span>
+
+        <span class="cov5" title="5">logger.Debug("new pair tokens: ", zap.Any("tokens", result))
+
+        return converter.ToProtoFromLoginResponse(result), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package controller
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/validator"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+        "go.uber.org/zap"
+)
+
+// Registration handles user registration requests and returns a registration response.
+func (c *Controller) Registration(ctx context.Context, req *authService.RegistrationRequest) (*authService.RegistrationResponse, error) <span class="cov0" title="0">{
+        logger.Debug("registration", zap.Any("req", req))
+
+        err := validator.Validate(ctx,
+                validator.ValidateName(req.GetName()),
+                validator.ValidateRole(req.GetRole()),
+                validator.ValidateEmail(req.GetEmail()),
+                validator.ValidatePassword(req.GetPassword()),
+                validator.ValidateSurname(req.GetSurname()))
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Info("failed to validate", zap.Error(err))
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">res, err := c.svc.Registration(ctx, converter.ToInfoFromProto(req))
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error(err.Error(), zap.Any("req", req))
+                return nil, fmt.Errorf("failed to registration: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">logger.Debug("new pair tokens: ", zap.Any("tokens", res))
+
+        return converter.ToProtoFromRegResponse(res), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package controller
+
+import (
+        "context"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/converter"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/validator"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+        "go.uber.org/zap"
+        "google.golang.org/protobuf/types/known/emptypb"
+)
+
+// UpdatePassword processes requests to update a user's password and returns an empty response.
+func (c *Controller) UpdatePassword(ctx context.Context, req *authService.UpdatePasswordRequest) (*emptypb.Empty, error) <span class="cov0" title="0">{
+        logger.Debug("update password", zap.Any("req", req))
+
+        err := validator.Validate(
+                ctx,
+                validator.ValidateEmail(req.GetEmail()),
+                validator.ValidatePassword(req.GetNewPassword()))
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to validate", zap.Error(err))
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">err = c.svc.UpdatePassword(ctx, converter.ToUpdatePassFromProto(req))
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to update password", zap.Error(err))
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package controller
+
+import (
+        "context"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+        "go.uber.org/zap"
+        "google.golang.org/protobuf/types/known/emptypb"
+)
+
+// ValidateToken checks the validity of the provided access token and returns an empty response.
+func (c *Controller) ValidateToken(ctx context.Context, req *authService.ValidateTokenRequest) (*emptypb.Empty, error) <span class="cov0" title="0">{
+        _, err := c.svc.ValidateToken(ctx, req.GetAccessToken())
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to validate token", zap.Any("req", req))
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package repository
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/Masterminds/squirrel"
+        "go.uber.org/zap"
+)
+
+// GetAccessToken retrieves the access token information for a given user ID.
+// It first attempts to get the user's role from Redis.
+// If the role is not found in Redis, it queries the database to retrieve it.
+// The role is then cached in Redis for future access.
+func (r *Repository) GetAccessToken(ctx context.Context, userID string) (*model.AccessTokenInfo, error) <span class="cov0" title="0">{
+        logger.Debug("getting userID in repository", zap.String("USER_ID", userID))
+
+        val, err := r.redisClient.Get(ctx, userID+" for role")
+        if nil == err </span><span class="cov0" title="0">{
+                return &amp;model.AccessTokenInfo{
+                        ID:   userID,
+                        Role: val,
+                }, nil
+        }</span>
+
+        <span class="cov0" title="0">queryBuilder := squirrel.Select(consts.RoleColumn).
+                From(consts.TableName).
+                PlaceholderFormat(squirrel.Dollar).
+                Where(squirrel.Eq{consts.IDColumn: userID}).
+                Limit(1)
+
+        query, args, err := queryBuilder.ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to build query", zap.Error(err))
+                return nil, fmt.Errorf("failed to build query: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">q := db.Query{
+                Name:     "GetAccessToken",
+                QueryRaw: query,
+        }
+
+        var role string
+        err = r.db.DB().ScanOneContext(ctx, &amp;role, q, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to get role from db", zap.Error(err))
+                return nil, fmt.Errorf("failed to get role from db: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">err = r.redisClient.Set(ctx, userID+" for role", role, 24*time.Hour)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to set role in redis", zap.Error(err))
+                return nil, fmt.Errorf("failed to set role in redis: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">logger.Debug("getting user role from database", zap.String("User role", role))
+
+        return &amp;model.AccessTokenInfo{
+                ID:   userID,
+                Role: role,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package repository
+
+import (
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis"
+)
+
+// Repository provides database access for data operations.
+type Repository struct {
+        db          db.Client
+        redisClient redis.IRedis
+}
+
+// New creates a new Repository instance with the given database client.
+func New(db db.Client, redisClient redis.IRedis) IRepository <span class="cov0" title="0">{
+        return &amp;Repository{
+                db:          db,
+                redisClient: redisClient,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package repository
+
+import (
+        "context"
+        "fmt"
+        "strings"
+        "time"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/Masterminds/squirrel"
+        "go.uber.org/zap"
+)
+
+// Login retrieves the user's login information by email, checking Redis first for cached data.
+func (r *Repository) Login(ctx context.Context, email string) (*model.LoginResponse, error) <span class="cov0" title="0">{
+        logger.Debug("getting email in repository", zap.String("EMAIL", email))
+
+        var loginResponse model.LoginResponse
+        err := r.redisClient.GetObject(ctx, email, &amp;loginResponse)
+        if nil == err </span><span class="cov0" title="0">{
+                logger.Info("found user in redis", zap.Any("user", loginResponse))
+                return &amp;loginResponse, nil
+        }</span>
+
+        <span class="cov0" title="0">queryBuilder := squirrel.Select(consts.IDColumn, consts.HashPasswordColumn, consts.RoleColumn).
+                From(consts.TableName).
+                PlaceholderFormat(squirrel.Dollar).
+                Where(squirrel.Eq{consts.EmailColumn: email}).
+                Limit(1)
+
+        query, args, err := queryBuilder.ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to build query", zap.Error(err))
+                return nil, fmt.Errorf("failed to build query: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">q := db.Query{
+                Name:     "Login",
+                QueryRaw: query,
+        }
+
+        err = r.db.DB().ScanOneContext(ctx, &amp;loginResponse, q, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                if strings.Contains(err.Error(), "no rows in result set") </span><span class="cov0" title="0">{
+                        logger.Debug("failed to get user from db", zap.Error(err))
+                        return nil, fmt.Errorf("user not found")
+                }</span>
+                <span class="cov0" title="0">logger.Error("failed to get user from db", zap.Error(err))
+                return nil, fmt.Errorf("failed to get user from db: %v", err)</span>
+        }
+
+        <span class="cov0" title="0">err = r.redisClient.SetObject(ctx, email, loginResponse, 15*time.Minute)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Warn("failed to set user role in redis", zap.Error(err))
+        }</span>
+
+        <span class="cov0" title="0">return &amp;loginResponse, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package repository
+
+import (
+        "context"
+        "fmt"
+        "strings"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/Masterminds/squirrel"
+        "go.uber.org/zap"
+)
+
+// Registration inserts a new user into the database and returns the user ID.
+func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb) (string, error) <span class="cov0" title="0">{
+        builderInsert := squirrel.Insert(consts.TableName).
+                PlaceholderFormat(squirrel.Dollar).
+                Columns(consts.IDColumn, consts.EmailColumn, consts.HashPasswordColumn, consts.RoleColumn).
+                Values(infoToDb.ID, infoToDb.Email, infoToDb.HashPassword, infoToDb.Role).
+                Suffix(consts.ReturningID)
+
+        query, args, err := builderInsert.ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to build insert query", zap.Error(err))
+                return "", fmt.Errorf("failed to build insert query: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">q := db.Query{
+                Name:     "Registration",
+                QueryRaw: query,
+        }
+
+        var ID string
+        err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&amp;ID)
+        if err != nil </span><span class="cov0" title="0">{
+                if strings.Contains(err.Error(), "duplicate key value violates unique constraint") </span><span class="cov0" title="0">{
+                        logger.Warn("email already registered", zap.Error(err))
+                        return "", fmt.Errorf("email already registered")
+                }</span>
+
+                <span class="cov0" title="0">logger.Error("failed to register user", zap.Error(err))
+                return "", fmt.Errorf("failed to register user: %v", err)</span>
+        }
+
+        <span class="cov0" title="0">return ID, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package repository
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/Masterminds/squirrel"
+        "go.uber.org/zap"
+)
+
+// UpdatePassword updates the user's password in the database based on the provided email.
+func (r *Repository) UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error <span class="cov0" title="0">{
+        queryBuilder := squirrel.Update(consts.TableName).
+                PlaceholderFormat(squirrel.Dollar).
+                Set(consts.HashPasswordColumn, updatePassDb.HashPassword).
+                Set(consts.UpdatedAtColumn, updatePassDb.UpdatedAt).
+                Where(squirrel.Eq{consts.EmailColumn: updatePassDb.Email})
+
+        query, args, err := queryBuilder.ToSql()
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to build query", zap.Error(err))
+                return fmt.Errorf("failed to build query: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">q := db.Query{
+                Name:     "UpdatePassword",
+                QueryRaw: query,
+        }
+
+        res, err := r.db.DB().ExecContext(ctx, q, args...)
+        fmt.Println(res)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to update password", zap.Error(err))
+                return fmt.Errorf("failed to update password: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">rowsAffected := res.RowsAffected()
+        if rowsAffected == 0 </span><span class="cov0" title="0">{
+                logger.Warn("user not found", zap.String("email", updatePassDb.Email))
+                return fmt.Errorf("user not found")
+        }</span>
+
+        <span class="cov0" title="0">err = r.redisClient.Delete(ctx, updatePassDb.Email)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to delete user from redis", zap.Error(err))
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package service
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "go.uber.org/zap"
+)
+
+// GetAccessToken generates a new access token and refresh token based on the provided refresh token.
+func (s *Service) GetAccessToken(ctx context.Context, refreshToken string) (*model.NewPairTokens, error) <span class="cov0" title="0">{
+        logger.Debug("getting refresh token on service", zap.String("REFRESH_TOKEN", refreshToken))
+
+        claims, err := s.authHelper.VerifyToken(refreshToken)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to verify token", zap.Error(err))
+                return nil, fmt.Errorf("failed to verify token: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">info, err := s.repo.GetAccessToken(ctx, claims.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to get access token", zap.Error(err))
+                return nil, fmt.Errorf("failed to get access token: %v", err)
+        }</span>
+        <span class="cov0" title="0">access, err := s.authHelper.GenerateAccessToken(info)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to generate access token", zap.Error(err))
+                return nil, fmt.Errorf("failed to generate access token: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">refresh, err := s.authHelper.GenerateRefreshToken(info.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to generate refresh token", zap.Error(err))
+                return nil, fmt.Errorf("failed to generate refresh token: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;model.NewPairTokens{AccessToken: access, RefreshToken: refresh}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package service
+
+import (
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper"
+)
+
+// Service provides business logic and interacts with the repository.
+type Service struct {
+        repo       repository.IRepository
+        authHelper auth_helper.AuthHelper
+}
+
+// New creates a new Service instance with the given repository.
+func New(repo repository.IRepository, authHelper auth_helper.AuthHelper) IService <span class="cov10" title="15">{
+        return &amp;Service{
+                repo:       repo,
+                authHelper: authHelper,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package service
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "go.uber.org/zap"
+)
+
+// Login authenticates a user with the provided login information and generates access and refresh tokens.
+func (s *Service) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model.AuthResponse, error) <span class="cov10" title="15">{
+        logger.Debug("get data in service", zap.Any("loginInfo", loginInfo))
+
+        result, err := s.repo.Login(ctx, loginInfo.Email)
+        if err != nil </span><span class="cov6" title="5">{
+                logger.Error("failed to login", zap.Error(err))
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="10">ok := s.authHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
+        if !ok </span><span class="cov6" title="5">{
+                logger.Error("invalid password", zap.Error(err))
+                return nil, fmt.Errorf("invalid password")
+        }</span>
+
+        <span class="cov6" title="5">accessToken, err := s.authHelper.GenerateAccessToken(&amp;model.AccessTokenInfo{
+                ID:   result.UserID,
+                Role: result.Role,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to generate access token", zap.Error(err))
+                return nil, fmt.Errorf("failed to generate access token: %v", err)
+        }</span>
+
+        <span class="cov6" title="5">refreshToken, err := s.authHelper.GenerateRefreshToken(result.UserID)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to generate refresh token", zap.Error(err))
+                return nil, fmt.Errorf("failed to generate refresh token: %v", err)
+        }</span>
+
+        <span class="cov6" title="5">logger.Debug("new pair tokens in service: ", zap.Any("tokens", result))
+
+        return &amp;model.AuthResponse{
+                AccessToken:  accessToken,
+                RefreshToken: refreshToken,
+                UserID:       result.UserID,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package service
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/google/uuid"
+        "go.uber.org/zap"
+)
+
+// Registration handles the registration of a new user, hashes their password,
+// and generates access and refresh tokens upon successful registration.
+func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*model.AuthResponse, error) <span class="cov0" title="0">{
+        HashedPassword, err := s.authHelper.HashPassword(userInfo.Password)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to hash password", zap.Error(err))
+                return nil, fmt.Errorf("failed to hash password: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">user := &amp;model.InfoToDb{
+                ID:           uuid.NewString(),
+                Email:        userInfo.Email,
+                HashPassword: HashedPassword,
+                Role:         userInfo.Role,
+        }
+
+        userID, err := s.repo.Registration(ctx, user)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to registration", zap.Error(err))
+                return nil, err
+        }</span>
+
+        // ТУТ ОТПРАВЛЯЕМ СНАЧАЛО СОЗДАНИЕ В СЕРВИСЕ ЮЗЕРОВ
+        // ПОТОМ ОТПРАВЛЯЕМ ПИСЬМО В КАФКУ
+
+        <span class="cov0" title="0">accessToken, err := s.authHelper.GenerateAccessToken(&amp;model.AccessTokenInfo{
+                ID:   userID,
+                Role: user.Role,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to generate access token", zap.Error(err))
+                return nil, fmt.Errorf("failed to generate access token: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">refreshToken, err := s.authHelper.GenerateRefreshToken(user.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to generate refresh token", zap.Error(err))
+                return nil, fmt.Errorf("failed to generate refresh token: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;model.AuthResponse{
+                AccessToken:  accessToken,
+                RefreshToken: refreshToken,
+                UserID:       userID,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package service
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "go.uber.org/zap"
+)
+
+// UpdatePassword hashes the new password and updates the user's password in the database.
+func (s *Service) UpdatePassword(ctx context.Context, updatePassInfo *model.UpdatePassInfo) error <span class="cov0" title="0">{
+        logger.Debug("get data in service", zap.Any("updatePassInfo", updatePassInfo))
+
+        hashPassword, err := s.authHelper.HashPassword(updatePassInfo.NewPassword)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to hash password", zap.Error(err))
+                return fmt.Errorf("failed to hash password: %v", err)
+        }</span>
+        <span class="cov0" title="0">err = s.repo.UpdatePassword(ctx, &amp;model.UpdatePassDb{
+                Email:        updatePassInfo.Email,
+                HashPassword: hashPassword,
+                UpdatedAt:    time.Now(),
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to update password", zap.Error(err))
+                return fmt.Errorf("failed to update password: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">logger.Debug("password updated", zap.Any("updatePassInfo", updatePassInfo))
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package service
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "go.uber.org/zap"
+)
+
+// ValidateToken verifies the access token and returns true if valid.
+func (s *Service) ValidateToken(_ context.Context, accessToken string) (bool, error) <span class="cov0" title="0">{
+        logger.Debug("get access token in service", zap.String("ACCESS_TOKEN", accessToken))
+
+        _, err := s.authHelper.VerifyToken(accessToken)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to verify token", zap.Error(err))
+                return false, fmt.Errorf("failed to verify token: %v", err)
+        }</span>
+        <span class="cov0" title="0">return true, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package auth_helper
+
+import (
+        "fmt"
+        "time"
+
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+        "github.com/golang-jwt/jwt"
+        "go.uber.org/zap"
+        "golang.org/x/crypto/bcrypt"
+)
+
+// AuthClient implements the AuthHelper interface and provides methods for
+// managing authentication tasks, including token generation and password handling.
+type AuthClient struct {
+        secretKey            []byte        // Secret key used for signing tokens
+        refreshTokenDuration time.Duration // Duration for which the refresh token is valid
+        accessTokenDuration  time.Duration // Duration for which the access token is valid
+}
+
+// New creates a new AuthClient instance with the provided secret key and token durations.
+// It returns an AuthHelper interface implementation for managing authentication tasks.
+func New(secretKey []byte, refreshTokenDuration time.Duration, accessTokenDuration time.Duration) AuthHelper <span class="cov0" title="0">{
+        return &amp;AuthClient{
+                secretKey:            secretKey,
+                refreshTokenDuration: refreshTokenDuration,
+                accessTokenDuration:  accessTokenDuration,
+        }
+}</span>
+
+// GenerateAccessToken creates a new access token for a user based on the provided access token information.
+// It sets the expiration time for the token and returns the signed token as a string.
+func (a *AuthClient) GenerateAccessToken(info *model.AccessTokenInfo) (string, error) <span class="cov0" title="0">{
+        claims := model.UserClaims{
+                StandardClaims: jwt.StandardClaims{
+                        ExpiresAt: time.Now().Add(a.accessTokenDuration).Unix(),
+                },
+                ID:   info.ID,
+                Role: info.Role,
+        }
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        return token.SignedString(a.secretKey)
+}</span>
+
+// GenerateRefreshToken creates a new refresh token for a user identified by their user ID.
+// The token will have an expiration time set according to the specified duration.
+func (a *AuthClient) GenerateRefreshToken(userID string) (string, error) <span class="cov0" title="0">{
+        claims := model.UserClaims{
+                StandardClaims: jwt.StandardClaims{
+                        ExpiresAt: time.Now().Add(a.refreshTokenDuration).Unix(),
+                },
+                ID: userID,
+        }
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        return token.SignedString(a.secretKey)
+}</span>
+
+// VerifyToken checks the validity of the provided JWT token. It parses the token and extracts the claims,
+// returning them if the token is valid. An error is returned if the token is invalid or expired.
+func (a *AuthClient) VerifyToken(token string) (*model.UserClaims, error) <span class="cov0" title="0">{
+        tokenClaims, err := jwt.ParseWithClaims(token, &amp;model.UserClaims{}, func(token *jwt.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                _, ok := token.Method.(*jwt.SigningMethodHMAC)
+                if !ok </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+                }</span>
+                <span class="cov0" title="0">return a.secretKey, nil</span>
+        })
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">claims, ok := tokenClaims.Claims.(*model.UserClaims)
+        if !ok || !tokenClaims.Valid </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("invalid token")
+        }</span>
+        <span class="cov0" title="0">return claims, nil</span>
+}
+
+// HashPassword generates a hashed version of the provided password using bcrypt.
+// It returns the hashed password as a string or an error if the hashing fails.
+func (a *AuthClient) HashPassword(password string) (string, error) <span class="cov0" title="0">{
+        hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("failed to hash password", zap.Error(err))
+                return "", err
+        }</span>
+        <span class="cov0" title="0">return string(hashedPassword), nil</span>
+}
+
+// ValidatePassword compares a hashed password with a candidate password to verify their equality.
+// It returns true if they match, or false otherwise.
+func (a *AuthClient) ValidatePassword(hashedPassword, candidatePassword string) bool <span class="cov0" title="0">{
+        err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(candidatePassword))
+        return err == nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package converter
+
+import (
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+)
+
+// ToInfoFromProto converts a RegistrationRequest from the authService to a UserInfo model.
+// This is used to transform incoming registration data into a format suitable for further processing.
+func ToInfoFromProto(info *authService.RegistrationRequest) *model.UserInfo <span class="cov0" title="0">{
+        return &amp;model.UserInfo{
+                Email:    info.GetEmail(),
+                Password: info.GetPassword(),
+                Name:     info.GetName(),
+                Surname:  info.GetSurname(),
+                Role:     info.GetRole(),
+        }
+}</span>
+
+// ToLoginInfoFromProto converts a LoginRequest from the authService to a LoginInfo model.
+// This function maps login details from the incoming request to the model structure used in the application.
+func ToLoginInfoFromProto(info *authService.LoginRequest) *model.LoginInfo <span class="cov10" title="10">{
+        return &amp;model.LoginInfo{
+                Email:    info.GetEmail(),
+                Password: info.GetPassword(),
+        }
+}</span>
+
+// ToUpdatePassFromProto converts an UpdatePasswordRequest from the authService to an UpdatePassInfo model.
+// It is used to extract and prepare email and new password information for updating user credentials.
+func ToUpdatePassFromProto(info *authService.UpdatePasswordRequest) *model.UpdatePassInfo <span class="cov0" title="0">{
+        return &amp;model.UpdatePassInfo{
+                Email:       info.GetEmail(),
+                NewPassword: info.GetNewPassword(),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package converter
+
+import (
+        "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+        authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+)
+
+// ToProtoFromLoginResponse converts the AuthResponse model into a gRPC-compatible LoginResponse.
+// This is useful for sending authentication details back to the client after a successful login.
+func ToProtoFromLoginResponse(resp *model.AuthResponse) *authService.LoginResponse <span class="cov10" title="5">{
+        return &amp;authService.LoginResponse{
+                AccessToken:  resp.AccessToken,
+                RefreshToken: resp.RefreshToken,
+                UserId:       resp.UserID,
+        }
+}</span>
+
+// ToProtoFromNewPairTokens transforms the NewPairTokens model into a gRPC GetAccessTokenResponse.
+// This is used to provide the client with a new pair of access and refresh tokens.
+func ToProtoFromNewPairTokens(resp *model.NewPairTokens) *authService.GetAccessTokenResponse <span class="cov0" title="0">{
+        return &amp;authService.GetAccessTokenResponse{
+                AccessToken:  resp.AccessToken,
+                RefreshToken: resp.RefreshToken,
+        }
+}</span>
+
+// ToProtoFromRegResponse converts the AuthResponse model into a RegistrationResponse for gRPC.
+// This allows the client to receive authentication tokens after successful registration.
+func ToProtoFromRegResponse(resp *model.AuthResponse) *authService.RegistrationResponse <span class="cov0" title="0">{
+        return &amp;authService.RegistrationResponse{
+                AccessToken:  resp.AccessToken,
+                RefreshToken: resp.RefreshToken,
+                UserId:       resp.UserID,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package logger
+
+import (
+        "go.uber.org/zap"
+        "go.uber.org/zap/zapcore"
+)
+
+var globalLogger *zap.Logger
+
+// Init initializes the global logger with the specified zapcore.Core and optional options.
+// It sets up a new zap.Logger and assigns it to the global variable `globalLogger`.
+func Init(core zapcore.Core, options ...zap.Option) <span class="cov6" title="10">{
+        globalLogger = zap.New(core, options...)
+}</span>
+
+// Debug logs a debug message with optional fields using the global logger.
+func Debug(msg string, fields ...zap.Field) <span class="cov10" title="50">{
+        globalLogger.Debug(msg, fields...)
+}</span>
+
+// Info logs an informational message with optional fields using the global logger.
+func Info(msg string, fields ...zap.Field) <span class="cov0" title="0">{
+        globalLogger.Info(msg, fields...)
+}</span>
+
+// Warn logs a warning message with optional fields using the global logger.
+func Warn(msg string, fields ...zap.Field) <span class="cov0" title="0">{
+        globalLogger.Warn(msg, fields...)
+}</span>
+
+// Error logs an error message with optional fields using the global logger.
+func Error(msg string, fields ...zap.Field) <span class="cov8" title="30">{
+        globalLogger.Error(msg, fields...)
+}</span>
+
+// Fatal logs a fatal error message with optional fields and then terminates the application.
+func Fatal(msg string, fields ...zap.Field) <span class="cov0" title="0">{
+        globalLogger.Fatal(msg, fields...)
+}</span>
+
+// WithOptions returns a new logger with the specified options applied to the global logger.
+func WithOptions(opts ...zap.Option) *zap.Logger <span class="cov0" title="0">{
+        return globalLogger.WithOptions(opts...)
+}</span>
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package validator
+
+import (
+        "encoding/json"
+
+        "github.com/pkg/errors"
+)
+
+// ValidationErrors holds validation error messages.
+type ValidationErrors struct {
+        Messages []string `json:"error_messages"`
+}
+
+// addError appends a new error message to the list of validation errors.
+func (v *ValidationErrors) addError(message string) <span class="cov7" title="20">{
+        v.Messages = append(v.Messages, message)
+}</span>
+
+// NewValidationErrors creates a new instance of ValidationErrors with given messages.
+func NewValidationErrors(messages ...string) *ValidationErrors <span class="cov10" title="60">{
+        return &amp;ValidationErrors{
+                Messages: messages,
+        }
+}</span>
+
+// Error returns a JSON string representation of the validation error messages.
+// If marshaling fails, it returns the marshaling error as a string.
+func (v *ValidationErrors) Error() string <span class="cov9" title="50">{
+        data, err := json.Marshal(v.Messages)
+        if err != nil </span><span class="cov0" title="0">{
+                return err.Error()
+        }</span>
+        <span class="cov9" title="50">return string(data)</span>
+}
+
+// IsValidationError checks if the provided error is of type ValidationErrors.
+// It returns true if the error is a validation error.
+func IsValidationError(err error) bool <span class="cov7" title="20">{
+        var ve *ValidationErrors
+        return errors.As(err, &amp;ve)
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package validator
+
+import (
+        "context"
+        "regexp"
+        "unicode/utf8"
+)
+
+// ValidateName checks the validity of a name string.
+// It ensures that the name is not empty and has a length between 3 and 64 characters.
+func ValidateName(name string) Condition <span class="cov0" title="0">{
+        return func(_ context.Context) error </span><span class="cov0" title="0">{
+                if name == "" </span><span class="cov0" title="0">{
+                        return NewValidationErrors("empty name")
+                }</span>
+                <span class="cov0" title="0">if utf8.RuneCountInString(name) &lt; 3 || utf8.RuneCountInString(name) &gt; 64 </span><span class="cov0" title="0">{
+                        return NewValidationErrors("name length must be between 3 and 64 characters")
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        }
+}
+
+// ValidateRole checks if the provided role is valid.
+// It only allows "admin" or "user" as acceptable roles.
+func ValidateRole(role string) Condition <span class="cov0" title="0">{
+        return func(_ context.Context) error </span><span class="cov0" title="0">{
+                if role != "admin" &amp;&amp; role != "user" </span><span class="cov0" title="0">{
+                        return NewValidationErrors("Only 'admin' and 'user' roles are allowed")
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        }
+}
+
+// ValidateEmail checks if the given email string is in a valid format.
+// It uses a regular expression to ensure the email is correctly structured.
+func ValidateEmail(email string) Condition <span class="cov10" title="25">{
+        return func(_ context.Context) error </span><span class="cov10" title="25">{
+                const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+                re := regexp.MustCompile(emailRegex)
+                result := re.MatchString(email)
+                if !result </span><span class="cov7" title="10">{
+                        return NewValidationErrors("invalid email")
+                }</span>
+                <span class="cov8" title="15">return nil</span>
+        }
+}
+
+// ValidatePassword checks if the provided password meets the length requirement.
+// It ensures the password length is between 8 and 20 characters.
+func ValidatePassword(password string) Condition <span class="cov10" title="25">{
+        return func(_ context.Context) error </span><span class="cov10" title="25">{
+                if utf8.RuneCountInString(password) &lt; 5 || utf8.RuneCountInString(password) &gt; 20 </span><span class="cov7" title="10">{
+                        return NewValidationErrors("password length must be between 5 and 20 characters")
+                }</span>
+                <span class="cov8" title="15">return nil</span>
+        }
+}
+
+// ValidateSurname checks the validity of a surname string.
+// It ensures that the surname is not empty and has a length between 3 and 64 characters.
+func ValidateSurname(surname string) Condition <span class="cov0" title="0">{
+        return func(_ context.Context) error </span><span class="cov0" title="0">{
+                if surname == "" </span><span class="cov0" title="0">{
+                        return NewValidationErrors("empty surname")
+                }</span>
+                <span class="cov0" title="0">if utf8.RuneCountInString(surname) &lt; 3 || utf8.RuneCountInString(surname) &gt; 64 </span><span class="cov0" title="0">{
+                        return NewValidationErrors("surname length must be between 3 and 64 characters")
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package validator
+
+import "context"
+
+// Condition defines a function type that takes a context and returns an error.
+type Condition func(ctx context.Context) error
+
+// Validate checks a series of conditions and collects validation errors.
+// If any condition returns a validation error, it is added to the validation errors collection.
+// If any other error occurs, it is returned immediately.
+func Validate(ctx context.Context, conds ...Condition) error <span class="cov8" title="25">{
+        ve := NewValidationErrors()
+
+        for _, c := range conds </span><span class="cov10" title="50">{
+                err := c(ctx)
+                if err != nil </span><span class="cov7" title="20">{
+                        if IsValidationError(err) </span><span class="cov7" title="20">{
+                                ve.addError(err.Error())
+                                continue</span>
+                        }
+
+                        <span class="cov0" title="0">return err</span>
+                }
+        }
+
+        <span class="cov8" title="25">if ve.Messages == nil </span><span class="cov6" title="10">{
+                return nil
+        }</span>
+
+        <span class="cov7" title="15">return ve</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

@@ -17,6 +17,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	t.Parallel()
 	level := "info"
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
 
@@ -58,7 +59,7 @@ func TestLogin(t *testing.T) {
 			Role:         role,
 		}
 
-		repositoryError = fmt.Errorf("service error")
+		repositoryError = fmt.Errorf("repository error")
 	)
 
 	defer t.Cleanup(mc.Finish)
@@ -115,11 +116,32 @@ func TestLogin(t *testing.T) {
 				return mock
 			},
 		},
+		{
+			name: "validate password error case",
+			args: args{
+				ctx: ctx,
+				req: req,
+			},
+			want: nil,
+			err:  fmt.Errorf("invalid password"),
+			IRepositoryMock: func(mc *minimock.Controller) repository.IRepository {
+				mock := mocks.NewIRepositoryMock(mc)
+				// задаем поведение мока (все методы сервиса которые вызываются внутри ручки контроллера)
+				mock.LoginMock.Expect(ctx, email).Return(loginResponse, nil)
+				return mock
+			},
+			AuthHelperMock: func(mc *minimock.Controller) auth_helper.AuthHelper {
+				mock := mocks.NewAuthHelperMock(mc)
+				mock.ValidatePasswordMock.Expect(hashPassword, password).Return(false)
+				return mock
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			IRepoMock := tt.IRepositoryMock(mc)
 			AuthHelperMock := tt.AuthHelperMock(mc)
 

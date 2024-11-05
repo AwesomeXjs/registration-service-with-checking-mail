@@ -18,6 +18,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	t.Parallel()
 	level := "info"
 	type IServiceMockFunc func(mc *minimock.Controller) service.IService
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
@@ -154,6 +155,7 @@ func TestLogin(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			IServiceMock := tt.IServiceMock(mc)
 			myController := controller.New(IServiceMock)
 
