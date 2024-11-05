@@ -35,7 +35,7 @@ func TestLogin(t *testing.T) {
 
 		accessToken  = gofakeit.UUID()
 		refreshToken = gofakeit.UUID()
-		userId       = gofakeit.UUID()
+		userID       = gofakeit.UUID()
 
 		req = &authService.LoginRequest{
 			Email:    email,
@@ -45,7 +45,7 @@ func TestLogin(t *testing.T) {
 		res = &authService.LoginResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserId:       userId,
+			UserId:       userID,
 		}
 
 		loginRequest = &model.LoginInfo{
@@ -56,7 +56,7 @@ func TestLogin(t *testing.T) {
 		loginResponse = &model.AuthResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserID:       userId,
+			UserID:       userID,
 		}
 
 		serviceError = fmt.Errorf("service error")
