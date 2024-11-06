@@ -52,7 +52,7 @@ func (a *App) InitDeps(ctx context.Context) error {
 			logger.Fatal("failed to init deps", zap.Error(err))
 		}
 	}
-	a.InitRoutes(a.server)
+	a.InitRoutes(ctx, a.server)
 	return nil
 }
 
@@ -71,6 +71,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) InitEchoServer(_ context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(logLevel)))
+
 	a.server = echo.New()
 	a.server.Use(middleware.Recover())
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -87,6 +88,6 @@ func (a *App) runHTTPServer() error {
 	return a.server.Start(a.serviceProvider.HTTPConfig().Address())
 }
 
-func (a *App) InitRoutes(server *echo.Echo) {
-	a.serviceProvider.Controller().InitRoutes(server)
+func (a *App) InitRoutes(ctx context.Context, server *echo.Echo) {
+	a.serviceProvider.Controller(ctx).InitRoutes(server)
 }

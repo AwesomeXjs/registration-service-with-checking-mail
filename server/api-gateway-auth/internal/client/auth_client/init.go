@@ -18,27 +18,22 @@ func New(authClient AuthClient) *GRPCClient {
 	}
 }
 
-func (G *GRPCClient) Registration(ctx context.Context, in *authService.RegistrationRequest, opts ...grpc.CallOption) (*authService.RegistrationResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (g *GRPCClient) Registration(ctx context.Context, in *authService.RegistrationRequest, opts ...grpc.CallOption) (*authService.RegistrationResponse, error) {
+	return g.authClient.Registration(ctx, in, opts...)
 }
 
-func (G *GRPCClient) Login(ctx context.Context, in *authService.LoginRequest, opts ...grpc.CallOption) (*authService.LoginResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (g *GRPCClient) Login(ctx context.Context, in *authService.LoginRequest, opts ...grpc.CallOption) (*authService.LoginResponse, error) {
+	return g.authClient.Login(ctx, in, opts...)
 }
 
-func (G *GRPCClient) ValidateToken(ctx context.Context, in *authService.ValidateTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+func (g *GRPCClient) ValidateToken(ctx context.Context, in *authService.ValidateTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	return g.authClient.ValidateToken(ctx, in, opts...)
 }
 
-func (G *GRPCClient) GetAccessToken(ctx context.Context, in *authService.GetAccessTokenRequest, opts ...grpc.CallOption) (*authService.GetAccessTokenResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (g *GRPCClient) GetAccessToken(ctx context.Context, in *authService.GetAccessTokenRequest, opts ...grpc.CallOption) (*authService.GetAccessTokenResponse, error) {
+	return g.authClient.GetAccessToken(ctx, in, opts...)
 }
 
-func (G *GRPCClient) UpdatePassword(ctx context.Context, in *authService.UpdatePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+func (g *GRPCClient) UpdatePassword(ctx context.Context, in *authService.UpdatePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	return g.authClient.UpdatePassword(ctx, in, opts...)
 }

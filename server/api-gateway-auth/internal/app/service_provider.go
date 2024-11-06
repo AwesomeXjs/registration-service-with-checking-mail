@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/client/auth_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/configs"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/controller"
@@ -51,7 +53,7 @@ func (s *serviceProvider) AuthClientConfig() *configs.AuthClient {
 	return s.authClientConfig
 }
 
-func (s *serviceProvider) AuthClient() auth_client.AuthClient {
+func (s *serviceProvider) AuthClient(_ context.Context) auth_client.AuthClient {
 	if s.authClient == nil {
 		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
@@ -65,9 +67,9 @@ func (s *serviceProvider) AuthClient() auth_client.AuthClient {
 	return s.authClient
 }
 
-func (s *serviceProvider) Controller() *controller.Controller {
+func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
 	if s.controller == nil {
-		s.controller = controller.New(s.AuthClient())
+		s.controller = controller.New(s.AuthClient(ctx))
 	}
 	return s.controller
 }
