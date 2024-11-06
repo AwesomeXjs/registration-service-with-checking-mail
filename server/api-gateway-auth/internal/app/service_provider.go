@@ -7,6 +7,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/configs"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/controller"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/header_helper"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
 	"go.uber.org/zap"
@@ -20,7 +21,8 @@ type serviceProvider struct {
 	authClientConfig *configs.AuthClient
 
 	// clients
-	authClient auth_client.AuthClient
+	authClient   auth_client.AuthClient
+	headerHelper header_helper.IHeaderHelper
 
 	// controllers
 	controller *controller.Controller
@@ -67,9 +69,16 @@ func (s *serviceProvider) AuthClient(_ context.Context) auth_client.AuthClient {
 	return s.authClient
 }
 
+func (s *serviceProvider) HeaderHelper() header_helper.IHeaderHelper {
+	if s.headerHelper == nil {
+		s.headerHelper = header_helper.New()
+	}
+	return s.headerHelper
+}
+
 func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
 	if s.controller == nil {
-		s.controller = controller.New(s.AuthClient(ctx))
+		s.controller = controller.New(s.AuthClient(ctx), s.HeaderHelper())
 	}
 	return s.controller
 }

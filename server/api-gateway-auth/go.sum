@@ -1,5 +1,7 @@
 github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service v0.0.0-20241105134648-b8deedfc0b47 h1:FXzJgT+SnxFzemkeK/Xp6yVXziHk2VtiwYjAXlbWO68=
 github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service v0.0.0-20241105134648-b8deedfc0b47/go.mod h1:cF8l8V1vhMsj+UDqsOItYlbYqsERYZTaJc3gXvegpr4=
+github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=
+github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/brianvoe/gofakeit v3.18.0+incompatible h1:wDOmHc9DLG4nRjUVVaxA+CEglKOW72Y5+4WNxUIkjM8=

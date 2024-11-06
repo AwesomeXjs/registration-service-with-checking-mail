@@ -4,6 +4,7 @@ go 1.22.2
 
 require (
 	github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service v0.0.0-20241105134648-b8deedfc0b47 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

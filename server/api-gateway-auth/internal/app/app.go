@@ -5,9 +5,11 @@ import (
 	"flag"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/configs"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/middlewares"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/consts"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
@@ -71,13 +73,23 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) InitEchoServer(_ context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(logLevel)))
+	govalidator.TagMap["role_enum"] = govalidator.Validator(func(str string) bool {
+		// Перечень допустимых значений для поля Role
+		validRoles := []string{"admin", "user"}
+		return govalidator.IsIn(str, validRoles...)
+	})
 
 	a.server = echo.New()
 	a.server.Use(middleware.Recover())
+	a.server.Use(middlewares.Logger)
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8080", "http://localhost:9999"},
+		AllowOrigins: []string{"http://localhost:8080"},
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin,
+			echo.HeaderContentType,
+			echo.HeaderAccept,
+			echo.HeaderAccessControlAllowCredentials,
+			echo.HeaderAuthorization, echo.HeaderAccessControlRequestHeaders},
 	}))
 
 	return nil
