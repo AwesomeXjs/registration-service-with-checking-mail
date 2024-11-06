@@ -36,6 +36,8 @@ func (c *Controller) GetAccessToken(ctx echo.Context) error {
 		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 
+	c.hh.SetRefreshTokenInCookie(ctx, consts.RefreshTokenKey, accessToken.RefreshToken)
+
 	return response.ResponseHelper(ctx, http.StatusOK, "OK", accessToken.AccessToken)
 
 }
