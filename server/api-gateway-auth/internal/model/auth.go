@@ -6,13 +6,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	UserID       string `json:"userId"`
-}
-
-type GetAccessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
+	UserID      string `json:"userId"`
 }
 
 type RegistrationRequest struct {

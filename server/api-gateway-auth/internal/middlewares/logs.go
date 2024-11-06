@@ -14,6 +14,14 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 
 		err := next(c)
 
+		if err != nil {
+			logger.Error("Failed to process request",
+				zap.Error(err),
+				zap.String("method", c.Request().Method),
+				zap.String("path", c.Request().URL.Path),
+				zap.Duration("duration", time.Since(start)))
+		}
+
 		logger.Info("Request details",
 			zap.String("method", c.Request().Method),
 			zap.String("path", c.Request().URL.Path),

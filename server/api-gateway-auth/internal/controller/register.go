@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/response"
-	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -25,13 +25,7 @@ func (c *Controller) Registration(ctx echo.Context) error {
 		return response.ResponseHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	result, err := c.authClient.Registration(ctx.Request().Context(), &authService.RegistrationRequest{
-		Email:    Request.Email,
-		Password: Request.Password,
-		Name:     Request.Name,
-		Role:     Request.Role,
-		Surname:  Request.Surname,
-	})
+	result, err := c.authClient.Registration(ctx.Request().Context(), converter.FromModelToProtoRegister(&Request))
 	if err != nil {
 		logger.Error("failed to register", zap.Error(err))
 		return response.ResponseHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
@@ -39,8 +33,5 @@ func (c *Controller) Registration(ctx echo.Context) error {
 
 	c.hh.SetRefreshTokenInCookie(ctx, "refresh_token", result.GetRefreshToken())
 
-	return ctx.JSON(200, &model.RegistrationResponse{
-		AccessToken: result.GetAccessToken(),
-		UserID:      result.GetUserId(),
-	})
+	return ctx.JSON(200, converter.ToModelFromProtoRegister(result))
 }
