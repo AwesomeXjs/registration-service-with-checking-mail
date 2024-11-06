@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/consts"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/response"
@@ -10,8 +11,20 @@ import (
 	"go.uber.org/zap"
 )
 
+// GetAccessToken - get access token
+// @Summary Get Access Token
+// @Security ApiKeyAuth
+// @Tags Token
+// @Description get new access token from refresh token
+// @ID get-access-token
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} response.Response
+// @Failure 401 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/get-access-token [get]
 func (c *Controller) GetAccessToken(ctx echo.Context) error {
-	cookie, err := c.hh.GetRefreshTokenFromCookie(ctx, "refresh_token")
+	cookie, err := c.hh.GetRefreshTokenFromCookie(ctx, consts.RefreshTokenKey)
 	if err != nil {
 		logger.Error("failed to get refresh token from cookie", zap.Error(err))
 		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())

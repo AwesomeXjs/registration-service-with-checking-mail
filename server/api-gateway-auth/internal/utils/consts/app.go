@@ -1,5 +1,6 @@
 package consts
 
 const (
-	EnvPath = ".env"
+	EnvPath         = ".env"
+	RefreshTokenKey = "refresh_token"
 )

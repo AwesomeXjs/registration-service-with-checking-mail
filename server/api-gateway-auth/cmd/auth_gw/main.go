@@ -8,6 +8,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// @title Authentication API
+// @version 1.0
+// @description API Server for Authentication
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	ctx := context.Background()
 

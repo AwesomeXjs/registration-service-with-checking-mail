@@ -1,0 +1,167 @@
+basePath: /
+definitions:
+  model.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      userId:
+        type: string
+    type: object
+  model.UpdatePasswordRequest:
+    properties:
+      email:
+        type: string
+      newPassword:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      detail:
+        type: string
+      request:
+        type: string
+      time:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for Authentication
+  title: Authentication API
+  version: "1.0"
+paths:
+  /api/v1/get-access-token:
+    get:
+      consumes:
+      - application/json
+      description: get new access token from refresh token
+      operationId: get-access-token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Access Token
+      tags:
+      - Token
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: login into system
+      operationId: login
+      parameters:
+      - description: login info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Login
+      tags:
+      - Auth
+  /api/v1/update-password:
+    patch:
+      consumes:
+      - application/json
+      description: update password
+      operationId: update-password
+      parameters:
+      - description: new info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdatePassword
+      tags:
+      - Auth
+  /api/v1/validate-token:
+    get:
+      consumes:
+      - application/json
+      description: validate access token
+      operationId: validate-access-token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: validate access token
+      tags:
+      - Token
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

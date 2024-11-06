@@ -11,6 +11,18 @@ import (
 	"go.uber.org/zap"
 )
 
+// ValidateToken - validate access token
+// @Summary validate access token
+// @Security ApiKeyAuth
+// @Tags Token
+// @Description validate access token
+// @ID validate-access-token
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Failure 401 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/validate-token [get]
 func (c *Controller) ValidateToken(ctx echo.Context) error {
 	accessToken, err := c.hh.GetAccessTokenFromHeader(ctx)
 	if err != nil {

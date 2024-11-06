@@ -9,7 +9,7 @@ services:
     image: postgres:14-alpine3.17
     container_name: pg-auth-service
     ports:
-      - "54321:5432"
+      - "5432:5432"
     volumes:
       - postgres_volume:/var/lib/postgresql/data
     env_file:

@@ -12,10 +12,35 @@ import (
 	"go.uber.org/zap"
 )
 
+// UpdatePassword - update password
+// @Summary UpdatePassword
+// @Security ApiKeyAuth
+// @Tags Auth
+// @Description update password
+// @ID update-password
+// @Accept  json
+// @Produce  json
+// @Param input body model.UpdatePasswordRequest true "new info"
+// @Success 200
+// @Failure 400 {object} response.Response
+// @Failure 422 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/update-password [patch]
 func (c *Controller) UpdatePassword(ctx echo.Context) error {
+	accessToken, err := c.hh.GetAccessTokenFromHeader(ctx)
+	if err != nil {
+		logger.Warn("failed to get access token from header", zap.Error(err))
+		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
+	}
+
+	_, err = c.authClient.ValidateToken(ctx.Request().Context(), converter.ToProtoValidateToken(accessToken))
+	if err != nil {
+		logger.Warn("failed to validate token", zap.Error(err))
+		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
+	}
 
 	var Request model.UpdatePasswordRequest
-	err := ctx.Bind(&Request)
+	err = ctx.Bind(&Request)
 	if err != nil {
 		logger.Error("failed to bind request", zap.Error(err))
 		return response.ResponseHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())

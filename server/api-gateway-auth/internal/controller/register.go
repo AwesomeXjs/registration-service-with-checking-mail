@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/consts"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/response"
@@ -31,7 +32,7 @@ func (c *Controller) Registration(ctx echo.Context) error {
 		return response.ResponseHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
 
-	c.hh.SetRefreshTokenInCookie(ctx, "refresh_token", result.GetRefreshToken())
+	c.hh.SetRefreshTokenInCookie(ctx, consts.RefreshTokenKey, result.GetRefreshToken())
 
 	return ctx.JSON(200, converter.ToModelFromProtoRegister(result))
 }
