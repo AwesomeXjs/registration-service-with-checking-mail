@@ -13,6 +13,19 @@ import (
 	"go.uber.org/zap"
 )
 
+// Registration - Registration
+// @Summary Login
+// @Tags Auth
+// @Description Registration new user
+// @ID registration
+// @Accept  json
+// @Produce  json
+// @Param input body model.RegistrationRequest true "registration info"
+// @Success 200 {object} model.RegistrationResponse
+// @Failure 400 {object} response.Response
+// @Failure 422 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/register [post]
 func (c *Controller) Registration(ctx echo.Context) error {
 	var Request model.RegistrationRequest
 	err := ctx.Bind(&Request)

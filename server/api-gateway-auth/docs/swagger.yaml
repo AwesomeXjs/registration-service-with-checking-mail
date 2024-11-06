@@ -14,6 +14,26 @@ definitions:
       userId:
         type: string
     type: object
+  model.RegistrationRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      surname:
+        type: string
+    type: object
+  model.RegistrationResponse:
+    properties:
+      accessToken:
+        type: string
+      userId:
+        type: string
+    type: object
   model.UpdatePasswordRequest:
     properties:
       email:
@@ -85,6 +105,41 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Login
+      tags:
+      - Auth
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      description: Registration new user
+      operationId: registration
+      parameters:
+      - description: registration info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.RegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.RegistrationResponse'
         "400":
           description: Bad Request
           schema:

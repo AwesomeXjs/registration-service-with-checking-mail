@@ -10,41 +10,12 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1;auth_v1";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info: {
-    title: "Auth"
-    description: "Auth API"
-    version: "1.0.0"
-    contact: {
-      name: "AwesomeXjs"
-      email: "bestawes0mex@gmail.com"
-      url: "https://github.com/AwesomeXjs"
-    };
-  };
-
-  host: "localhost:8080"
-  schemes: HTTP
-  schemes: HTTPS
-  consumes: "application/json"
-  produces: "application/json"
-};
-
 service AuthV1 {
   // Register new user with email and password, returns access token, refresh token and user id
-  rpc Registration(RegistrationRequest) returns (RegistrationResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/auth/registration"
-      body: "*"
-    };
-  };
+  rpc Registration(RegistrationRequest) returns (RegistrationResponse);
 
   // Login with email and password
-  rpc Login(LoginRequest) returns (LoginResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/auth/login"
-      body: "*"
-    };
-  };
+  rpc Login(LoginRequest) returns (LoginResponse);
 
   // Validate access token for authentication
   rpc ValidateToken(ValidateTokenRequest) returns (google.protobuf.Empty);
