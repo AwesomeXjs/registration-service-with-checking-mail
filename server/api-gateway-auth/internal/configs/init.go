@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// LoadEnv loads environment variables from the specified .env file.
 func LoadEnv(path string) error {
 	err := godotenv.Load(path)
 	if err != nil {

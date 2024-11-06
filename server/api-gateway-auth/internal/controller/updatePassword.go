@@ -30,32 +30,32 @@ func (c *Controller) UpdatePassword(ctx echo.Context) error {
 	accessToken, err := c.hh.GetAccessTokenFromHeader(ctx)
 	if err != nil {
 		logger.Warn("failed to get access token from header", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
+		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 
 	_, err = c.authClient.ValidateToken(ctx.Request().Context(), converter.ToProtoValidateToken(accessToken))
 	if err != nil {
 		logger.Warn("failed to validate token", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
+		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 
 	var Request model.UpdatePasswordRequest
 	err = ctx.Bind(&Request)
 	if err != nil {
 		logger.Error("failed to bind request", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
+		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
 
 	_, err = govalidator.ValidateStruct(Request)
 	if err != nil {
 		logger.Error("failed to validate struct", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
+		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
 	_, err = c.authClient.UpdatePassword(ctx.Request().Context(), converter.FromModelToProtoUpdatePass(&Request))
 	if err != nil {
 		logger.Error("failed to update password", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
+		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
 
 	return nil

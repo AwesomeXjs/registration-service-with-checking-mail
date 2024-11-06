@@ -15,9 +15,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+// serviceProvider manages the application's configuration, clients, and controllers.
 type serviceProvider struct {
 	// configs
-	httpConfig       *configs.HttpConfig
+	httpConfig       *configs.HTTPConfig
 	authClientConfig *configs.AuthClient
 
 	// clients
@@ -28,11 +29,13 @@ type serviceProvider struct {
 	controller *controller.Controller
 }
 
+// newServiceProvider creates a new instance of serviceProvider.
 func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
 
-func (s *serviceProvider) HTTPConfig() *configs.HttpConfig {
+// HTTPConfig returns the HTTP configuration, initializing it if necessary.
+func (s *serviceProvider) HTTPConfig() *configs.HTTPConfig {
 	if s.httpConfig == nil {
 		cfg, err := configs.NewHTTPConfig()
 		if err != nil {
@@ -40,10 +43,10 @@ func (s *serviceProvider) HTTPConfig() *configs.HttpConfig {
 		}
 		s.httpConfig = cfg
 	}
-
 	return s.httpConfig
 }
 
+// AuthClientConfig returns the authentication client configuration, initializing it if necessary.
 func (s *serviceProvider) AuthClientConfig() *configs.AuthClient {
 	if s.authClientConfig == nil {
 		cfg, err := configs.NewAuthClient()
@@ -55,6 +58,7 @@ func (s *serviceProvider) AuthClientConfig() *configs.AuthClient {
 	return s.authClientConfig
 }
 
+// AuthClient returns the authentication client, initializing it if necessary.
 func (s *serviceProvider) AuthClient(_ context.Context) auth_client.AuthClient {
 	if s.authClient == nil {
 		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -69,6 +73,7 @@ func (s *serviceProvider) AuthClient(_ context.Context) auth_client.AuthClient {
 	return s.authClient
 }
 
+// HeaderHelper returns the header helper instance, initializing it if necessary.
 func (s *serviceProvider) HeaderHelper() header_helper.IHeaderHelper {
 	if s.headerHelper == nil {
 		s.headerHelper = header_helper.New()
@@ -76,6 +81,7 @@ func (s *serviceProvider) HeaderHelper() header_helper.IHeaderHelper {
 	return s.headerHelper
 }
 
+// Controller returns the controller instance, initializing it if necessary.
 func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
 	if s.controller == nil {
 		s.controller = controller.New(s.AuthClient(ctx), s.HeaderHelper())

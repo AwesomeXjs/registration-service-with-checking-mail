@@ -1,11 +1,12 @@
 package controller
 
 import (
-	_ "github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/docs"
+	_ "github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/docs" // swagger docs
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// InitRoutes initializes all the routes for the application.
 func (c *Controller) InitRoutes(server *echo.Echo) {
 	// Swagger init
 	server.GET("/swagger/*", echoSwagger.WrapHandler)

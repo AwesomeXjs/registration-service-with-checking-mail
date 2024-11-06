@@ -27,17 +27,17 @@ func (c *Controller) GetAccessToken(ctx echo.Context) error {
 	cookie, err := c.hh.GetRefreshTokenFromCookie(ctx, consts.RefreshTokenKey)
 	if err != nil {
 		logger.Error("failed to get refresh token from cookie", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
+		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 
 	accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), converter.FromModelToProtoGetAccessToken(cookie))
 	if err != nil {
 		logger.Error("failed to get access token", zap.Error(err))
-		return response.ResponseHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
+		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 
 	c.hh.SetRefreshTokenInCookie(ctx, consts.RefreshTokenKey, accessToken.RefreshToken)
 
-	return response.ResponseHelper(ctx, http.StatusOK, "OK", accessToken.AccessToken)
+	return response.RespHelper(ctx, http.StatusOK, "OK", accessToken.AccessToken)
 
 }

@@ -8,6 +8,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// Logger is a middleware that logs details of each HTTP request.
+// It logs the request method, path, and duration. In case of an error, it also logs the error details.
 func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		start := time.Now()
