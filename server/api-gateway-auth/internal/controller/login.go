@@ -34,6 +34,7 @@ func (c *Controller) Login(ctx echo.Context) error {
 		logger.Error("failed to bind request", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
+	logger.Debug("login request: ", zap.Any("request", Request))
 
 	_, err = govalidator.ValidateStruct(Request)
 	if err != nil {

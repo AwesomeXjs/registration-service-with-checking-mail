@@ -33,6 +33,8 @@ func (c *Controller) Registration(ctx echo.Context) error {
 		logger.Warn("failed to bind request", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
+	logger.Debug("registration request: ", zap.Any("request", Request))
+
 	_, err = govalidator.ValidateStruct(Request)
 	if err != nil {
 		logger.Warn("failed to validate struct", zap.Error(err))

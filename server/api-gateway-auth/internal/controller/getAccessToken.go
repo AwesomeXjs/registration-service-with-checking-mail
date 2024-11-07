@@ -24,13 +24,14 @@ import (
 // @Failure 500 {object} response.Response
 // @Router /api/v1/get-access-token [get]
 func (c *Controller) GetAccessToken(ctx echo.Context) error {
-	cookie, err := c.hh.GetRefreshTokenFromCookie(ctx, consts.RefreshTokenKey)
+	refreshToken, err := c.hh.GetRefreshTokenFromCookie(ctx, consts.RefreshTokenKey)
 	if err != nil {
 		logger.Error("failed to get refresh token from cookie", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
+	logger.Debug("get refresh token", zap.String("REFRESH_TOKEN", refreshToken))
 
-	accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), converter.FromModelToProtoGetAccessToken(cookie))
+	accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), converter.FromModelToProtoGetAccessToken(refreshToken))
 	if err != nil {
 		logger.Error("failed to get access token", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())

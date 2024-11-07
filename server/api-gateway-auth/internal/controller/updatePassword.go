@@ -32,6 +32,7 @@ func (c *Controller) UpdatePassword(ctx echo.Context) error {
 		logger.Warn("failed to get access token from header", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
+	logger.Debug("get access token from header", zap.String("ACCESS_TOKEN", accessToken))
 
 	_, err = c.authClient.ValidateToken(ctx.Request().Context(), converter.ToProtoValidateToken(accessToken))
 	if err != nil {
@@ -45,6 +46,7 @@ func (c *Controller) UpdatePassword(ctx echo.Context) error {
 		logger.Error("failed to bind request", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
+	logger.Debug("update password request: ", zap.Any("request", Request))
 
 	_, err = govalidator.ValidateStruct(Request)
 	if err != nil {

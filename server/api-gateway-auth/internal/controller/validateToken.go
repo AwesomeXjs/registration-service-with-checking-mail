@@ -29,6 +29,7 @@ func (c *Controller) ValidateToken(ctx echo.Context) error {
 		logger.Warn("failed to get access token from header", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
+	logger.Debug("get access token from header", zap.String("ACCESS_TOKEN", accessToken))
 
 	_, err = c.authClient.ValidateToken(ctx.Request().Context(), converter.ToProtoValidateToken(accessToken))
 	if err != nil {
