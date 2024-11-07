@@ -42,7 +42,6 @@ func (c *Controller) Login(ctx echo.Context) error {
 	}
 
 	result, err := c.authClient.Login(ctx.Request().Context(), converter.FromModelToProtoLogin(&Request))
-
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid password") {
 			logger.Warn("failed to login", zap.Error(err))

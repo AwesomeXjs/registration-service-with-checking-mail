@@ -121,7 +121,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Login",
+                "summary": "Registration",
                 "operationId": "registration",
                 "parameters": [
                     {

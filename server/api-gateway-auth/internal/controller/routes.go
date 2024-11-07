@@ -8,7 +8,6 @@ import (
 
 // InitRoutes initializes all the routes for the application.
 func (c *Controller) InitRoutes(server *echo.Echo) {
-	// Swagger init
 	server.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// App routes

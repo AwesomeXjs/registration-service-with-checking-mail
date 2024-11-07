@@ -14,7 +14,7 @@ import (
 )
 
 // Registration - Registration
-// @Summary Login
+// @Summary Registration
 // @Tags Auth
 // @Description Registration new user
 // @ID registration

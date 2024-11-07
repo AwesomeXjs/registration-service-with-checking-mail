@@ -11,13 +11,13 @@ import (
 // GRPCClient wraps the AuthClient interface, providing methods to interact with
 // the authentication gRPC service. It delegates requests to the underlying AuthClient.
 type GRPCClient struct {
-	authClient AuthClient // The AuthClient instance to make actual gRPC calls.
+	authClient AuthClient
 }
 
 // New creates a new GRPCClient instance, initializing it with the provided AuthClient.
 func New(authClient AuthClient) *GRPCClient {
 	return &GRPCClient{
-		authClient: authClient, // Initializes the authClient field with the provided AuthClient.
+		authClient: authClient,
 	}
 }
 
