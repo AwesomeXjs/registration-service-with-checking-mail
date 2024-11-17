@@ -44,10 +44,9 @@ get-deps:
 
 # mocks
 mocks:
-	rm -rf tests/mocks && mkdir -p tests/mocks
-	#${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
-	#${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
-	#${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
+	rm -rf tests/unit/mocks && mkdir -p tests/unit/mocks
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/client/auth_client.AuthClient -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/header_helper.IHeaderHelper -o tests/unit/mocks -s "_minimock.go"
 
 test:
 	go clean -testcache
