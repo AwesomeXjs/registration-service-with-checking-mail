@@ -15,7 +15,7 @@ type GRPCClient struct {
 }
 
 // New creates a new GRPCClient instance, initializing it with the provided AuthClient.
-func New(authClient AuthClient) *GRPCClient {
+func New(authClient AuthClient) AuthClient {
 	return &GRPCClient{
 		authClient: authClient,
 	}

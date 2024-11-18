@@ -3,7 +3,7 @@ compose:
 
 
 run-auth:
-	cd server/auth-service && go run cmd/auth/main.go
+	cd auth-service && go run cmd/auth/main.go
 
 run-auth-gw:
-	cd server/api-gateway-auth && go run cmd/auth_gw/main.go
+	cd api-gateway-auth && go run cmd/auth_gw/main.go
