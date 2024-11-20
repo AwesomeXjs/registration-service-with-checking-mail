@@ -107,9 +107,10 @@ init-migration:
 # mocks
 mocks:
 	rm -rf tests/mocks && mkdir -p tests/mocks
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka.IProducer -o tests/unit/mocks -s "_minimock.go"
 
 test:
 	go clean -testcache

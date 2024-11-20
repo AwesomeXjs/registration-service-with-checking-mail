@@ -48,24 +48,24 @@ get-deps:
 
 
 generate:
-	make generate-auth-api
+	make generate-mail-api
 
-generate-auth-api:
+generate-mail-api:
 	mkdir -p pkg/mail_v1
 	protoc --proto_path api/mail_v1 --proto_path vendor.protogen \
     --go_out=pkg/mail_v1 --go_opt=paths=source_relative \
     --plugin=protoc-get-go=bin/protoc-gen-go \
     --go-grpc_out=pkg/mail_v1 --go-grpc_opt=paths=source_relative \
     --plugin=protoc-get-go-grpc=bin/protoc-gen-go-grpc \
-    api/mail_v1/auth.proto
+    api/mail_v1/mail.proto
 
 
 # mocks
 mocks:
 	rm -rf tests/mocks && mkdir -p tests/mocks
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
+	#${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
+	#${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
+	#${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o tests/unit/mocks -s "_minimock.go"
 
 test:
 	go clean -testcache
