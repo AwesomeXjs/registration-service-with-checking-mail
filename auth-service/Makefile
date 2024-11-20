@@ -56,6 +56,7 @@ get-deps:
 	go get github.com/fatih/color # terminal colors
 	go get github.com/redis/go-redis/v9 # redis
 	go get github.com/goccy/go-json # json decoder
+	go get github.com/confluentinc/confluent-kafka-go/v2/kafka # kafka
 
 
 # файлы для конфортной работы с плагинами grpc

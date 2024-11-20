@@ -5,6 +5,7 @@ import (
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db/pg"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis/go_redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/configs"
@@ -23,11 +24,13 @@ type serviceProvider struct {
 	pgConfig    configs.PGConfig
 	grpcConfig  configs.GRPCConfig
 	redisConfig configs.RedisConfig
+	kafkaConfig configs.KafkaConfig
 
 	// clients
-	dbClient    db.Client
-	authHelper  auth_helper.AuthHelper
-	redisClient redis.IRedis
+	dbClient      db.Client
+	authHelper    auth_helper.AuthHelper
+	redisClient   redis.IRedis
+	kafkaProducer kafka.IProducer
 
 	// layers
 	controller *controller.Controller
@@ -76,6 +79,18 @@ func (s *serviceProvider) RedisConfig() configs.RedisConfig {
 	return s.redisConfig
 }
 
+func (s *serviceProvider) KafkaConfig() configs.KafkaConfig {
+	if s.kafkaConfig == nil {
+		cfg, err := configs.NewKafkaConfig()
+		if err != nil {
+			logger.Fatal("failed to get kafka config", zap.Error(err))
+		}
+		s.kafkaConfig = cfg
+	}
+	return s.kafkaConfig
+
+}
+
 // DBClient initializes and returns the database client if not already created.
 // It also pings the database to ensure the connection is valid.
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
@@ -114,6 +129,18 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 	return s.redisClient
 }
 
+func (s *serviceProvider) KafkaProducer() kafka.IProducer {
+	if s.kafkaProducer == nil {
+		producer, err := kafka.NewProducer(s.KafkaConfig().Address())
+		if err != nil {
+			logger.Fatal("failed to create kafka producer", zap.Error(err))
+		}
+		closer.Add(producer.Close)
+		s.kafkaProducer = producer
+	}
+	return s.kafkaProducer
+}
+
 // AuthHelper initializes and returns the authentication helper if not already created.
 func (s *serviceProvider) AuthHelper() auth_helper.AuthHelper {
 	if s.authHelper == nil {
@@ -138,7 +165,7 @@ func (s *serviceProvider) Repository(ctx context.Context) repository.IRepository
 // Service initializes and returns the service layer for core business logic.
 func (s *serviceProvider) Service(ctx context.Context) service.IService {
 	if s.service == nil {
-		s.service = service.New(s.Repository(ctx), s.AuthHelper())
+		s.service = service.New(s.Repository(ctx), s.AuthHelper(), s.KafkaProducer())
 	}
 	return s.service
 }

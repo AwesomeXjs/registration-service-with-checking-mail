@@ -5,10 +5,8 @@ package auth_v1;
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
-import "google/api/annotations.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1;auth_v1";
+option go_package = "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1;auth_v1";
 
 service AuthV1 {
   // Register new user with email and password, returns access token, refresh token and user id

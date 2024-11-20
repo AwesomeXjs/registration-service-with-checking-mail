@@ -3,11 +3,16 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+)
+
+var (
+	topicRegistration = "registration"
 )
 
 // Registration handles the registration of a new user, hashes their password,
@@ -32,8 +37,11 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 		return nil, err
 	}
 
-	// ТУТ ОТПРАВЛЯЕМ СНАЧАЛО СОЗДАНИЕ В СЕРВИСЕ ЮЗЕРОВ
-	// ПОТОМ ОТПРАВЛЯЕМ ПИСЬМО В КАФКУ
+	err = s.kafkaProducer.Produce(user.Email, topicRegistration, user.ID, time.Now())
+	if err != nil {
+		logger.Error("failed to produce message", zap.Error(err))
+		return nil, fmt.Errorf("failed to produce message: %v", err)
+	}
 
 	accessToken, err := s.authHelper.GenerateAccessToken(&model.AccessTokenInfo{
 		ID:   userID,
