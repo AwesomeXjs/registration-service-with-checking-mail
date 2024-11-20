@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 )
 
 // IRepository defines the methods for user-related database operations.

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/consts"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/Masterminds/squirrel"
 	"go.uber.org/zap"
 )

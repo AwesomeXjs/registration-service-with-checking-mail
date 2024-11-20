@@ -3,18 +3,18 @@ package app
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db/pg"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/kafka"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis/go_redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/controller"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db/pg"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis/go_redis"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/configs"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/controller"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"go.uber.org/zap"
 )
 
@@ -129,6 +129,10 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 	return s.redisClient
 }
 
+// KafkaProducer returns an instance of the Kafka producer.
+// If the Kafka producer is not created yet, it creates a new one using the Kafka configuration addresses.
+// In case of an error while creating the producer, the function logs a fatal error and stops execution.
+// It also adds the producer's Close method to "closer" to ensure proper cleanup when done.
 func (s *serviceProvider) KafkaProducer() kafka.IProducer {
 	if s.kafkaProducer == nil {
 		producer, err := kafka.NewProducer(s.KafkaConfig().Address())

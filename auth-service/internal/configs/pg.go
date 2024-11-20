@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/consts"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/consts"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"go.uber.org/zap"
 )
 

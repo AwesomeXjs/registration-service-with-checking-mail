@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
-	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
+	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

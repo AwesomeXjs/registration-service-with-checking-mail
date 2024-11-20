@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 )
 
 // IService defines the methods for user authentication and authorization services.

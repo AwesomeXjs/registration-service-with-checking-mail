@@ -3,7 +3,7 @@ package pg
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
 )

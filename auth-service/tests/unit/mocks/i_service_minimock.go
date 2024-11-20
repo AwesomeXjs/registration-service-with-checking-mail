@@ -2,7 +2,7 @@
 
 package mocks
 
-//go:generate minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service.IService -o i_service_minimock.go -n IServiceMock -p mocks
+//go:generate minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service.IService -o i_service_minimock.go -n IServiceMock -p mocks
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	mm_atomic "sync/atomic"
 	mm_time "time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/gojuno/minimock/v3"
 )
 

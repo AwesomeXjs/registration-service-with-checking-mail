@@ -3,8 +3,8 @@ package transaction
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/db/pg"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db/pg"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"

@@ -3,7 +3,7 @@ package configs
 import (
 	"fmt"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )

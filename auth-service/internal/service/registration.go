@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )

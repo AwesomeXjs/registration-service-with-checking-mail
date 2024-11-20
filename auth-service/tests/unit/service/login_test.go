@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/tests/unit/mocks"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/tests/unit/mocks"
 	"github.com/brianvoe/gofakeit"
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
@@ -23,6 +25,7 @@ func TestLogin(t *testing.T) {
 
 	type IRepositoryMockFunc func(mc *minimock.Controller) repository.IRepository
 	type AuthHelperMockFunc func(mc *minimock.Controller) auth_helper.AuthHelper
+	type IProducerMockFunc func(mc *minimock.Controller) kafka.IProducer
 
 	type args struct {
 		ctx context.Context
@@ -65,12 +68,13 @@ func TestLogin(t *testing.T) {
 	defer t.Cleanup(mc.Finish)
 
 	tests := []struct {
-		name            string              // название теста
-		args            args                // аргументы которые передаем в ручку Login
-		want            *model.AuthResponse // что хотим получить из ручки Login
-		err             error
-		IRepositoryMock IRepositoryMockFunc // функция которая возвращает замоканый сервис с нужным поведением
-		AuthHelperMock  AuthHelperMockFunc
+		name              string              // название теста
+		args              args                // аргументы которые передаем в ручку Login
+		want              *model.AuthResponse // что хотим получить из ручки Login
+		err               error
+		IRepositoryMock   IRepositoryMockFunc // функция которая возвращает замоканый сервис с нужным поведением
+		AuthHelperMock    AuthHelperMockFunc
+		IProducerMockFunc IProducerMockFunc
 	}{
 		{
 			name: "success",
@@ -96,6 +100,11 @@ func TestLogin(t *testing.T) {
 				mock.GenerateRefreshTokenMock.Expect(userID).Return(refreshToken, nil)
 				return mock
 			},
+			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
+				mock := mocks.NewIProducerMock(mc)
+				mock.ProduceMock.Expect(email, "email", "email", time.Now()).Return(nil)
+				return mock
+			},
 		},
 		{
 			name: "repository error case",
@@ -113,6 +122,11 @@ func TestLogin(t *testing.T) {
 			},
 			AuthHelperMock: func(mc *minimock.Controller) auth_helper.AuthHelper {
 				mock := mocks.NewAuthHelperMock(mc)
+				return mock
+			},
+			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
+				mock := mocks.NewIProducerMock(mc)
+				mock.ProduceMock.Expect(email, "email", "email", time.Now()).Return(nil)
 				return mock
 			},
 		},
@@ -135,6 +149,11 @@ func TestLogin(t *testing.T) {
 				mock.ValidatePasswordMock.Expect(hashPassword, password).Return(false)
 				return mock
 			},
+			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
+				mock := mocks.NewIProducerMock(mc)
+				mock.ProduceMock.Expect(email, "email", "email", time.Now()).Return(nil)
+				return mock
+			},
 		},
 	}
 
@@ -144,8 +163,9 @@ func TestLogin(t *testing.T) {
 			t.Parallel()
 			IRepoMock := tt.IRepositoryMock(mc)
 			AuthHelperMock := tt.AuthHelperMock(mc)
+			IProducerMock := tt.IProducerMockFunc(mc)
 
-			myService := service.New(IRepoMock, AuthHelperMock)
+			myService := service.New(IRepoMock, AuthHelperMock, IProducerMock)
 
 			result, err := myService.Login(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)

@@ -1,6 +1,6 @@
 package auth_helper
 
-import "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+import "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 
 // AuthHelper defines the methods required for authentication tasks,
 // including token generation, verification, and password management.

@@ -2,14 +2,14 @@
 
 package mocks
 
-//go:generate minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper.AuthHelper -o auth_helper_minimock.go -n AuthHelperMock -p mocks
+//go:generate minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper.AuthHelper -o auth_helper_minimock.go -n AuthHelperMock -p mocks
 
 import (
 	"sync"
 	mm_atomic "sync/atomic"
 	mm_time "time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/model"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/gojuno/minimock/v3"
 )
 

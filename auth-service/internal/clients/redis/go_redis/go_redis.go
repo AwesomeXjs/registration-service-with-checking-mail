@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/configs"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/goccy/go-json"
 	goRedis "github.com/redis/go-redis/v9"
 	"go.uber.org/zap"

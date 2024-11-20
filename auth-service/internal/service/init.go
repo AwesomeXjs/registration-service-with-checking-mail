@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/clients/kafka"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/repository"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/utils/auth_helper"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper"
 )
 
 // Service provides business logic and interacts with the repository.

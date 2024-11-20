@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/internal/service"
-	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
+	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 )
 
 // Controller handles gRPC requests for the authentication service.
