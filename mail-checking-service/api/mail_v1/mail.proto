@@ -15,5 +15,7 @@ service MailV1 {
 }
 
 message CheckUniqueCodeRequest {
-  string code = 1;
+  string email = 1;
+  string code = 2;
+  string accessToken = 3;
 }

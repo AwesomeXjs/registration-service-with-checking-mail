@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
@@ -102,7 +101,6 @@ func TestLogin(t *testing.T) {
 			},
 			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
 				mock := mocks.NewIProducerMock(mc)
-				mock.ProduceMock.Expect(email, "email", "email", time.Now()).Return(nil)
 				return mock
 			},
 		},
@@ -126,7 +124,6 @@ func TestLogin(t *testing.T) {
 			},
 			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
 				mock := mocks.NewIProducerMock(mc)
-				mock.ProduceMock.Expect(email, "email", "email", time.Now()).Return(nil)
 				return mock
 			},
 		},
@@ -151,7 +148,6 @@ func TestLogin(t *testing.T) {
 			},
 			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
 				mock := mocks.NewIProducerMock(mc)
-				mock.ProduceMock.Expect(email, "email", "email", time.Now()).Return(nil)
 				return mock
 			},
 		},

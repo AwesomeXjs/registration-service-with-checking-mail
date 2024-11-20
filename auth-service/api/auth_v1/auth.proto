@@ -9,16 +9,12 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1;auth_v1";
 
 service AuthV1 {
-  // Register new user with email and password, returns access token, refresh token and user id
   rpc Registration(RegistrationRequest) returns (RegistrationResponse);
 
-  // Login with email and password
   rpc Login(LoginRequest) returns (LoginResponse);
 
-  // Validate access token for authentication
   rpc ValidateToken(ValidateTokenRequest) returns (google.protobuf.Empty);
 
-  // Get access token from refresh token
   rpc GetAccessToken(GetAccessTokenRequest) returns (GetAccessTokenResponse);
 
   rpc UpdatePassword(UpdatePasswordRequest) returns (google.protobuf.Empty);
