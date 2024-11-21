@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/utils/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"go.uber.org/zap"
 )
 
 const (
@@ -50,11 +52,9 @@ func NewConsumer(handler Handler, addresses []string, topic string, consumerGrou
 
 func (c *Consumer) Start() {
 	for {
-		// если консьюмер остановлен - выходим из цикла
 		if c.stop {
 			break
 		}
-		// читаем сообщение
 		kafkaMsg, err := c.consumer.ReadMessage(noTimeout)
 		if err != nil {
 			fmt.Printf("Failed to read message: %s\n", err)
@@ -66,7 +66,7 @@ func (c *Consumer) Start() {
 
 		// тут обрабатываем сообщение (передаем в другой сервис)
 		if err = c.handler.HandleMessage(kafkaMsg.Value, kafkaMsg.TopicPartition.Offset, c.consumerNumber); err != nil {
-			fmt.Printf("Failed to handle message: %s\n", err)
+			logger.Info("failed to handle message", zap.Error(err))
 		}
 
 		// после обработки мы должны вручную сохранить оффсет локально
