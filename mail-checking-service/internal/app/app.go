@@ -40,7 +40,7 @@ func New(ctx context.Context) (*App, error) {
 }
 
 // Run starts the gRPC server and ensures proper resource cleanup.
-func (a *App) Run() error {
+func (a *App) Run(ctx context.Context) error {
 	defer func() {
 		closer.CloseAll()
 		closer.Wait()
@@ -59,22 +59,22 @@ func (a *App) Run() error {
 
 	go func() {
 		defer wg.Done()
-		cons := a.serviceProvider.KafkaConsumer(1)
-		cons.Start()
+		cons := a.serviceProvider.KafkaConsumer(ctx, 1)
+		cons.Start(ctx)
 		closer.Add(cons.Stop)
 	}()
 
 	go func() {
 		defer wg.Done()
-		cons := a.serviceProvider.KafkaConsumer(2)
-		cons.Start()
+		cons := a.serviceProvider.KafkaConsumer(ctx, 2)
+		cons.Start(ctx)
 		closer.Add(cons.Stop)
 	}()
 
 	go func() {
 		defer wg.Done()
-		cons := a.serviceProvider.KafkaConsumer(3)
-		cons.Start()
+		cons := a.serviceProvider.KafkaConsumer(ctx, 3)
+		cons.Start(ctx)
 		closer.Add(cons.Stop)
 	}()
 

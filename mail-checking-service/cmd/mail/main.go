@@ -16,7 +16,7 @@ func main() {
 		logger.Fatal("failed to init app", zap.Error(err))
 	}
 
-	err = myApp.Run()
+	err = myApp.Run(ctx)
 	if err != nil {
 		logger.Fatal("failed to run app", zap.Error(err))
 	}

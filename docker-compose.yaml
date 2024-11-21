@@ -3,6 +3,7 @@ version: "3"
 volumes:
   postgres_volume:
   redis-data:
+  redis-mail:
 
 services:
   pg-auth-service:
@@ -110,6 +111,13 @@ services:
         - kafka3
       networks:
         - kafka-net
+  redis-mail-service:
+    image: redis:7.2.5-alpine3.20
+    container_name: redis-mail-service
+    ports:
+      - "6385:6379"
+    volumes:
+      - redis-mail:/data
 networks:
     kafka-net:
       driver: bridge

@@ -1,6 +1,8 @@
 package controller
 
-import "github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
+import (
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
+)
 
 // Controller handles gRPC requests for the authentication service.
 // It embeds UnimplementedMailV1Server to provide default implementations

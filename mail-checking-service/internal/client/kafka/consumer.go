@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -47,10 +48,11 @@ func NewConsumer(handler Handler, addresses []string, topic string, consumerGrou
 	return &Consumer{
 		consumer:       consumer,
 		handler:        handler,
-		consumerNumber: consumerNumber}, nil
+		consumerNumber: consumerNumber,
+	}, nil
 }
 
-func (c *Consumer) Start() {
+func (c *Consumer) Start(ctx context.Context) {
 	for {
 		if c.stop {
 			break
@@ -64,12 +66,10 @@ func (c *Consumer) Start() {
 			continue
 		}
 
-		// тут обрабатываем сообщение (передаем в другой сервис)
-		if err = c.handler.HandleMessage(kafkaMsg.Value, kafkaMsg.TopicPartition.Offset, c.consumerNumber); err != nil {
-			logger.Info("failed to handle message", zap.Error(err))
+		if err = c.handler.HandleMessage(ctx, kafkaMsg.Value, kafkaMsg.TopicPartition.Offset, c.consumerNumber); err != nil {
+			logger.Error("failed to handle message", zap.Error(err))
 		}
 
-		// после обработки мы должны вручную сохранить оффсет локально
 		if _, err = c.consumer.StoreMessage(kafkaMsg); err != nil {
 			fmt.Printf("Failed to store message: %s\n", err)
 		}
