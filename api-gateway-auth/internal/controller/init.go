@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/client/auth_client"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/header_helper"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/client/auth_client"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/header_helper"
 )
 
 // Controller handles the authentication and header-related operations.

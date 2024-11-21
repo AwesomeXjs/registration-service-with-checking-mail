@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/converter"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/response"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/converter"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/response"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )

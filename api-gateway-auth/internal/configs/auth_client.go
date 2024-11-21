@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/logger"
 	"go.uber.org/zap"
 )
 

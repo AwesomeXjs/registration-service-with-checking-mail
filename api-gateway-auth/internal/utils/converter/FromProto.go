@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/internal/model"
-	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
+	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 )
 
 // ToModelFromProtoRegister converts a RegistrationResponse from gRPC to a RegistrationResponse model.

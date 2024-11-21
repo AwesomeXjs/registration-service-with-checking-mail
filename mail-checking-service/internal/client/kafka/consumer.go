@@ -12,10 +12,6 @@ const (
 	noTimeout      = -1
 )
 
-type Handler interface {
-	HandleMessage(kafkaMsg []byte, offset kafka.Offset, consumerNumber int) error
-}
-
 type Consumer struct {
 	consumer       *kafka.Consumer
 	stop           bool

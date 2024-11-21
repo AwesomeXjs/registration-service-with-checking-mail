@@ -1,7 +1,7 @@
 package controller
 
 import (
-	_ "github.com/AwesomeXjs/registration-service-with-checking-mail/server/api-gateway-auth/docs" // swagger docs
+	_ "github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/docs" // swagger docs
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
