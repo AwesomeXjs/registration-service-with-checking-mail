@@ -6,8 +6,7 @@ import (
 	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/goccy/go-json"
 	goRedis "github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -24,7 +23,7 @@ type GoRedisClient struct {
 
 // NewGoRedisClient initializes a new GoRedisClient with the provided Redis configuration.
 // It creates a new Redis client using the configuration's address.
-func NewGoRedisClient(config configs.RedisConfig) *GoRedisClient {
+func NewGoRedisClient(config redis.IRedisConfig) *GoRedisClient {
 	redisClient := &GoRedisClient{
 		Client: goRedis.NewClient(&goRedis.Options{
 			Addr:     config.Address(),

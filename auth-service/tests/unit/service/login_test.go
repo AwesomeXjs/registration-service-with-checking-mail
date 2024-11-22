@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
+	logger2 "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/tests/unit/mocks"
 	"github.com/brianvoe/gofakeit"
 	"github.com/gojuno/minimock/v3"
@@ -20,10 +20,10 @@ import (
 func TestLogin(t *testing.T) {
 	t.Parallel()
 	level := "info"
-	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
+	logger2.Init(logger2.GetCore(logger2.GetAtomicLevel(&level)))
 
 	type IRepositoryMockFunc func(mc *minimock.Controller) repository.IRepository
-	type AuthHelperMockFunc func(mc *minimock.Controller) auth_helper.AuthHelper
+	type AuthHelperMockFunc func(mc *minimock.Controller) jwt_manager.AuthHelper
 	type IProducerMockFunc func(mc *minimock.Controller) kafka.IProducer
 
 	type args struct {
@@ -89,7 +89,7 @@ func TestLogin(t *testing.T) {
 				mock.LoginMock.Expect(ctx, email).Return(loginResponse, nil)
 				return mock
 			},
-			AuthHelperMock: func(mc *minimock.Controller) auth_helper.AuthHelper {
+			AuthHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
 				mock := mocks.NewAuthHelperMock(mc)
 				mock.ValidatePasswordMock.Expect(hashPassword, password).Return(true)
 				mock.GenerateAccessTokenMock.Expect(&model.AccessTokenInfo{
@@ -118,7 +118,7 @@ func TestLogin(t *testing.T) {
 				mock.LoginMock.Expect(ctx, email).Return(nil, repositoryError)
 				return mock
 			},
-			AuthHelperMock: func(mc *minimock.Controller) auth_helper.AuthHelper {
+			AuthHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
 				mock := mocks.NewAuthHelperMock(mc)
 				return mock
 			},
@@ -141,7 +141,7 @@ func TestLogin(t *testing.T) {
 				mock.LoginMock.Expect(ctx, email).Return(loginResponse, nil)
 				return mock
 			},
-			AuthHelperMock: func(mc *minimock.Controller) auth_helper.AuthHelper {
+			AuthHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
 				mock := mocks.NewAuthHelperMock(mc)
 				mock.ValidatePasswordMock.Expect(hashPassword, password).Return(false)
 				return mock

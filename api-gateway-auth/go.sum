@@ -1,3 +1,5 @@
+github.com/AwesomeXjs/libs v1.0.1 h1:Pk3xmvZ6QVEk1X3psnYMu2/Dfwf1GKKNx+UE8RBK8m8=
+github.com/AwesomeXjs/libs v1.0.1/go.mod h1:2p0dm1+E/CeqI58fPdzaXZdp7BHsBeBhNLYZdkxB6gg=
 github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241120184722-219c1dc9a24d h1:JmIF5gGC+bEB+yvm8TklqVihdX0FyVySF6TC0HhIc6s=
 github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241120184722-219c1dc9a24d/go.mod h1:tNB6POtHHqDmGLVUdJQq32A5x76aOWRMas6x0N15S0k=
 github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service v0.0.0-20241105134648-b8deedfc0b47 h1:FXzJgT+SnxFzemkeK/Xp6yVXziHk2VtiwYjAXlbWO68=

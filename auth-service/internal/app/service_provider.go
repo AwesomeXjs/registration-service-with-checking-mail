@@ -3,37 +3,36 @@ package app
 import (
 	"context"
 
+	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db/pg"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis/go_redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/controller"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/grpc_server"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"go.uber.org/zap"
 )
 
 // serviceProvider struct holds configurations and instances needed to set up and manage services.
 type serviceProvider struct {
 	// configs
-	pgConfig    configs.PGConfig
-	grpcConfig  configs.GRPCConfig
-	redisConfig configs.RedisConfig
-	kafkaConfig configs.KafkaConfig
+	pgConfig    db.PGConfig
+	grpcConfig  GRPCConfig
+	redisConfig redis.IRedisConfig
+	kafkaConfig kafka.IKafkaConfig
 
 	// clients
 	dbClient      db.Client
-	authHelper    auth_helper.AuthHelper
+	authHelper    jwt_manager.AuthHelper
 	redisClient   redis.IRedis
 	kafkaProducer kafka.IProducer
 
 	// layers
-	controller *controller.Controller
+	grpcServer *grpc_server.GrpcServer
 	service    service.IService
 	repository repository.IRepository
 }
@@ -44,9 +43,9 @@ func newServiceProvider() *serviceProvider {
 }
 
 // PGConfig initializes and returns the PostgreSQL configuration if not already set.
-func (s *serviceProvider) PGConfig() configs.PGConfig {
+func (s *serviceProvider) PGConfig() db.PGConfig {
 	if s.pgConfig == nil {
-		cfg, err := configs.NewPgConfig()
+		cfg, err := db.NewPgConfig()
 		if err != nil {
 			logger.Fatal("failed to get pg config", zap.Error(err))
 		}
@@ -56,9 +55,9 @@ func (s *serviceProvider) PGConfig() configs.PGConfig {
 }
 
 // GRPCConfig initializes and returns the gRPC configuration if not already set.
-func (s *serviceProvider) GRPCConfig() configs.GRPCConfig {
+func (s *serviceProvider) GRPCConfig() GRPCConfig {
 	if s.grpcConfig == nil {
-		cfg, err := configs.NewGrpcConfig()
+		cfg, err := NewGrpcConfig()
 		if err != nil {
 			logger.Fatal("failed to get grpc config", zap.Error(err))
 		}
@@ -68,9 +67,9 @@ func (s *serviceProvider) GRPCConfig() configs.GRPCConfig {
 }
 
 // RedisConfig retrieves the Redis configuration, initializing it if necessary.
-func (s *serviceProvider) RedisConfig() configs.RedisConfig {
+func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
 	if s.redisConfig == nil {
-		cfg, err := configs.NewRedisConfig()
+		cfg, err := redis.NewRedisConfig()
 		if err != nil {
 			logger.Fatal("failed to get redis config", zap.Error(err))
 		}
@@ -79,9 +78,9 @@ func (s *serviceProvider) RedisConfig() configs.RedisConfig {
 	return s.redisConfig
 }
 
-func (s *serviceProvider) KafkaConfig() configs.KafkaConfig {
+func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
 	if s.kafkaConfig == nil {
-		cfg, err := configs.NewKafkaConfig()
+		cfg, err := kafka.NewKafkaConfig()
 		if err != nil {
 			logger.Fatal("failed to get kafka config", zap.Error(err))
 		}
@@ -146,14 +145,14 @@ func (s *serviceProvider) KafkaProducer() kafka.IProducer {
 }
 
 // AuthHelper initializes and returns the authentication helper if not already created.
-func (s *serviceProvider) AuthHelper() auth_helper.AuthHelper {
+func (s *serviceProvider) AuthHelper() jwt_manager.AuthHelper {
 	if s.authHelper == nil {
-		cfg, err := configs.NewAuthConfig()
+		cfg, err := jwt_manager.NewAuthConfig()
 		if err != nil {
 			logger.Fatal("failed to get auth config", zap.Error(err))
 		}
 
-		s.authHelper = auth_helper.New(cfg.GetSecretKey(), cfg.GetRefreshTokenDuration(), cfg.GetAccessTokenDuration())
+		s.authHelper = jwt_manager.New(cfg.GetSecretKey(), cfg.GetRefreshTokenDuration(), cfg.GetAccessTokenDuration())
 	}
 	return s.authHelper
 }
@@ -174,10 +173,10 @@ func (s *serviceProvider) Service(ctx context.Context) service.IService {
 	return s.service
 }
 
-// Controller initializes and returns the controller layer to handle business logic requests.
-func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
-	if s.controller == nil {
-		s.controller = controller.New(s.Service(ctx))
+// GrpcServer initializes and returns the controller layer to handle business logic requests.
+func (s *serviceProvider) GrpcServer(ctx context.Context) *grpc_server.GrpcServer {
+	if s.grpcServer == nil {
+		s.grpcServer = grpc_server.New(s.Service(ctx))
 	}
-	return s.controller
+	return s.grpcServer
 }

@@ -7,9 +7,8 @@ import (
 	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/consts"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/Masterminds/squirrel"
 	"go.uber.org/zap"
 )
@@ -25,10 +24,10 @@ func (r *Repository) Login(ctx context.Context, email string) (*model.LoginRespo
 		return &loginResponse, nil
 	}
 
-	queryBuilder := squirrel.Select(consts.IDColumn, consts.HashPasswordColumn, consts.RoleColumn).
-		From(consts.TableName).
+	queryBuilder := squirrel.Select(IDColumn, HashPasswordColumn, RoleColumn).
+		From(TableName).
 		PlaceholderFormat(squirrel.Dollar).
-		Where(squirrel.Eq{consts.EmailColumn: email}).
+		Where(squirrel.Eq{EmailColumn: email}).
 		Limit(1)
 
 	query, args, err := queryBuilder.ToSql()

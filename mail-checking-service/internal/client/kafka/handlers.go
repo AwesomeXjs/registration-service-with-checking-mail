@@ -6,8 +6,7 @@ import (
 	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -16,15 +15,15 @@ import (
 
 type Handler interface {
 	HandleMessage(ctx context.Context, kafkaMsg []byte, offset kafka.Offset, consumerNumber int) error
-	sendEmail(ctx context.Context, config configs.IMailConfig, to, subject, body string) error
+	sendEmail(ctx context.Context, config IMailConfig, to, subject, body string) error
 }
 
 type KafkaHandler struct {
 	redisClient redis.IRedis
-	configEmail configs.IMailConfig
+	configEmail IMailConfig
 }
 
-func NewKafkaHandler(redisClient redis.IRedis, configEmail configs.IMailConfig) *KafkaHandler {
+func NewKafkaHandler(redisClient redis.IRedis, configEmail IMailConfig) *KafkaHandler {
 	return &KafkaHandler{
 		redisClient: redisClient,
 		configEmail: configEmail,
@@ -47,7 +46,7 @@ func (h *KafkaHandler) HandleMessage(ctx context.Context, kafkaMsg []byte, offse
 	return nil
 }
 
-func (h *KafkaHandler) sendEmail(ctx context.Context, config configs.IMailConfig, to, subject, body string) error {
+func (h *KafkaHandler) sendEmail(ctx context.Context, config IMailConfig, to, subject, body string) error {
 	mailer := gomail.NewMessage()
 	mailer.SetHeader("From", "xxx@example.com")
 	mailer.SetHeader("To", to)

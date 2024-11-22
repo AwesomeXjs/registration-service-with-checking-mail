@@ -3,6 +3,7 @@ module github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway
 go 1.22.2
 
 require (
+	github.com/AwesomeXjs/libs v1.0.1 // indirect
 	github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241120184722-219c1dc9a24d // indirect
 	github.com/AwesomeXjs/registration-service-with-checking-mail/server/auth-service v0.0.0-20241105134648-b8deedfc0b47 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect

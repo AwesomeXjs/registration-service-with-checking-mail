@@ -3,15 +3,15 @@ package app
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/consts"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/interceptors"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
+	"github.com/AwesomeXjs/libs/pkg/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -20,6 +20,7 @@ import (
 var (
 	// LogLevel defines the logging level, which can be set using the command-line flag "-l".
 	LogLevel = flag.String("l", "info", "log level")
+	envPath  = ".env" // EnvPath - contains path to .env file
 )
 
 // App struct encapsulates the dependencies and the gRPC server instance.
@@ -69,8 +70,10 @@ func (a *App) InitDeps(ctx context.Context) error {
 
 // InitConfig loads environment variables from the specified path.
 func (a *App) InitConfig(_ context.Context) error {
-	if err := configs.LoadEnv(consts.EnvPath); err != nil {
-		logger.Fatal("failed to load env", zap.Error(err))
+	err := godotenv.Load(envPath)
+	if err != nil {
+		logger.Error("Error loading .env file", zap.String("path", envPath))
+		return fmt.Errorf("error loading .env file: %v", err)
 	}
 	return nil
 }
@@ -92,7 +95,7 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 				interceptors.LogInterceptor),
 		))
 	reflection.Register(a.grpcServer)
-	authService.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.Controller(ctx))
+	authService.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GrpcServer(ctx))
 
 	return nil
 }

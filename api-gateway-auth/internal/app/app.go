@@ -3,16 +3,21 @@ package app
 import (
 	"context"
 	"flag"
+	"fmt"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/configs"
+	"github.com/AwesomeXjs/libs/pkg/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/consts"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/logger"
 	"github.com/asaskevich/govalidator"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
+)
+
+const (
+	// EnvPath is the path to the .env file that contains environment variables.
+	EnvPath = ".env"
 )
 
 // logLevel is a command-line flag for specifying the log level.
@@ -67,11 +72,12 @@ func (a *App) InitDeps(ctx context.Context) error {
 
 // InitConfig loads environment variables for the application.
 func (a *App) InitConfig(_ context.Context) error {
-	if err := configs.LoadEnv(consts.EnvPath); err != nil {
-		// Log fatal error if environment variables fail to load
-		logger.Fatal("failed to load env", zap.Error(err))
+	err := godotenv.Load(EnvPath)
+	if err != nil {
+		logger.Error("Error loading .env file", zap.String("path", EnvPath))
+		return fmt.Errorf("error loading .env file: %v", err)
 	}
-	return nil
+	return err
 }
 
 // initServiceProvider initializes the service provider.

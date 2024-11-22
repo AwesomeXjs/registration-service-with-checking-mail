@@ -3,13 +3,12 @@ package app
 import (
 	"context"
 
+	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis/go_redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/configs"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/controller"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/utils/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/grpc_server"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
 	"go.uber.org/zap"
 )
 
@@ -18,15 +17,15 @@ const (
 )
 
 type serviceProvider struct {
-	grpcConfig  configs.GRPCConfigs
-	kafkaConfig configs.KafkaConfig
-	redisConfig configs.RedisConfig
-	emailConfig configs.IMailConfig
+	grpcConfig  GRPCConfigs
+	kafkaConfig kafka.KafkaConfig
+	redisConfig redis.RedisConfig
+	emailConfig kafka.IMailConfig
 
 	kafkaConsumer *kafka.Consumer
 	redisClient   redis.IRedis
 
-	controller   *controller.Controller
+	controller   *grpc_server.GrpcServer
 	kafkaHandler *kafka.KafkaHandler
 }
 
@@ -36,9 +35,9 @@ func newServiceProvider() *serviceProvider {
 }
 
 // GRPCConfig initializes and returns the gRPC configuration if not already set.
-func (s *serviceProvider) GRPCConfig() configs.GRPCConfigs {
+func (s *serviceProvider) GRPCConfig() GRPCConfigs {
 	if s.grpcConfig == nil {
-		cfg, err := configs.NewGRPCConfig()
+		cfg, err := NewGRPCConfig()
 		if err != nil {
 			logger.Fatal("failed to get grpc config", zap.Error(err))
 		}
@@ -47,9 +46,9 @@ func (s *serviceProvider) GRPCConfig() configs.GRPCConfigs {
 	return s.grpcConfig
 }
 
-func (s *serviceProvider) EmailConfig() configs.IMailConfig {
+func (s *serviceProvider) EmailConfig() kafka.IMailConfig {
 	if s.emailConfig == nil {
-		cfg, err := configs.NewMailConfig()
+		cfg, err := kafka.NewMailConfig()
 		if err != nil {
 			logger.Warn("failed to get email config", zap.Error(err))
 		}
@@ -58,9 +57,9 @@ func (s *serviceProvider) EmailConfig() configs.IMailConfig {
 	return s.emailConfig
 }
 
-func (s *serviceProvider) KafkaConfig() configs.KafkaConfig {
+func (s *serviceProvider) KafkaConfig() kafka.KafkaConfig {
 	if s.kafkaConfig == nil {
-		cfg, err := configs.NewKafkaConfig()
+		cfg, err := kafka.NewKafkaConfig()
 		if err != nil {
 			logger.Fatal("failed to get kafka config", zap.Error(err))
 		}
@@ -69,9 +68,9 @@ func (s *serviceProvider) KafkaConfig() configs.KafkaConfig {
 	return s.kafkaConfig
 }
 
-func (s *serviceProvider) RedisConfig() configs.RedisConfig {
+func (s *serviceProvider) RedisConfig() redis.RedisConfig {
 	if s.redisConfig == nil {
-		cfg, err := configs.NewRedisConfig()
+		cfg, err := redis.NewRedisConfig()
 		if err != nil {
 			logger.Fatal("failed to get redis config", zap.Error(err))
 		}
@@ -95,10 +94,9 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 	return s.redisClient
 }
 
-// Controller initializes and returns the controller layer to handle business logic requests.
-func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
+func (s *serviceProvider) GrpcServer(ctx context.Context) *grpc_server.GrpcServer {
 	if s.controller == nil {
-		s.controller = controller.New()
+		s.controller = grpc_server.New()
 	}
 	return s.controller
 }

@@ -6,20 +6,19 @@ import (
 	"strings"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/consts"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
 	"github.com/Masterminds/squirrel"
 	"go.uber.org/zap"
 )
 
 // Registration inserts a new user into the database and returns the user ID.
 func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb) (string, error) {
-	builderInsert := squirrel.Insert(consts.TableName).
+	builderInsert := squirrel.Insert(TableName).
 		PlaceholderFormat(squirrel.Dollar).
-		Columns(consts.IDColumn, consts.EmailColumn, consts.HashPasswordColumn, consts.RoleColumn).
+		Columns(IDColumn, EmailColumn, HashPasswordColumn, RoleColumn).
 		Values(infoToDb.ID, infoToDb.Email, infoToDb.HashPassword, infoToDb.Role).
-		Suffix(consts.ReturningID)
+		Suffix(ReturningID)
 
 	query, args, err := builderInsert.ToSql()
 	if err != nil {

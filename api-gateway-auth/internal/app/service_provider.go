@@ -3,12 +3,11 @@ package app
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/client/auth_client"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/configs"
+	"github.com/AwesomeXjs/libs/pkg/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/client/grpc_auth_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/controller"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/header_helper"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/headers_manager"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -18,12 +17,12 @@ import (
 // serviceProvider manages the application's configuration, clients, and controllers.
 type serviceProvider struct {
 	// configs
-	httpConfig       *configs.HTTPConfig
-	authClientConfig *configs.AuthClient
+	httpConfig       IHTTPConfig
+	authClientConfig grpc_auth_client.IAuthClientConfig
 
 	// clients
-	authClient   auth_client.AuthClient
-	headerHelper header_helper.IHeaderHelper
+	authClient   grpc_auth_client.AuthClient
+	headerHelper headers_manager.IHeaderHelper
 
 	// controllers
 	controller *controller.Controller
@@ -35,9 +34,9 @@ func newServiceProvider() *serviceProvider {
 }
 
 // HTTPConfig returns the HTTP configuration, initializing it if necessary.
-func (s *serviceProvider) HTTPConfig() *configs.HTTPConfig {
+func (s *serviceProvider) HTTPConfig() IHTTPConfig {
 	if s.httpConfig == nil {
-		cfg, err := configs.NewHTTPConfig()
+		cfg, err := NewHTTPConfig()
 		if err != nil {
 			logger.Fatal("failed to get http config", zap.Error(err))
 		}
@@ -47,9 +46,9 @@ func (s *serviceProvider) HTTPConfig() *configs.HTTPConfig {
 }
 
 // AuthClientConfig returns the authentication client configuration, initializing it if necessary.
-func (s *serviceProvider) AuthClientConfig() *configs.AuthClient {
+func (s *serviceProvider) AuthClientConfig() grpc_auth_client.IAuthClientConfig {
 	if s.authClientConfig == nil {
-		cfg, err := configs.NewAuthClient()
+		cfg, err := grpc_auth_client.NewAuthClient()
 		if err != nil {
 			logger.Fatal("failed to get grpc config", zap.Error(err))
 		}
@@ -58,8 +57,8 @@ func (s *serviceProvider) AuthClientConfig() *configs.AuthClient {
 	return s.authClientConfig
 }
 
-// AuthClient returns the authentication client, initializing it if necessary.
-func (s *serviceProvider) AuthClient(_ context.Context) auth_client.AuthClient {
+// GrpcAuthClient returns the authentication client, initializing it if necessary.
+func (s *serviceProvider) GrpcAuthClient(_ context.Context) grpc_auth_client.AuthClient {
 	if s.authClient == nil {
 		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
@@ -68,15 +67,15 @@ func (s *serviceProvider) AuthClient(_ context.Context) auth_client.AuthClient {
 		closer.Add(conn.Close)
 
 		client := auth_v1.NewAuthV1Client(conn)
-		s.authClient = auth_client.New(client)
+		s.authClient = grpc_auth_client.New(client)
 	}
 	return s.authClient
 }
 
 // HeaderHelper returns the header helper instance, initializing it if necessary.
-func (s *serviceProvider) HeaderHelper() header_helper.IHeaderHelper {
+func (s *serviceProvider) HeaderHelper() headers_manager.IHeaderHelper {
 	if s.headerHelper == nil {
-		s.headerHelper = header_helper.New()
+		s.headerHelper = headers_manager.New()
 	}
 	return s.headerHelper
 }
@@ -84,7 +83,7 @@ func (s *serviceProvider) HeaderHelper() header_helper.IHeaderHelper {
 // Controller returns the controller instance, initializing it if necessary.
 func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
 	if s.controller == nil {
-		s.controller = controller.New(s.AuthClient(ctx), s.HeaderHelper())
+		s.controller = controller.New(s.GrpcAuthClient(ctx), s.HeaderHelper())
 	}
 	return s.controller
 }

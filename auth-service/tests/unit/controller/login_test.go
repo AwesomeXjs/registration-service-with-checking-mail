@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/controller"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/grpc_server"
+	logger2 "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/logger"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/validator"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/validator"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/tests/unit/mocks"
 	"github.com/brianvoe/gofakeit"
@@ -21,7 +21,7 @@ func TestLogin(t *testing.T) {
 	t.Parallel()
 	level := "info"
 	type IServiceMockFunc func(mc *minimock.Controller) service.IService
-	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
+	logger2.Init(logger2.GetCore(logger2.GetAtomicLevel(&level)))
 
 	type args struct {
 		ctx context.Context
@@ -157,7 +157,7 @@ func TestLogin(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			IServiceMock := tt.IServiceMock(mc)
-			myController := controller.New(IServiceMock)
+			myController := grpc_server.New(IServiceMock)
 
 			result, err := myController.Login(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)

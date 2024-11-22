@@ -3,7 +3,7 @@ package middlewares
 import (
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )

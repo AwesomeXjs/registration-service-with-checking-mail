@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/app"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/utils/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
 	"go.uber.org/zap"
 )
 
