@@ -11,14 +11,14 @@ import (
 // Kafka environment variable keys.
 // These constants represent the environment variable names for Kafka broker addresses.
 const (
-	Kafka1 = "KAFKA1"
-	Kafka2 = "KAFKA2"
-	Kafka3 = "KAFKA3"
+	FirstKafka  = "KAFKA1"
+	SecondKafka = "KAFKA2"
+	ThirdKafka  = "KAFKA3"
 )
 
-// KafkaConfig defines an interface for Kafka configuration.
+// IKafkaConfig defines an interface for Kafka configuration.
 // It includes a method to retrieve Kafka broker addresses.
-type KafkaConfig interface {
+type IKafkaConfig interface {
 	// Address returns a list of Kafka broker addresses.
 	Address() []string
 }
@@ -35,20 +35,20 @@ type kafkaConfig struct {
 // Returns:
 // - KafkaConfig: An instance of kafkaConfig if all environment variables are set correctly.
 // - error: An error if any of the required environment variables are missing.
-func NewKafkaConfig() (KafkaConfig, error) {
-	kafka1 := os.Getenv(Kafka1)
+func NewKafkaConfig() (IKafkaConfig, error) {
+	kafka1 := os.Getenv(FirstKafka)
 	if len(kafka1) == 0 {
-		logger.Error("failed to get kafka host", zap.String("kafka host", Kafka1))
+		logger.Error("failed to get kafka host", zap.String("kafka host", FirstKafka))
 		return nil, fmt.Errorf("KAFKA_1 is not set")
 	}
-	kafka2 := os.Getenv(Kafka2)
+	kafka2 := os.Getenv(SecondKafka)
 	if len(kafka2) == 0 {
-		logger.Error("failed to get kafka host", zap.String("kafka host", Kafka2))
+		logger.Error("failed to get kafka host", zap.String("kafka host", SecondKafka))
 		return nil, fmt.Errorf("KAFKA_2 is not set")
 	}
-	kafka3 := os.Getenv(Kafka3)
+	kafka3 := os.Getenv(ThirdKafka)
 	if len(kafka3) == 0 {
-		logger.Error("failed to get kafka host", zap.String("kafka host", Kafka3))
+		logger.Error("failed to get kafka host", zap.String("kafka host", ThirdKafka))
 		return nil, fmt.Errorf("KAFKA_3 is not set")
 	}
 

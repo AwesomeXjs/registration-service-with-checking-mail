@@ -19,8 +19,8 @@ const (
 	GrpcPort = "GRPC_PORT"
 )
 
-// GRPCConfig defines an interface for obtaining the gRPC server address.
-type GRPCConfigs interface {
+// IGRPCConfigs defines an interface for obtaining the gRPC server address.
+type IGRPCConfigs interface {
 	GetAddress() string
 }
 
@@ -36,7 +36,7 @@ func (g *grpcConfig) GetAddress() string {
 
 // NewGRPCConfig creates a new GRPCConfig instance by reading the host and port from environment variables.
 // It returns an error if either value is not set.
-func NewGRPCConfig() (GRPCConfigs, error) {
+func NewGRPCConfig() (IGRPCConfigs, error) {
 	host := os.Getenv(GrpcHost)
 	if len(host) == 0 {
 		logger.Error("failed to get grpc host", zap.String("grpc host", GrpcHost))

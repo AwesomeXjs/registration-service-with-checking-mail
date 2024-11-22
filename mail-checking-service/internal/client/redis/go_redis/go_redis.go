@@ -23,7 +23,7 @@ type GoRedisClient struct {
 
 // NewGoRedisClient initializes a new GoRedisClient with the provided Redis configuration.
 // It creates a new Redis client using the configuration's address.
-func NewGoRedisClient(config redis.RedisConfig) *GoRedisClient {
+func NewGoRedisClient(config redis.IRedisConfig) *GoRedisClient {
 	redisClient := &GoRedisClient{
 		Client: goRedis.NewClient(&goRedis.Options{
 			Addr:     config.Address(),

@@ -8,12 +8,12 @@ import (
 
 // Constants for environment variable names for Redis configuration.
 const (
-	RedisPortEnvName = "REDIS_PORT"
-	RedisHostEnvName = "REDIS_HOST"
+	PortEnvName = "REDIS_PORT"
+	HostEnvName = "REDIS_HOST"
 )
 
-// RedisConfig defines an interface for obtaining the Redis address.
-type RedisConfig interface {
+// IRedisConfig defines an interface for obtaining the Redis address.
+type IRedisConfig interface {
 	Address() string
 }
 
@@ -24,9 +24,9 @@ type redisConfig struct {
 }
 
 // NewRedisConfig creates a new RedisConfig instance by reading environment variables.
-func NewRedisConfig() (RedisConfig, error) {
-	port := os.Getenv(RedisPortEnvName)
-	host := os.Getenv(RedisHostEnvName)
+func NewRedisConfig() (IRedisConfig, error) {
+	port := os.Getenv(PortEnvName)
+	host := os.Getenv(HostEnvName)
 	if len(port) == 0 || len(host) == 0 {
 		return nil, fmt.Errorf("REDIS_PORT or REDIS_HOST is not set")
 	}

@@ -17,16 +17,16 @@ const (
 )
 
 type serviceProvider struct {
-	grpcConfig  GRPCConfigs
-	kafkaConfig kafka.KafkaConfig
-	redisConfig redis.RedisConfig
+	grpcConfig  IGRPCConfigs
+	kafkaConfig kafka.IKafkaConfig
+	redisConfig redis.IRedisConfig
 	emailConfig kafka.IMailConfig
 
 	kafkaConsumer *kafka.Consumer
 	redisClient   redis.IRedis
 
 	controller   *grpc_server.GrpcServer
-	kafkaHandler *kafka.KafkaHandler
+	kafkaHandler kafka.IKafkaHandler
 }
 
 // newServiceProvider creates a new instance of serviceProvider.
@@ -35,7 +35,7 @@ func newServiceProvider() *serviceProvider {
 }
 
 // GRPCConfig initializes and returns the gRPC configuration if not already set.
-func (s *serviceProvider) GRPCConfig() GRPCConfigs {
+func (s *serviceProvider) GRPCConfig() IGRPCConfigs {
 	if s.grpcConfig == nil {
 		cfg, err := NewGRPCConfig()
 		if err != nil {
@@ -57,7 +57,7 @@ func (s *serviceProvider) EmailConfig() kafka.IMailConfig {
 	return s.emailConfig
 }
 
-func (s *serviceProvider) KafkaConfig() kafka.KafkaConfig {
+func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
 	if s.kafkaConfig == nil {
 		cfg, err := kafka.NewKafkaConfig()
 		if err != nil {
@@ -68,7 +68,7 @@ func (s *serviceProvider) KafkaConfig() kafka.KafkaConfig {
 	return s.kafkaConfig
 }
 
-func (s *serviceProvider) RedisConfig() redis.RedisConfig {
+func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
 	if s.redisConfig == nil {
 		cfg, err := redis.NewRedisConfig()
 		if err != nil {
@@ -94,14 +94,14 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 	return s.redisClient
 }
 
-func (s *serviceProvider) GrpcServer(ctx context.Context) *grpc_server.GrpcServer {
+func (s *serviceProvider) GrpcServer(_ context.Context) *grpc_server.GrpcServer {
 	if s.controller == nil {
 		s.controller = grpc_server.New()
 	}
 	return s.controller
 }
 
-func (s *serviceProvider) KafkaHandler(ctx context.Context) *kafka.KafkaHandler {
+func (s *serviceProvider) KafkaHandler(ctx context.Context) kafka.IKafkaHandler {
 	if s.kafkaHandler == nil {
 		handler := kafka.NewKafkaHandler(s.RedisClient(ctx), s.EmailConfig())
 		s.kafkaHandler = handler
