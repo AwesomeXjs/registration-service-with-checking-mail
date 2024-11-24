@@ -1,4 +1,4 @@
-package kafka
+package mail
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ import (
 
 // Constants for environment variable names containing mail server configuration.
 const (
-	MailHost = "MAIL_HOST" // The hostname of the mail server.
-	MailPort = "MAIL_PORT" // The port of the mail server.
-	MailUser = "MAIL_USER" // The username for mail server authentication.
-	MailPass = "MAIL_PASS" // The password for mail server authentication.
+	MyMailHost = "MAIL_HOST" // The hostname of the mail server.
+	MyMailPort = "MAIL_PORT" // The port of the mail server.
+	MyMailUser = "MAIL_USER" // The username for mail server authentication.
+	MyMailPass = "MAIL_PASS" // The password for mail server authentication.
 )
 
 // IMailConfig defines the interface for accessing mail server configuration.
@@ -29,8 +29,8 @@ type IMailConfig interface {
 	GetPassword() string
 }
 
-// MailConfig implements the IMailConfig interface and stores mail server configuration.
-type MailConfig struct {
+// MyMailConfig implements the IMailConfig interface and stores mail server configuration.
+type MyMailConfig struct {
 	host string // The hostname of the mail server.
 	port int    // The port number of the mail server.
 	user string // The username for mail server authentication.
@@ -40,28 +40,31 @@ type MailConfig struct {
 // NewMailConfig creates a new instance of MailConfig by loading values from environment variables.
 // Returns an error if any required environment variable is missing or invalid.
 func NewMailConfig() (IMailConfig, error) {
-	host := os.Getenv(MailHost)
+	host := os.Getenv(MyMailHost)
 	if len(host) == 0 {
+		logger.Error("failed to get mail host", zap.String("mail host", MyMailHost))
 		return nil, fmt.Errorf("failed to get mail host")
 	}
 
-	port, err := strconv.Atoi(os.Getenv(MailPort))
+	port, err := strconv.Atoi(os.Getenv(MyMailPort))
 	if err != nil {
+		logger.Error("failed to get mail port", zap.String("mail port", MyMailPort))
 		return nil, fmt.Errorf("failed to get mail port")
 	}
 
-	user := os.Getenv(MailUser)
+	user := os.Getenv(MyMailUser)
 	if len(user) == 0 {
+		logger.Error("failed to get mail user", zap.String("mail user", MyMailUser))
 		return nil, fmt.Errorf("failed to get mail user")
 	}
 
-	pass := os.Getenv(MailPass)
+	pass := os.Getenv(MyMailPass)
 	if len(pass) == 0 {
-		logger.Error("failed to get mail pass", zap.String("mail pass", MailPass))
+		logger.Error("failed to get mail pass", zap.String("mail pass", MyMailPass))
 		return nil, fmt.Errorf("failed to get mail pass")
 	}
 
-	return &MailConfig{
+	return &MyMailConfig{
 		host: host,
 		port: port,
 		user: user,
@@ -70,21 +73,21 @@ func NewMailConfig() (IMailConfig, error) {
 }
 
 // GetHost returns the hostname of the mail server.
-func (m *MailConfig) GetHost() string {
+func (m *MyMailConfig) GetHost() string {
 	return m.host
 }
 
 // GetPort returns the port number of the mail server.
-func (m *MailConfig) GetPort() int {
+func (m *MyMailConfig) GetPort() int {
 	return m.port
 }
 
 // GetUserName returns the username used for mail server authentication.
-func (m *MailConfig) GetUserName() string {
+func (m *MyMailConfig) GetUserName() string {
 	return m.user
 }
 
 // GetPassword returns the password used for mail server authentication.
-func (m *MailConfig) GetPassword() string {
+func (m *MyMailConfig) GetPassword() string {
 	return m.pass
 }

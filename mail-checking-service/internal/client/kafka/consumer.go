@@ -80,7 +80,7 @@ func (c *Consumer) Start(ctx context.Context) {
 
 		// Handle the Kafka message using the provided handler.
 		if err = c.handler.HandleMessage(ctx, kafkaMsg.Value, kafkaMsg.TopicPartition.Offset, c.consumerNumber); err != nil {
-			logger.Error("failed to handle message", zap.Error(err))
+			logger.Warn("failed to handle message", zap.Error(err))
 		}
 
 		// Store the message's offset to ensure it can be committed later.

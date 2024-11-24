@@ -5,6 +5,7 @@ import (
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/kafka"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/mail"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis/go_redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/grpc_server"
@@ -20,12 +21,13 @@ type serviceProvider struct {
 	grpcConfig  IGRPCConfigs
 	kafkaConfig kafka.IKafkaConfig
 	redisConfig redis.IRedisConfig
-	emailConfig kafka.IMailConfig
+	emailConfig mail.IMailConfig
 
 	kafkaConsumer *kafka.Consumer
 	redisClient   redis.IRedis
+	mailClient    mail.IMailClient
 
-	controller   *grpc_server.GrpcServer
+	grpcServer   *grpc_server.GrpcServer
 	kafkaHandler kafka.IKafkaHandler
 }
 
@@ -46,9 +48,9 @@ func (s *serviceProvider) GRPCConfig() IGRPCConfigs {
 	return s.grpcConfig
 }
 
-func (s *serviceProvider) EmailConfig() kafka.IMailConfig {
+func (s *serviceProvider) MailConfig() mail.IMailConfig {
 	if s.emailConfig == nil {
-		cfg, err := kafka.NewMailConfig()
+		cfg, err := mail.NewMailConfig()
 		if err != nil {
 			logger.Warn("failed to get email config", zap.Error(err))
 		}
@@ -94,16 +96,25 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 	return s.redisClient
 }
 
-func (s *serviceProvider) GrpcServer(_ context.Context) *grpc_server.GrpcServer {
-	if s.controller == nil {
-		s.controller = grpc_server.New()
+func (s *serviceProvider) MailClient() mail.IMailClient {
+	if s.mailClient == nil {
+		mailClient := mail.NewMailClient(s.MailConfig())
+
+		s.mailClient = mailClient
 	}
-	return s.controller
+	return s.mailClient
+}
+
+func (s *serviceProvider) GrpcServer(ctx context.Context) *grpc_server.GrpcServer {
+	if s.grpcServer == nil {
+		s.grpcServer = grpc_server.New(s.RedisClient(ctx))
+	}
+	return s.grpcServer
 }
 
 func (s *serviceProvider) KafkaHandler(ctx context.Context) kafka.IKafkaHandler {
 	if s.kafkaHandler == nil {
-		handler := kafka.NewKafkaHandler(s.RedisClient(ctx), s.EmailConfig())
+		handler := kafka.NewKafkaHandler(s.RedisClient(ctx), s.MailClient())
 		s.kafkaHandler = handler
 	}
 	return s.kafkaHandler
