@@ -3,6 +3,7 @@ package converter
 import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 )
 
 // FromModelToProtoRegister converts a RegistrationRequest model to a gRPC RegistrationRequest.
@@ -46,9 +47,13 @@ func ToProtoValidateToken(token string) *authService.ValidateTokenRequest {
 	}
 }
 
-// FromModelToProtoConfirmEmail converts a ConfirmEmailRequest model to a gRPC ConfirmEmailRequest.
-func FromModelToProtoConfirmEmail(info *model.ConfirmEmailRequest) *authService.ConfirmEmailRequest {
-	return &authService.ConfirmEmailRequest{
-		Email: info.Email,
+// FromModelToProtoCheckUniqueCode converts a ConfirmEmailRequest model to a CheckUniqueCodeRequest proto message.
+// It maps the fields from the model to the corresponding fields in the proto request,
+// including the verification code, email address, and the provided access token.
+func FromModelToProtoCheckUniqueCode(Request *model.ConfirmEmailRequest, accessToken string) *mail_v1.CheckUniqueCodeRequest {
+	return &mail_v1.CheckUniqueCodeRequest{
+		Code:        Request.Code,
+		Email:       Request.Email,
+		AccessToken: accessToken,
 	}
 }

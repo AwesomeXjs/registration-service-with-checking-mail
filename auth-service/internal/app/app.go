@@ -45,7 +45,7 @@ func (a *App) Run() error {
 		closer.CloseAll()
 		closer.Wait()
 	}()
-	err := a.RunGRPSServer()
+	err := a.RunGRPCServer()
 	if err != nil {
 		logger.Fatal("failed to run grpc server", zap.Error(err))
 	}
@@ -100,8 +100,8 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 	return nil
 }
 
-// RunGRPSServer starts the gRPC server and listens on the configured address.
-func (a *App) RunGRPSServer() error {
+// RunGRPCServer starts the gRPC server and listens on the configured address.
+func (a *App) RunGRPCServer() error {
 	logger.Info("starting grpc server on " + a.serviceProvider.GRPCConfig().GetAddress())
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().GetAddress())
 	if err != nil {

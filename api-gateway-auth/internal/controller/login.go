@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	converter2 "github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
@@ -41,7 +40,7 @@ func (c *Controller) Login(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	result, err := c.authClient.Login(ctx.Request().Context(), converter2.FromModelToProtoLogin(&Request))
+	result, refreshToken, err := c.authClient.Login(ctx.Request().Context(), &Request)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid password") {
 			logger.Warn("failed to login", zap.Error(err))
@@ -50,7 +49,7 @@ func (c *Controller) Login(ctx echo.Context) error {
 		logger.Error("failed to login", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
-	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, result.GetRefreshToken())
+	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, refreshToken)
 
-	return ctx.JSON(200, converter2.ToModelFromProtoLogin(result))
+	return ctx.JSON(http.StatusOK, result)
 }

@@ -2,20 +2,23 @@ package grpc_auth_client
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"go.uber.org/zap"
 )
 
 // GRPCClient wraps the AuthClient interface, providing methods to interact with
 // the authentication gRPC service. It delegates requests to the underlying AuthClient.
 type GRPCClient struct {
-	authClient AuthClient
+	authClient authService.AuthV1Client
 }
 
 // New creates a new GRPCClient instance, initializing it with the provided AuthClient.
-func New(authClient AuthClient) AuthClient {
+func New(authClient authService.AuthV1Client) AuthClient {
 	return &GRPCClient{
 		authClient: authClient,
 	}
@@ -23,30 +26,58 @@ func New(authClient AuthClient) AuthClient {
 
 // Registration delegates the registration request to the underlying authClient.
 // It sends the registration request to the authentication service and returns the response.
-func (g *GRPCClient) Registration(ctx context.Context, in *authService.RegistrationRequest, opts ...grpc.CallOption) (*authService.RegistrationResponse, error) {
-	return g.authClient.Registration(ctx, in, opts...) // Delegates to the Registration method of the AuthClient.
+func (g *GRPCClient) Registration(ctx context.Context, request *model.RegistrationRequest) (*model.RegistrationResponse, string, error) {
+	result, err := g.authClient.Registration(ctx, converter.FromModelToProtoRegister(request)) // Delegates to the Registration method of the AuthClient.
+
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to register user: %v", err)
+	}
+
+	return converter.ToModelFromProtoRegister(result), result.GetRefreshToken(), nil
 }
 
 // Login delegates the login request to the underlying authClient.
 // It sends the login credentials to the authentication service and returns the response.
-func (g *GRPCClient) Login(ctx context.Context, in *authService.LoginRequest, opts ...grpc.CallOption) (*authService.LoginResponse, error) {
-	return g.authClient.Login(ctx, in, opts...) // Delegates to the Login method of the AuthClient.
+func (g *GRPCClient) Login(ctx context.Context, request *model.LoginRequest) (*model.LoginResponse, string, error) {
+	result, err := g.authClient.Login(ctx, converter.FromModelToProtoLogin(request)) // Delegates to the Login method of the AuthClient.
+	if err != nil {
+		logger.Error("failed to login", zap.Error(err))
+		return nil, "", fmt.Errorf("failed to login user: %v", err)
+	}
+
+	return converter.ToModelFromProtoLogin(result), result.GetRefreshToken(), nil // Delegates to the Login method of the AuthClient.
 }
 
 // ValidateToken delegates the token validation request to the underlying authClient.
 // It sends the token to the authentication service for validation and returns the response.
-func (g *GRPCClient) ValidateToken(ctx context.Context, in *authService.ValidateTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	return g.authClient.ValidateToken(ctx, in, opts...) // Delegates to the ValidateToken method of the AuthClient.
+func (g *GRPCClient) ValidateToken(ctx context.Context, accessToken string) error {
+	_, err := g.authClient.ValidateToken(ctx, converter.ToProtoValidateToken(accessToken))
+	if err != nil {
+		logger.Error("failed to validate token", zap.Error(err))
+		return fmt.Errorf("failed to validate token: %v", err)
+	}
+	return nil // Delegates to the ValidateToken method of the AuthClient.
 }
 
 // GetAccessToken delegates the request to get a new access token using a refresh token to the underlying authClient.
 // It sends the refresh token to the authentication service and returns the new access token response.
-func (g *GRPCClient) GetAccessToken(ctx context.Context, in *authService.GetAccessTokenRequest, opts ...grpc.CallOption) (*authService.GetAccessTokenResponse, error) {
-	return g.authClient.GetAccessToken(ctx, in, opts...) // Delegates to the GetAccessToken method of the AuthClient.
+func (g *GRPCClient) GetAccessToken(ctx context.Context, refreshToken string) (string, string, error) {
+	result, err := g.authClient.GetAccessToken(ctx, converter.FromModelToProtoGetAccessToken(refreshToken)) // Delegates to the GetAccessToken method of the AuthClient.
+	if err != nil {
+		logger.Error("failed to get access token", zap.Error(err))
+		return "", "", fmt.Errorf("failed to get access token: %v", err)
+	}
+	return result.GetRefreshToken(), result.GetAccessToken(), nil
 }
 
 // UpdatePassword delegates the password update request to the underlying authClient.
 // It sends the new password to the authentication service and returns an empty response.
-func (g *GRPCClient) UpdatePassword(ctx context.Context, in *authService.UpdatePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	return g.authClient.UpdatePassword(ctx, in, opts...) // Delegates to the UpdatePassword method of the AuthClient.
+func (g *GRPCClient) UpdatePassword(ctx context.Context, request *model.UpdatePasswordRequest) error {
+	_, err := g.authClient.UpdatePassword(ctx, converter.FromModelToProtoUpdatePass(request))
+	if err != nil {
+		logger.Error("failed to update password", zap.Error(err))
+		return fmt.Errorf("failed to update password: %v", err)
+	}
+
+	return nil // Delegates to the UpdatePassword method of the AuthClient.
 }

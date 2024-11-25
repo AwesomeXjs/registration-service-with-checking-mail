@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
 	"github.com/labstack/echo/v4"
@@ -31,7 +30,7 @@ func (c *Controller) ValidateToken(ctx echo.Context) error {
 	}
 	logger.Debug("get access token from header", zap.String("ACCESS_TOKEN", accessToken))
 
-	_, err = c.authClient.ValidateToken(ctx.Request().Context(), converter.ToProtoValidateToken(accessToken))
+	err = c.authClient.ValidateToken(ctx.Request().Context(), accessToken)
 	if err != nil {
 		if strings.Contains(err.Error(), "failed to verify") {
 			logger.Warn("failed to validate token", zap.Error(err))

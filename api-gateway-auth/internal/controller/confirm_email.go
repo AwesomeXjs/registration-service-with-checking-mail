@@ -6,7 +6,6 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -16,7 +15,7 @@ import (
 // @Summary verify email
 // @Tags Verify
 // @Security ApiKeyAuth
-// @Description get new access token from refresh token
+// @Description verify email
 // @ID verify-email
 // @Accept  json
 // @Produce  json
@@ -45,11 +44,7 @@ func (c *Controller) ConfirmEmail(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	_, err = c.mailClient.CheckUniqueCode(ctx.Request().Context(), &mail_v1.CheckUniqueCodeRequest{
-		Code:        Request.Code,
-		Email:       Request.Email,
-		AccessToken: accessToken,
-	})
+	err = c.mailClient.CheckUniqueCode(ctx.Request().Context(), accessToken, &Request)
 	if err != nil {
 		logger.Error("failed to check unique code", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())

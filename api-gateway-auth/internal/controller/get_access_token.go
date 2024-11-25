@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
 	"github.com/labstack/echo/v4"
@@ -35,14 +34,14 @@ func (c *Controller) GetAccessToken(ctx echo.Context) error {
 	}
 	logger.Debug("get refresh token", zap.String("REFRESH_TOKEN", refreshToken))
 
-	accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), converter.FromModelToProtoGetAccessToken(refreshToken))
+	refreshToken, accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), refreshToken)
 	if err != nil {
 		logger.Error("failed to get access token", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 
-	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, accessToken.RefreshToken)
+	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, refreshToken)
 
-	return response.RespHelper(ctx, http.StatusOK, "OK", accessToken.AccessToken)
+	return response.RespHelper(ctx, http.StatusOK, "OK", accessToken)
 
 }

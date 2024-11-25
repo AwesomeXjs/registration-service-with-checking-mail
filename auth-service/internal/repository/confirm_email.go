@@ -10,6 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// ConfirmEmail updates the user's email verification status to confirmed in the database.
+// It accepts a context and the user's email as parameters and returns an error if any issues occur.
 func (r *Repository) ConfirmEmail(ctx context.Context, email string) error {
 	queryBuilder := squirrel.Update(TableName).
 		PlaceholderFormat(squirrel.Dollar).

@@ -115,7 +115,7 @@ mocks:
 test:
 	go clean -testcache
 	go test ./... -covermode count -coverpkg=github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/tests/... -count 5
-	rm -r tests/unit/controller/logs
+	rm -r tests/unit/server/logs
 	rm -r tests/unit/service/logs
 
 coverage:

@@ -3,11 +3,13 @@ package mail_client
 import (
 	"context"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 )
 
+// MailClient defines the methods that a mail client must implement to interact
+// with the mail service, specifically for checking the uniqueness of an email confirmation code.
 type MailClient interface {
-	CheckUniqueCode(ctx context.Context, in *mail_v1.CheckUniqueCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// CheckUniqueCode checks whether the provided confirmation code is unique
+	// for the given email and access token. It returns an error if the operation fails.
+	CheckUniqueCode(ctx context.Context, accessToken string, request *model.ConfirmEmailRequest) error
 }

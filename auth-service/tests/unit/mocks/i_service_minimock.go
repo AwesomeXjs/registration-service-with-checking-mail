@@ -19,6 +19,13 @@ type IServiceMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
 
+	funcConfirmEmail          func(ctx context.Context, email string) (err error)
+	funcConfirmEmailOrigin    string
+	inspectFuncConfirmEmail   func(ctx context.Context, email string)
+	afterConfirmEmailCounter  uint64
+	beforeConfirmEmailCounter uint64
+	ConfirmEmailMock          mIServiceMockConfirmEmail
+
 	funcGetAccessToken          func(ctx context.Context, refreshToken string) (np1 *model.NewPairTokens, err error)
 	funcGetAccessTokenOrigin    string
 	inspectFuncGetAccessToken   func(ctx context.Context, refreshToken string)
@@ -63,6 +70,9 @@ func NewIServiceMock(t minimock.Tester) *IServiceMock {
 		controller.RegisterMocker(m)
 	}
 
+	m.ConfirmEmailMock = mIServiceMockConfirmEmail{mock: m}
+	m.ConfirmEmailMock.callArgs = []*IServiceMockConfirmEmailParams{}
+
 	m.GetAccessTokenMock = mIServiceMockGetAccessToken{mock: m}
 	m.GetAccessTokenMock.callArgs = []*IServiceMockGetAccessTokenParams{}
 
@@ -81,6 +91,348 @@ func NewIServiceMock(t minimock.Tester) *IServiceMock {
 	t.Cleanup(m.MinimockFinish)
 
 	return m
+}
+
+type mIServiceMockConfirmEmail struct {
+	optional           bool
+	mock               *IServiceMock
+	defaultExpectation *IServiceMockConfirmEmailExpectation
+	expectations       []*IServiceMockConfirmEmailExpectation
+
+	callArgs []*IServiceMockConfirmEmailParams
+	mutex    sync.RWMutex
+
+	expectedInvocations       uint64
+	expectedInvocationsOrigin string
+}
+
+// IServiceMockConfirmEmailExpectation specifies expectation struct of the IService.ConfirmEmail
+type IServiceMockConfirmEmailExpectation struct {
+	mock               *IServiceMock
+	params             *IServiceMockConfirmEmailParams
+	paramPtrs          *IServiceMockConfirmEmailParamPtrs
+	expectationOrigins IServiceMockConfirmEmailExpectationOrigins
+	results            *IServiceMockConfirmEmailResults
+	returnOrigin       string
+	Counter            uint64
+}
+
+// IServiceMockConfirmEmailParams contains parameters of the IService.ConfirmEmail
+type IServiceMockConfirmEmailParams struct {
+	ctx   context.Context
+	email string
+}
+
+// IServiceMockConfirmEmailParamPtrs contains pointers to parameters of the IService.ConfirmEmail
+type IServiceMockConfirmEmailParamPtrs struct {
+	ctx   *context.Context
+	email *string
+}
+
+// IServiceMockConfirmEmailResults contains results of the IService.ConfirmEmail
+type IServiceMockConfirmEmailResults struct {
+	err error
+}
+
+// IServiceMockConfirmEmailOrigins contains origins of expectations of the IService.ConfirmEmail
+type IServiceMockConfirmEmailExpectationOrigins struct {
+	origin      string
+	originCtx   string
+	originEmail string
+}
+
+// Marks this method to be optional. The default behavior of any method with Return() is '1 or more', meaning
+// the test will fail minimock's automatic final call check if the mocked method was not called at least once.
+// Optional() makes method check to work in '0 or more' mode.
+// It is NOT RECOMMENDED to use this option unless you really need it, as default behaviour helps to
+// catch the problems when the expected method call is totally skipped during test run.
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Optional() *mIServiceMockConfirmEmail {
+	mmConfirmEmail.optional = true
+	return mmConfirmEmail
+}
+
+// Expect sets up expected params for IService.ConfirmEmail
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Expect(ctx context.Context, email string) *mIServiceMockConfirmEmail {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IServiceMockConfirmEmailExpectation{}
+	}
+
+	if mmConfirmEmail.defaultExpectation.paramPtrs != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by ExpectParams functions")
+	}
+
+	mmConfirmEmail.defaultExpectation.params = &IServiceMockConfirmEmailParams{ctx, email}
+	mmConfirmEmail.defaultExpectation.expectationOrigins.origin = minimock.CallerInfo(1)
+	for _, e := range mmConfirmEmail.expectations {
+		if minimock.Equal(e.params, mmConfirmEmail.defaultExpectation.params) {
+			mmConfirmEmail.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmConfirmEmail.defaultExpectation.params)
+		}
+	}
+
+	return mmConfirmEmail
+}
+
+// ExpectCtxParam1 sets up expected param ctx for IService.ConfirmEmail
+func (mmConfirmEmail *mIServiceMockConfirmEmail) ExpectCtxParam1(ctx context.Context) *mIServiceMockConfirmEmail {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IServiceMockConfirmEmailExpectation{}
+	}
+
+	if mmConfirmEmail.defaultExpectation.params != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Expect")
+	}
+
+	if mmConfirmEmail.defaultExpectation.paramPtrs == nil {
+		mmConfirmEmail.defaultExpectation.paramPtrs = &IServiceMockConfirmEmailParamPtrs{}
+	}
+	mmConfirmEmail.defaultExpectation.paramPtrs.ctx = &ctx
+	mmConfirmEmail.defaultExpectation.expectationOrigins.originCtx = minimock.CallerInfo(1)
+
+	return mmConfirmEmail
+}
+
+// ExpectEmailParam2 sets up expected param email for IService.ConfirmEmail
+func (mmConfirmEmail *mIServiceMockConfirmEmail) ExpectEmailParam2(email string) *mIServiceMockConfirmEmail {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IServiceMockConfirmEmailExpectation{}
+	}
+
+	if mmConfirmEmail.defaultExpectation.params != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Expect")
+	}
+
+	if mmConfirmEmail.defaultExpectation.paramPtrs == nil {
+		mmConfirmEmail.defaultExpectation.paramPtrs = &IServiceMockConfirmEmailParamPtrs{}
+	}
+	mmConfirmEmail.defaultExpectation.paramPtrs.email = &email
+	mmConfirmEmail.defaultExpectation.expectationOrigins.originEmail = minimock.CallerInfo(1)
+
+	return mmConfirmEmail
+}
+
+// Inspect accepts an inspector function that has same arguments as the IService.ConfirmEmail
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Inspect(f func(ctx context.Context, email string)) *mIServiceMockConfirmEmail {
+	if mmConfirmEmail.mock.inspectFuncConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("Inspect function is already set for IServiceMock.ConfirmEmail")
+	}
+
+	mmConfirmEmail.mock.inspectFuncConfirmEmail = f
+
+	return mmConfirmEmail
+}
+
+// Return sets up results that will be returned by IService.ConfirmEmail
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Return(err error) *IServiceMock {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IServiceMockConfirmEmailExpectation{mock: mmConfirmEmail.mock}
+	}
+	mmConfirmEmail.defaultExpectation.results = &IServiceMockConfirmEmailResults{err}
+	mmConfirmEmail.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
+	return mmConfirmEmail.mock
+}
+
+// Set uses given function f to mock the IService.ConfirmEmail method
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Set(f func(ctx context.Context, email string) (err error)) *IServiceMock {
+	if mmConfirmEmail.defaultExpectation != nil {
+		mmConfirmEmail.mock.t.Fatalf("Default expectation is already set for the IService.ConfirmEmail method")
+	}
+
+	if len(mmConfirmEmail.expectations) > 0 {
+		mmConfirmEmail.mock.t.Fatalf("Some expectations are already set for the IService.ConfirmEmail method")
+	}
+
+	mmConfirmEmail.mock.funcConfirmEmail = f
+	mmConfirmEmail.mock.funcConfirmEmailOrigin = minimock.CallerInfo(1)
+	return mmConfirmEmail.mock
+}
+
+// When sets expectation for the IService.ConfirmEmail which will trigger the result defined by the following
+// Then helper
+func (mmConfirmEmail *mIServiceMockConfirmEmail) When(ctx context.Context, email string) *IServiceMockConfirmEmailExpectation {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IServiceMock.ConfirmEmail mock is already set by Set")
+	}
+
+	expectation := &IServiceMockConfirmEmailExpectation{
+		mock:               mmConfirmEmail.mock,
+		params:             &IServiceMockConfirmEmailParams{ctx, email},
+		expectationOrigins: IServiceMockConfirmEmailExpectationOrigins{origin: minimock.CallerInfo(1)},
+	}
+	mmConfirmEmail.expectations = append(mmConfirmEmail.expectations, expectation)
+	return expectation
+}
+
+// Then sets up IService.ConfirmEmail return parameters for the expectation previously defined by the When method
+func (e *IServiceMockConfirmEmailExpectation) Then(err error) *IServiceMock {
+	e.results = &IServiceMockConfirmEmailResults{err}
+	return e.mock
+}
+
+// Times sets number of times IService.ConfirmEmail should be invoked
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Times(n uint64) *mIServiceMockConfirmEmail {
+	if n == 0 {
+		mmConfirmEmail.mock.t.Fatalf("Times of IServiceMock.ConfirmEmail mock can not be zero")
+	}
+	mm_atomic.StoreUint64(&mmConfirmEmail.expectedInvocations, n)
+	mmConfirmEmail.expectedInvocationsOrigin = minimock.CallerInfo(1)
+	return mmConfirmEmail
+}
+
+func (mmConfirmEmail *mIServiceMockConfirmEmail) invocationsDone() bool {
+	if len(mmConfirmEmail.expectations) == 0 && mmConfirmEmail.defaultExpectation == nil && mmConfirmEmail.mock.funcConfirmEmail == nil {
+		return true
+	}
+
+	totalInvocations := mm_atomic.LoadUint64(&mmConfirmEmail.mock.afterConfirmEmailCounter)
+	expectedInvocations := mm_atomic.LoadUint64(&mmConfirmEmail.expectedInvocations)
+
+	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
+}
+
+// ConfirmEmail implements mm_service.IService
+func (mmConfirmEmail *IServiceMock) ConfirmEmail(ctx context.Context, email string) (err error) {
+	mm_atomic.AddUint64(&mmConfirmEmail.beforeConfirmEmailCounter, 1)
+	defer mm_atomic.AddUint64(&mmConfirmEmail.afterConfirmEmailCounter, 1)
+
+	mmConfirmEmail.t.Helper()
+
+	if mmConfirmEmail.inspectFuncConfirmEmail != nil {
+		mmConfirmEmail.inspectFuncConfirmEmail(ctx, email)
+	}
+
+	mm_params := IServiceMockConfirmEmailParams{ctx, email}
+
+	// Record call args
+	mmConfirmEmail.ConfirmEmailMock.mutex.Lock()
+	mmConfirmEmail.ConfirmEmailMock.callArgs = append(mmConfirmEmail.ConfirmEmailMock.callArgs, &mm_params)
+	mmConfirmEmail.ConfirmEmailMock.mutex.Unlock()
+
+	for _, e := range mmConfirmEmail.ConfirmEmailMock.expectations {
+		if minimock.Equal(*e.params, mm_params) {
+			mm_atomic.AddUint64(&e.Counter, 1)
+			return e.results.err
+		}
+	}
+
+	if mmConfirmEmail.ConfirmEmailMock.defaultExpectation != nil {
+		mm_atomic.AddUint64(&mmConfirmEmail.ConfirmEmailMock.defaultExpectation.Counter, 1)
+		mm_want := mmConfirmEmail.ConfirmEmailMock.defaultExpectation.params
+		mm_want_ptrs := mmConfirmEmail.ConfirmEmailMock.defaultExpectation.paramPtrs
+
+		mm_got := IServiceMockConfirmEmailParams{ctx, email}
+
+		if mm_want_ptrs != nil {
+
+			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
+				mmConfirmEmail.t.Errorf("IServiceMock.ConfirmEmail got unexpected parameter ctx, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+					mmConfirmEmail.ConfirmEmailMock.defaultExpectation.expectationOrigins.originCtx, *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+			}
+
+			if mm_want_ptrs.email != nil && !minimock.Equal(*mm_want_ptrs.email, mm_got.email) {
+				mmConfirmEmail.t.Errorf("IServiceMock.ConfirmEmail got unexpected parameter email, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+					mmConfirmEmail.ConfirmEmailMock.defaultExpectation.expectationOrigins.originEmail, *mm_want_ptrs.email, mm_got.email, minimock.Diff(*mm_want_ptrs.email, mm_got.email))
+			}
+
+		} else if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
+			mmConfirmEmail.t.Errorf("IServiceMock.ConfirmEmail got unexpected parameters, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+				mmConfirmEmail.ConfirmEmailMock.defaultExpectation.expectationOrigins.origin, *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+		}
+
+		mm_results := mmConfirmEmail.ConfirmEmailMock.defaultExpectation.results
+		if mm_results == nil {
+			mmConfirmEmail.t.Fatal("No results are set for the IServiceMock.ConfirmEmail")
+		}
+		return (*mm_results).err
+	}
+	if mmConfirmEmail.funcConfirmEmail != nil {
+		return mmConfirmEmail.funcConfirmEmail(ctx, email)
+	}
+	mmConfirmEmail.t.Fatalf("Unexpected call to IServiceMock.ConfirmEmail. %v %v", ctx, email)
+	return
+}
+
+// ConfirmEmailAfterCounter returns a count of finished IServiceMock.ConfirmEmail invocations
+func (mmConfirmEmail *IServiceMock) ConfirmEmailAfterCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmConfirmEmail.afterConfirmEmailCounter)
+}
+
+// ConfirmEmailBeforeCounter returns a count of IServiceMock.ConfirmEmail invocations
+func (mmConfirmEmail *IServiceMock) ConfirmEmailBeforeCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmConfirmEmail.beforeConfirmEmailCounter)
+}
+
+// Calls returns a list of arguments used in each call to IServiceMock.ConfirmEmail.
+// The list is in the same order as the calls were made (i.e. recent calls have a higher index)
+func (mmConfirmEmail *mIServiceMockConfirmEmail) Calls() []*IServiceMockConfirmEmailParams {
+	mmConfirmEmail.mutex.RLock()
+
+	argCopy := make([]*IServiceMockConfirmEmailParams, len(mmConfirmEmail.callArgs))
+	copy(argCopy, mmConfirmEmail.callArgs)
+
+	mmConfirmEmail.mutex.RUnlock()
+
+	return argCopy
+}
+
+// MinimockConfirmEmailDone returns true if the count of the ConfirmEmail invocations corresponds
+// the number of defined expectations
+func (m *IServiceMock) MinimockConfirmEmailDone() bool {
+	if m.ConfirmEmailMock.optional {
+		// Optional methods provide '0 or more' call count restriction.
+		return true
+	}
+
+	for _, e := range m.ConfirmEmailMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			return false
+		}
+	}
+
+	return m.ConfirmEmailMock.invocationsDone()
+}
+
+// MinimockConfirmEmailInspect logs each unmet expectation
+func (m *IServiceMock) MinimockConfirmEmailInspect() {
+	for _, e := range m.ConfirmEmailMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			m.t.Errorf("Expected call to IServiceMock.ConfirmEmail at\n%s with params: %#v", e.expectationOrigins.origin, *e.params)
+		}
+	}
+
+	afterConfirmEmailCounter := mm_atomic.LoadUint64(&m.afterConfirmEmailCounter)
+	// if default expectation was set then invocations count should be greater than zero
+	if m.ConfirmEmailMock.defaultExpectation != nil && afterConfirmEmailCounter < 1 {
+		if m.ConfirmEmailMock.defaultExpectation.params == nil {
+			m.t.Errorf("Expected call to IServiceMock.ConfirmEmail at\n%s", m.ConfirmEmailMock.defaultExpectation.returnOrigin)
+		} else {
+			m.t.Errorf("Expected call to IServiceMock.ConfirmEmail at\n%s with params: %#v", m.ConfirmEmailMock.defaultExpectation.expectationOrigins.origin, *m.ConfirmEmailMock.defaultExpectation.params)
+		}
+	}
+	// if func was set then invocations count should be greater than zero
+	if m.funcConfirmEmail != nil && afterConfirmEmailCounter < 1 {
+		m.t.Errorf("Expected call to IServiceMock.ConfirmEmail at\n%s", m.funcConfirmEmailOrigin)
+	}
+
+	if !m.ConfirmEmailMock.invocationsDone() && afterConfirmEmailCounter > 0 {
+		m.t.Errorf("Expected %d calls to IServiceMock.ConfirmEmail at\n%s but found %d calls",
+			mm_atomic.LoadUint64(&m.ConfirmEmailMock.expectedInvocations), m.ConfirmEmailMock.expectedInvocationsOrigin, afterConfirmEmailCounter)
+	}
 }
 
 type mIServiceMockGetAccessToken struct {
@@ -1801,6 +2153,8 @@ func (m *IServiceMock) MinimockValidateTokenInspect() {
 func (m *IServiceMock) MinimockFinish() {
 	m.finishOnce.Do(func() {
 		if !m.minimockDone() {
+			m.MinimockConfirmEmailInspect()
+
 			m.MinimockGetAccessTokenInspect()
 
 			m.MinimockLoginInspect()
@@ -1833,6 +2187,7 @@ func (m *IServiceMock) MinimockWait(timeout mm_time.Duration) {
 func (m *IServiceMock) minimockDone() bool {
 	done := true
 	return done &&
+		m.MinimockConfirmEmailDone() &&
 		m.MinimockGetAccessTokenDone() &&
 		m.MinimockLoginDone() &&
 		m.MinimockRegistrationDone() &&

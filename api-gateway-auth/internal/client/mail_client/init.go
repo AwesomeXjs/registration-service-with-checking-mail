@@ -2,22 +2,41 @@ package mail_client
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"go.uber.org/zap"
 )
 
+// GRPCMailClient is a struct that holds an instance of the mail_v1.MailV1Client.
+// It provides gRPC-based communication methods for mail-related operations.
 type GRPCMailClient struct {
-	mailClient MailClient
+	mailClient mail_v1.MailV1Client // The actual gRPC client that communicates with the mail service.
 }
 
-func NewGRPCMailClient(mailClient MailClient) MailClient {
+// NewGRPCMailClient creates and returns a new instance of GRPCMailClient.
+// This function wraps the provided mail_v1.MailV1Client instance, allowing gRPC communication.
+func NewGRPCMailClient(mailClient mail_v1.MailV1Client) MailClient {
 	return &GRPCMailClient{
-		mailClient: mailClient,
+		mailClient: mailClient, // Assign the provided gRPC mail client to the GRPCMailClient.
 	}
 }
 
-func (g *GRPCMailClient) CheckUniqueCode(ctx context.Context, in *mail_v1.CheckUniqueCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	return g.mailClient.CheckUniqueCode(ctx, in, opts...)
+// CheckUniqueCode calls the CheckUniqueCode method on the gRPC mail client.
+// It takes an access token and a ConfirmEmailRequest, converts the request to the appropriate proto format,
+// and then checks if the unique code is valid. If the operation fails, it logs an error and returns it.
+func (g *GRPCMailClient) CheckUniqueCode(ctx context.Context, accessToken string, request *model.ConfirmEmailRequest) error {
+	// Convert the model request to the proto request format and call CheckUniqueCode on the gRPC client.
+	_, err := g.mailClient.CheckUniqueCode(ctx, converter.FromModelToProtoCheckUniqueCode(request, accessToken))
+	if err != nil {
+		// Log the error if the gRPC call fails.
+		logger.Error("failed to check unique code", zap.Error(err))
+		// Return a formatted error.
+		return fmt.Errorf("failed to check unique code: %v", err)
+	}
+	// Return nil if no error occurred.
+	return nil
 }

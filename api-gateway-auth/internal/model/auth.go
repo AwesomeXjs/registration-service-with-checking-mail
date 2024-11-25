@@ -45,6 +45,9 @@ type UpdatePasswordRequest struct {
 	NewPassword string `json:"newPassword" valid:"required,type(string),stringlength(5|20)"`
 }
 
+// ConfirmEmailRequest represents the data required for confirming an email.
+// It includes a verification code and the email address to be verified.
+// The struct includes validation rules to ensure both fields are provided and the email is valid.
 type ConfirmEmailRequest struct {
 	Code  string `json:"code" valid:"required"`
 	Email string `json:"email" valid:"required,email,type(string)"`

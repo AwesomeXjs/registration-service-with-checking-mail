@@ -42,7 +42,7 @@ func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
 
-// PGConfig initializes and returns the PostgreSQL configuration if not already set.
+// PGConfig initializes and returns the PostgresSQL configuration if not already set.
 func (s *serviceProvider) PGConfig() db.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := db.NewPgConfig()

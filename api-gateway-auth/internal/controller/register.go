@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 
-	converter2 "github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
@@ -40,13 +39,13 @@ func (c *Controller) Registration(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	result, err := c.authClient.Registration(ctx.Request().Context(), converter2.FromModelToProtoRegister(&Request))
+	result, refreshToken, err := c.authClient.Registration(ctx.Request().Context(), &Request)
 	if err != nil {
 		logger.Error("failed to register", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
 
-	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, result.GetRefreshToken())
+	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, refreshToken)
 
-	return ctx.JSON(200, converter2.ToModelFromProtoRegister(result))
+	return ctx.JSON(http.StatusOK, result)
 }

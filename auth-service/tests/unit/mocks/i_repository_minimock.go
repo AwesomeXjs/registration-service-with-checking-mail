@@ -19,6 +19,13 @@ type IRepositoryMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
 
+	funcConfirmEmail          func(ctx context.Context, email string) (err error)
+	funcConfirmEmailOrigin    string
+	inspectFuncConfirmEmail   func(ctx context.Context, email string)
+	afterConfirmEmailCounter  uint64
+	beforeConfirmEmailCounter uint64
+	ConfirmEmailMock          mIRepositoryMockConfirmEmail
+
 	funcGetAccessToken          func(ctx context.Context, userID string) (ap1 *model.AccessTokenInfo, err error)
 	funcGetAccessTokenOrigin    string
 	inspectFuncGetAccessToken   func(ctx context.Context, userID string)
@@ -56,6 +63,9 @@ func NewIRepositoryMock(t minimock.Tester) *IRepositoryMock {
 		controller.RegisterMocker(m)
 	}
 
+	m.ConfirmEmailMock = mIRepositoryMockConfirmEmail{mock: m}
+	m.ConfirmEmailMock.callArgs = []*IRepositoryMockConfirmEmailParams{}
+
 	m.GetAccessTokenMock = mIRepositoryMockGetAccessToken{mock: m}
 	m.GetAccessTokenMock.callArgs = []*IRepositoryMockGetAccessTokenParams{}
 
@@ -71,6 +81,348 @@ func NewIRepositoryMock(t minimock.Tester) *IRepositoryMock {
 	t.Cleanup(m.MinimockFinish)
 
 	return m
+}
+
+type mIRepositoryMockConfirmEmail struct {
+	optional           bool
+	mock               *IRepositoryMock
+	defaultExpectation *IRepositoryMockConfirmEmailExpectation
+	expectations       []*IRepositoryMockConfirmEmailExpectation
+
+	callArgs []*IRepositoryMockConfirmEmailParams
+	mutex    sync.RWMutex
+
+	expectedInvocations       uint64
+	expectedInvocationsOrigin string
+}
+
+// IRepositoryMockConfirmEmailExpectation specifies expectation struct of the IRepository.ConfirmEmail
+type IRepositoryMockConfirmEmailExpectation struct {
+	mock               *IRepositoryMock
+	params             *IRepositoryMockConfirmEmailParams
+	paramPtrs          *IRepositoryMockConfirmEmailParamPtrs
+	expectationOrigins IRepositoryMockConfirmEmailExpectationOrigins
+	results            *IRepositoryMockConfirmEmailResults
+	returnOrigin       string
+	Counter            uint64
+}
+
+// IRepositoryMockConfirmEmailParams contains parameters of the IRepository.ConfirmEmail
+type IRepositoryMockConfirmEmailParams struct {
+	ctx   context.Context
+	email string
+}
+
+// IRepositoryMockConfirmEmailParamPtrs contains pointers to parameters of the IRepository.ConfirmEmail
+type IRepositoryMockConfirmEmailParamPtrs struct {
+	ctx   *context.Context
+	email *string
+}
+
+// IRepositoryMockConfirmEmailResults contains results of the IRepository.ConfirmEmail
+type IRepositoryMockConfirmEmailResults struct {
+	err error
+}
+
+// IRepositoryMockConfirmEmailOrigins contains origins of expectations of the IRepository.ConfirmEmail
+type IRepositoryMockConfirmEmailExpectationOrigins struct {
+	origin      string
+	originCtx   string
+	originEmail string
+}
+
+// Marks this method to be optional. The default behavior of any method with Return() is '1 or more', meaning
+// the test will fail minimock's automatic final call check if the mocked method was not called at least once.
+// Optional() makes method check to work in '0 or more' mode.
+// It is NOT RECOMMENDED to use this option unless you really need it, as default behaviour helps to
+// catch the problems when the expected method call is totally skipped during test run.
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Optional() *mIRepositoryMockConfirmEmail {
+	mmConfirmEmail.optional = true
+	return mmConfirmEmail
+}
+
+// Expect sets up expected params for IRepository.ConfirmEmail
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Expect(ctx context.Context, email string) *mIRepositoryMockConfirmEmail {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IRepositoryMockConfirmEmailExpectation{}
+	}
+
+	if mmConfirmEmail.defaultExpectation.paramPtrs != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by ExpectParams functions")
+	}
+
+	mmConfirmEmail.defaultExpectation.params = &IRepositoryMockConfirmEmailParams{ctx, email}
+	mmConfirmEmail.defaultExpectation.expectationOrigins.origin = minimock.CallerInfo(1)
+	for _, e := range mmConfirmEmail.expectations {
+		if minimock.Equal(e.params, mmConfirmEmail.defaultExpectation.params) {
+			mmConfirmEmail.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmConfirmEmail.defaultExpectation.params)
+		}
+	}
+
+	return mmConfirmEmail
+}
+
+// ExpectCtxParam1 sets up expected param ctx for IRepository.ConfirmEmail
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) ExpectCtxParam1(ctx context.Context) *mIRepositoryMockConfirmEmail {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IRepositoryMockConfirmEmailExpectation{}
+	}
+
+	if mmConfirmEmail.defaultExpectation.params != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Expect")
+	}
+
+	if mmConfirmEmail.defaultExpectation.paramPtrs == nil {
+		mmConfirmEmail.defaultExpectation.paramPtrs = &IRepositoryMockConfirmEmailParamPtrs{}
+	}
+	mmConfirmEmail.defaultExpectation.paramPtrs.ctx = &ctx
+	mmConfirmEmail.defaultExpectation.expectationOrigins.originCtx = minimock.CallerInfo(1)
+
+	return mmConfirmEmail
+}
+
+// ExpectEmailParam2 sets up expected param email for IRepository.ConfirmEmail
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) ExpectEmailParam2(email string) *mIRepositoryMockConfirmEmail {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IRepositoryMockConfirmEmailExpectation{}
+	}
+
+	if mmConfirmEmail.defaultExpectation.params != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Expect")
+	}
+
+	if mmConfirmEmail.defaultExpectation.paramPtrs == nil {
+		mmConfirmEmail.defaultExpectation.paramPtrs = &IRepositoryMockConfirmEmailParamPtrs{}
+	}
+	mmConfirmEmail.defaultExpectation.paramPtrs.email = &email
+	mmConfirmEmail.defaultExpectation.expectationOrigins.originEmail = minimock.CallerInfo(1)
+
+	return mmConfirmEmail
+}
+
+// Inspect accepts an inspector function that has same arguments as the IRepository.ConfirmEmail
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Inspect(f func(ctx context.Context, email string)) *mIRepositoryMockConfirmEmail {
+	if mmConfirmEmail.mock.inspectFuncConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("Inspect function is already set for IRepositoryMock.ConfirmEmail")
+	}
+
+	mmConfirmEmail.mock.inspectFuncConfirmEmail = f
+
+	return mmConfirmEmail
+}
+
+// Return sets up results that will be returned by IRepository.ConfirmEmail
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Return(err error) *IRepositoryMock {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Set")
+	}
+
+	if mmConfirmEmail.defaultExpectation == nil {
+		mmConfirmEmail.defaultExpectation = &IRepositoryMockConfirmEmailExpectation{mock: mmConfirmEmail.mock}
+	}
+	mmConfirmEmail.defaultExpectation.results = &IRepositoryMockConfirmEmailResults{err}
+	mmConfirmEmail.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
+	return mmConfirmEmail.mock
+}
+
+// Set uses given function f to mock the IRepository.ConfirmEmail method
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Set(f func(ctx context.Context, email string) (err error)) *IRepositoryMock {
+	if mmConfirmEmail.defaultExpectation != nil {
+		mmConfirmEmail.mock.t.Fatalf("Default expectation is already set for the IRepository.ConfirmEmail method")
+	}
+
+	if len(mmConfirmEmail.expectations) > 0 {
+		mmConfirmEmail.mock.t.Fatalf("Some expectations are already set for the IRepository.ConfirmEmail method")
+	}
+
+	mmConfirmEmail.mock.funcConfirmEmail = f
+	mmConfirmEmail.mock.funcConfirmEmailOrigin = minimock.CallerInfo(1)
+	return mmConfirmEmail.mock
+}
+
+// When sets expectation for the IRepository.ConfirmEmail which will trigger the result defined by the following
+// Then helper
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) When(ctx context.Context, email string) *IRepositoryMockConfirmEmailExpectation {
+	if mmConfirmEmail.mock.funcConfirmEmail != nil {
+		mmConfirmEmail.mock.t.Fatalf("IRepositoryMock.ConfirmEmail mock is already set by Set")
+	}
+
+	expectation := &IRepositoryMockConfirmEmailExpectation{
+		mock:               mmConfirmEmail.mock,
+		params:             &IRepositoryMockConfirmEmailParams{ctx, email},
+		expectationOrigins: IRepositoryMockConfirmEmailExpectationOrigins{origin: minimock.CallerInfo(1)},
+	}
+	mmConfirmEmail.expectations = append(mmConfirmEmail.expectations, expectation)
+	return expectation
+}
+
+// Then sets up IRepository.ConfirmEmail return parameters for the expectation previously defined by the When method
+func (e *IRepositoryMockConfirmEmailExpectation) Then(err error) *IRepositoryMock {
+	e.results = &IRepositoryMockConfirmEmailResults{err}
+	return e.mock
+}
+
+// Times sets number of times IRepository.ConfirmEmail should be invoked
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Times(n uint64) *mIRepositoryMockConfirmEmail {
+	if n == 0 {
+		mmConfirmEmail.mock.t.Fatalf("Times of IRepositoryMock.ConfirmEmail mock can not be zero")
+	}
+	mm_atomic.StoreUint64(&mmConfirmEmail.expectedInvocations, n)
+	mmConfirmEmail.expectedInvocationsOrigin = minimock.CallerInfo(1)
+	return mmConfirmEmail
+}
+
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) invocationsDone() bool {
+	if len(mmConfirmEmail.expectations) == 0 && mmConfirmEmail.defaultExpectation == nil && mmConfirmEmail.mock.funcConfirmEmail == nil {
+		return true
+	}
+
+	totalInvocations := mm_atomic.LoadUint64(&mmConfirmEmail.mock.afterConfirmEmailCounter)
+	expectedInvocations := mm_atomic.LoadUint64(&mmConfirmEmail.expectedInvocations)
+
+	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
+}
+
+// ConfirmEmail implements mm_repository.IRepository
+func (mmConfirmEmail *IRepositoryMock) ConfirmEmail(ctx context.Context, email string) (err error) {
+	mm_atomic.AddUint64(&mmConfirmEmail.beforeConfirmEmailCounter, 1)
+	defer mm_atomic.AddUint64(&mmConfirmEmail.afterConfirmEmailCounter, 1)
+
+	mmConfirmEmail.t.Helper()
+
+	if mmConfirmEmail.inspectFuncConfirmEmail != nil {
+		mmConfirmEmail.inspectFuncConfirmEmail(ctx, email)
+	}
+
+	mm_params := IRepositoryMockConfirmEmailParams{ctx, email}
+
+	// Record call args
+	mmConfirmEmail.ConfirmEmailMock.mutex.Lock()
+	mmConfirmEmail.ConfirmEmailMock.callArgs = append(mmConfirmEmail.ConfirmEmailMock.callArgs, &mm_params)
+	mmConfirmEmail.ConfirmEmailMock.mutex.Unlock()
+
+	for _, e := range mmConfirmEmail.ConfirmEmailMock.expectations {
+		if minimock.Equal(*e.params, mm_params) {
+			mm_atomic.AddUint64(&e.Counter, 1)
+			return e.results.err
+		}
+	}
+
+	if mmConfirmEmail.ConfirmEmailMock.defaultExpectation != nil {
+		mm_atomic.AddUint64(&mmConfirmEmail.ConfirmEmailMock.defaultExpectation.Counter, 1)
+		mm_want := mmConfirmEmail.ConfirmEmailMock.defaultExpectation.params
+		mm_want_ptrs := mmConfirmEmail.ConfirmEmailMock.defaultExpectation.paramPtrs
+
+		mm_got := IRepositoryMockConfirmEmailParams{ctx, email}
+
+		if mm_want_ptrs != nil {
+
+			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
+				mmConfirmEmail.t.Errorf("IRepositoryMock.ConfirmEmail got unexpected parameter ctx, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+					mmConfirmEmail.ConfirmEmailMock.defaultExpectation.expectationOrigins.originCtx, *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+			}
+
+			if mm_want_ptrs.email != nil && !minimock.Equal(*mm_want_ptrs.email, mm_got.email) {
+				mmConfirmEmail.t.Errorf("IRepositoryMock.ConfirmEmail got unexpected parameter email, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+					mmConfirmEmail.ConfirmEmailMock.defaultExpectation.expectationOrigins.originEmail, *mm_want_ptrs.email, mm_got.email, minimock.Diff(*mm_want_ptrs.email, mm_got.email))
+			}
+
+		} else if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
+			mmConfirmEmail.t.Errorf("IRepositoryMock.ConfirmEmail got unexpected parameters, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+				mmConfirmEmail.ConfirmEmailMock.defaultExpectation.expectationOrigins.origin, *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+		}
+
+		mm_results := mmConfirmEmail.ConfirmEmailMock.defaultExpectation.results
+		if mm_results == nil {
+			mmConfirmEmail.t.Fatal("No results are set for the IRepositoryMock.ConfirmEmail")
+		}
+		return (*mm_results).err
+	}
+	if mmConfirmEmail.funcConfirmEmail != nil {
+		return mmConfirmEmail.funcConfirmEmail(ctx, email)
+	}
+	mmConfirmEmail.t.Fatalf("Unexpected call to IRepositoryMock.ConfirmEmail. %v %v", ctx, email)
+	return
+}
+
+// ConfirmEmailAfterCounter returns a count of finished IRepositoryMock.ConfirmEmail invocations
+func (mmConfirmEmail *IRepositoryMock) ConfirmEmailAfterCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmConfirmEmail.afterConfirmEmailCounter)
+}
+
+// ConfirmEmailBeforeCounter returns a count of IRepositoryMock.ConfirmEmail invocations
+func (mmConfirmEmail *IRepositoryMock) ConfirmEmailBeforeCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmConfirmEmail.beforeConfirmEmailCounter)
+}
+
+// Calls returns a list of arguments used in each call to IRepositoryMock.ConfirmEmail.
+// The list is in the same order as the calls were made (i.e. recent calls have a higher index)
+func (mmConfirmEmail *mIRepositoryMockConfirmEmail) Calls() []*IRepositoryMockConfirmEmailParams {
+	mmConfirmEmail.mutex.RLock()
+
+	argCopy := make([]*IRepositoryMockConfirmEmailParams, len(mmConfirmEmail.callArgs))
+	copy(argCopy, mmConfirmEmail.callArgs)
+
+	mmConfirmEmail.mutex.RUnlock()
+
+	return argCopy
+}
+
+// MinimockConfirmEmailDone returns true if the count of the ConfirmEmail invocations corresponds
+// the number of defined expectations
+func (m *IRepositoryMock) MinimockConfirmEmailDone() bool {
+	if m.ConfirmEmailMock.optional {
+		// Optional methods provide '0 or more' call count restriction.
+		return true
+	}
+
+	for _, e := range m.ConfirmEmailMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			return false
+		}
+	}
+
+	return m.ConfirmEmailMock.invocationsDone()
+}
+
+// MinimockConfirmEmailInspect logs each unmet expectation
+func (m *IRepositoryMock) MinimockConfirmEmailInspect() {
+	for _, e := range m.ConfirmEmailMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			m.t.Errorf("Expected call to IRepositoryMock.ConfirmEmail at\n%s with params: %#v", e.expectationOrigins.origin, *e.params)
+		}
+	}
+
+	afterConfirmEmailCounter := mm_atomic.LoadUint64(&m.afterConfirmEmailCounter)
+	// if default expectation was set then invocations count should be greater than zero
+	if m.ConfirmEmailMock.defaultExpectation != nil && afterConfirmEmailCounter < 1 {
+		if m.ConfirmEmailMock.defaultExpectation.params == nil {
+			m.t.Errorf("Expected call to IRepositoryMock.ConfirmEmail at\n%s", m.ConfirmEmailMock.defaultExpectation.returnOrigin)
+		} else {
+			m.t.Errorf("Expected call to IRepositoryMock.ConfirmEmail at\n%s with params: %#v", m.ConfirmEmailMock.defaultExpectation.expectationOrigins.origin, *m.ConfirmEmailMock.defaultExpectation.params)
+		}
+	}
+	// if func was set then invocations count should be greater than zero
+	if m.funcConfirmEmail != nil && afterConfirmEmailCounter < 1 {
+		m.t.Errorf("Expected call to IRepositoryMock.ConfirmEmail at\n%s", m.funcConfirmEmailOrigin)
+	}
+
+	if !m.ConfirmEmailMock.invocationsDone() && afterConfirmEmailCounter > 0 {
+		m.t.Errorf("Expected %d calls to IRepositoryMock.ConfirmEmail at\n%s but found %d calls",
+			mm_atomic.LoadUint64(&m.ConfirmEmailMock.expectedInvocations), m.ConfirmEmailMock.expectedInvocationsOrigin, afterConfirmEmailCounter)
+	}
 }
 
 type mIRepositoryMockGetAccessToken struct {
@@ -1448,6 +1800,8 @@ func (m *IRepositoryMock) MinimockUpdatePasswordInspect() {
 func (m *IRepositoryMock) MinimockFinish() {
 	m.finishOnce.Do(func() {
 		if !m.minimockDone() {
+			m.MinimockConfirmEmailInspect()
+
 			m.MinimockGetAccessTokenInspect()
 
 			m.MinimockLoginInspect()
@@ -1478,6 +1832,7 @@ func (m *IRepositoryMock) MinimockWait(timeout mm_time.Duration) {
 func (m *IRepositoryMock) minimockDone() bool {
 	done := true
 	return done &&
+		m.MinimockConfirmEmailDone() &&
 		m.MinimockGetAccessTokenDone() &&
 		m.MinimockLoginDone() &&
 		m.MinimockRegistrationDone() &&

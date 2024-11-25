@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/converter"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
@@ -34,7 +33,7 @@ func (c *Controller) UpdatePassword(ctx echo.Context) error {
 	}
 	logger.Debug("get access token from header", zap.String("ACCESS_TOKEN", accessToken))
 
-	_, err = c.authClient.ValidateToken(ctx.Request().Context(), converter.ToProtoValidateToken(accessToken))
+	err = c.authClient.ValidateToken(ctx.Request().Context(), accessToken)
 	if err != nil {
 		logger.Warn("failed to validate token", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
@@ -54,7 +53,7 @@ func (c *Controller) UpdatePassword(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	_, err = c.authClient.UpdatePassword(ctx.Request().Context(), converter.FromModelToProtoUpdatePass(&Request))
+	err = c.authClient.UpdatePassword(ctx.Request().Context(), &Request)
 	if err != nil {
 		logger.Error("failed to update password", zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
