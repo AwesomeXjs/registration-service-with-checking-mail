@@ -5,10 +5,12 @@ import (
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/client/grpc_auth_client"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/client/mail_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/controller"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/headers_manager"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,9 +21,11 @@ type serviceProvider struct {
 	// configs
 	httpConfig       IHTTPConfig
 	authClientConfig grpc_auth_client.IAuthClientConfig
+	mailClientConfig mail_client.IMailClientConfig
 
 	// clients
 	authClient   grpc_auth_client.AuthClient
+	mailClient   mail_client.MailClient
 	headerHelper headers_manager.IHeaderHelper
 
 	// controllers
@@ -57,6 +61,17 @@ func (s *serviceProvider) AuthClientConfig() grpc_auth_client.IAuthClientConfig 
 	return s.authClientConfig
 }
 
+func (s *serviceProvider) MailClientConfig() mail_client.IMailClientConfig {
+	if s.mailClientConfig == nil {
+		cfg, err := mail_client.NewMailClient()
+		if err != nil {
+			logger.Fatal("failed to get grpc config", zap.Error(err))
+		}
+		s.mailClientConfig = cfg
+	}
+	return s.mailClientConfig
+}
+
 // GrpcAuthClient returns the authentication client, initializing it if necessary.
 func (s *serviceProvider) GrpcAuthClient(_ context.Context) grpc_auth_client.AuthClient {
 	if s.authClient == nil {
@@ -72,6 +87,20 @@ func (s *serviceProvider) GrpcAuthClient(_ context.Context) grpc_auth_client.Aut
 	return s.authClient
 }
 
+func (s *serviceProvider) MailClient() mail_client.MailClient {
+	if s.mailClient == nil {
+		conn, err := grpc.NewClient(s.MailClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+		closer.Add(conn.Close)
+
+		client := mail_v1.NewMailV1Client(conn)
+		s.mailClient = mail_client.NewGRPCMailClient(client)
+	}
+	return s.mailClient
+}
+
 // HeaderHelper returns the header helper instance, initializing it if necessary.
 func (s *serviceProvider) HeaderHelper() headers_manager.IHeaderHelper {
 	if s.headerHelper == nil {
@@ -83,7 +112,7 @@ func (s *serviceProvider) HeaderHelper() headers_manager.IHeaderHelper {
 // Controller returns the controller instance, initializing it if necessary.
 func (s *serviceProvider) Controller(ctx context.Context) *controller.Controller {
 	if s.controller == nil {
-		s.controller = controller.New(s.GrpcAuthClient(ctx), s.HeaderHelper())
+		s.controller = controller.New(s.GrpcAuthClient(ctx), s.MailClient(), s.HeaderHelper())
 	}
 	return s.controller
 }

@@ -21,6 +21,7 @@ func (c *Controller) InitRoutes(server *echo.Echo) {
 			v1.POST("/register", c.Registration)
 			v1.GET("/validate-token", c.ValidateToken)
 			v1.PATCH("/update-password", c.UpdatePassword)
+			v1.POST("/confirm-email", c.ConfirmEmail)
 		}
 	}
 }

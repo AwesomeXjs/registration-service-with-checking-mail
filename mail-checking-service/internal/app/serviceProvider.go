@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/grpc_auth_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/mail"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
@@ -11,6 +13,8 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/grpc_server"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -18,14 +22,16 @@ const (
 )
 
 type serviceProvider struct {
-	grpcConfig  IGRPCConfigs
-	kafkaConfig kafka.IKafkaConfig
-	redisConfig redis.IRedisConfig
-	emailConfig mail.IMailConfig
+	grpcConfig       IGRPCConfigs
+	kafkaConfig      kafka.IKafkaConfig
+	redisConfig      redis.IRedisConfig
+	emailConfig      mail.IMailConfig
+	authClientConfig grpc_auth_client.IAuthClientConfig
 
 	kafkaConsumer *kafka.Consumer
 	redisClient   redis.IRedis
 	mailClient    mail.IMailClient
+	authClient    grpc_auth_client.IAuthClient
 
 	grpcServer   *grpc_server.GrpcServer
 	kafkaHandler kafka.IKafkaHandler
@@ -81,6 +87,17 @@ func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
 	return s.redisConfig
 }
 
+func (s *serviceProvider) AuthClientConfig() grpc_auth_client.IAuthClientConfig {
+	if s.authClientConfig == nil {
+		cfg, err := grpc_auth_client.NewAuthClientConfig()
+		if err != nil {
+			logger.Fatal("failed to get grpc config", zap.Error(err))
+		}
+		s.authClientConfig = cfg
+	}
+	return s.authClientConfig
+}
+
 func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 	if s.redisClient == nil {
 		redisClient := go_redis.NewGoRedisClient(s.RedisConfig())
@@ -105,9 +122,23 @@ func (s *serviceProvider) MailClient() mail.IMailClient {
 	return s.mailClient
 }
 
+func (s *serviceProvider) AuthClient() grpc_auth_client.IAuthClient {
+	if s.authClient == nil {
+		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+		closer.Add(conn.Close)
+
+		client := auth_v1.NewAuthV1Client(conn)
+		s.authClient = grpc_auth_client.NewAuthClient(client)
+	}
+	return s.authClient
+}
+
 func (s *serviceProvider) GrpcServer(ctx context.Context) *grpc_server.GrpcServer {
 	if s.grpcServer == nil {
-		s.grpcServer = grpc_server.New(s.RedisClient(ctx))
+		s.grpcServer = grpc_server.New(s.RedisClient(ctx), s.AuthClient())
 	}
 	return s.grpcServer
 }

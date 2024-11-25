@@ -45,3 +45,10 @@ func ToProtoValidateToken(token string) *authService.ValidateTokenRequest {
 		AccessToken: token,
 	}
 }
+
+// FromModelToProtoConfirmEmail converts a ConfirmEmailRequest model to a gRPC ConfirmEmailRequest.
+func FromModelToProtoConfirmEmail(info *model.ConfirmEmailRequest) *authService.ConfirmEmailRequest {
+	return &authService.ConfirmEmailRequest{
+		Email: info.Email,
+	}
+}

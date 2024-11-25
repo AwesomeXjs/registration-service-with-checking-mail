@@ -55,7 +55,6 @@ func (h *Handler) HandleMessage(ctx context.Context, kafkaMsg []byte, offset kaf
 	// Send the code via email to the recipient specified in the Kafka message.
 	if err := h.mailClient.SendEmail(ctx, string(kafkaMsg), "Verification Code", fmt.Sprintf("Your code is: %s", code)); err != nil {
 		logger.Warn("failed to send verification code", zap.String("code", code), zap.String("email", string(kafkaMsg)), zap.Error(err))
-		return fmt.Errorf("%w", err)
 	}
 
 	// Store the verification code in Redis with a 1-hour expiration.

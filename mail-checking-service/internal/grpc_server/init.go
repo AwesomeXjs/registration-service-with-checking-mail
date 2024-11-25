@@ -1,6 +1,7 @@
 package grpc_server
 
 import (
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/grpc_auth_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 )
@@ -11,12 +12,14 @@ import (
 type GrpcServer struct {
 	mail_v1.UnimplementedMailV1Server
 	redisClient redis.IRedis
+	authClient  grpc_auth_client.IAuthClient
 }
 
 // New creates a new instance of Controller with the provided service.
 // The service is used to manage authentication-related operations.
-func New(redisClient redis.IRedis) *GrpcServer {
+func New(redisClient redis.IRedis, authClient grpc_auth_client.IAuthClient) *GrpcServer {
 	return &GrpcServer{
 		redisClient: redisClient,
+		authClient:  authClient,
 	}
 }

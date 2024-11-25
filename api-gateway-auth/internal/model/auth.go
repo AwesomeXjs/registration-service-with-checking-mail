@@ -44,3 +44,8 @@ type UpdatePasswordRequest struct {
 	Email       string `json:"email" valid:"required,email,type(string)"`
 	NewPassword string `json:"newPassword" valid:"required,type(string),stringlength(5|20)"`
 }
+
+type ConfirmEmailRequest struct {
+	Code  string `json:"code" valid:"required"`
+	Email string `json:"email" valid:"required,email,type(string)"`
+}

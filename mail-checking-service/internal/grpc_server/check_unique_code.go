@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 
@@ -24,7 +25,14 @@ func (c *GrpcServer) CheckUniqueCode(ctx context.Context, req *mail_v1.CheckUniq
 		return nil, fmt.Errorf("code is invalid")
 	}
 
-	// тут логика по верификации
+	_, err = c.authClient.ConfirmEmail(ctx, &authService.ConfirmEmailRequest{
+		Email: req.GetEmail(),
+	})
+
+	if err != nil {
+		logger.Error("failed to confirm email", zap.Error(err))
+		return nil, fmt.Errorf("failed to confirm email: %v", err)
+	}
 
 	return nil, nil
 }

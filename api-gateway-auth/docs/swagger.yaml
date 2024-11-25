@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  model.ConfirmEmailRequest:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+    type: object
   model.LoginRequest:
     properties:
       email:
@@ -59,6 +66,37 @@ info:
   title: Authentication API
   version: "1.0"
 paths:
+  /api/v1/confirm-email:
+    post:
+      consumes:
+      - application/json
+      description: get new access token from refresh token
+      operationId: verify-email
+      parameters:
+      - description: email info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.ConfirmEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: verify email
+      tags:
+      - Verify
   /api/v1/get-access-token:
     get:
       consumes:
