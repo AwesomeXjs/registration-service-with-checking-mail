@@ -25,11 +25,6 @@ type Consumer struct {
 }
 
 // NewConsumer creates a new Kafka consumer instance with the specified configuration.
-// - `handler`: The handler that will process consumed messages.
-// - `addresses`: The list of Kafka broker addresses.
-// - `topic`: The Kafka topic to subscribe to.
-// - `consumerGroup`: The name of the consumer group.
-// - `consumerNumber`: Identifier for this consumer instance.
 // Returns a pointer to the Consumer instance or an error if initialization fails.
 func NewConsumer(handler IKafkaHandler, addresses []string, topic string, consumerGroup string, consumerNumber int) (*Consumer, error) {
 	// Kafka consumer configuration.

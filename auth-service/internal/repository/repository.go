@@ -22,6 +22,9 @@ const (
 	// RoleColumn denotes the column used to store the user's role (e.g., "admin" or "user").
 	RoleColumn = "role"
 
+	// Verification defines the column used to store the verification status of a user.
+	Verification = "verification"
+
 	// CreatedAtColumn defines the column that records when a user record was created.
 	CreatedAtColumn = "created_at"
 
@@ -51,4 +54,8 @@ type IRepository interface {
 	// It takes a UpdatePassDb struct with the user's email and new hashed password,
 	// and returns an error if the operation fails.
 	UpdatePassword(ctx context.Context, updatePassDb *model.UpdatePassDb) error
+
+	// ConfirmEmail sends a confirmation email to the user with the provided email address.
+	// It returns an error if the email sending operation fails.
+	ConfirmEmail(ctx context.Context, email string) error
 }

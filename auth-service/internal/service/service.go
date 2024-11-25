@@ -27,4 +27,8 @@ type IService interface {
 	// UpdatePassword changes the password for the user associated with the provided information.
 	// It returns an error if the password update operation fails.
 	UpdatePassword(ctx context.Context, updatePassInfo *model.UpdatePassInfo) error
+
+	// ConfirmEmail sends a confirmation email to the user with the provided email address.
+	// It returns an error if the email sending operation fails.
+	ConfirmEmail(ctx context.Context, email string) error
 }
