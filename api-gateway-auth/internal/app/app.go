@@ -4,6 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
+	"net/http/pprof"
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
@@ -59,6 +61,7 @@ func (a *App) InitDeps(ctx context.Context) error {
 		a.InitConfig,          // Initialize config
 		a.InitEchoServer,      // Initialize Echo server
 		a.initServiceProvider, // Initialize service provider
+		a.InitRoutes,
 	}
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
@@ -66,7 +69,6 @@ func (a *App) InitDeps(ctx context.Context) error {
 			logger.Fatal("failed to init deps", zap.Error(err))
 		}
 	}
-	a.InitRoutes(ctx, a.server) // Initialize the routes
 	return nil
 }
 
@@ -97,7 +99,16 @@ func (a *App) InitEchoServer(_ context.Context) error {
 		return govalidator.IsIn(str, validRoles...)
 	})
 
-	a.server = echo.New()              // Create a new Echo server
+	a.server = echo.New() // Create a new Echo server
+
+	// Добавляем pprof
+	a.server.GET("/debug/pprof/*", echo.WrapHandler(http.DefaultServeMux))
+	a.server.GET("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
+	a.server.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
+	a.server.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
+	a.server.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
+	a.server.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+
 	a.server.Use(middleware.Recover()) // Middleware for recovering from panics
 	a.server.Use(middlewares.Logger)   // Custom logging middleware
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -122,6 +133,7 @@ func (a *App) runHTTPServer() error {
 }
 
 // InitRoutes sets up the application routes.
-func (a *App) InitRoutes(ctx context.Context, server *echo.Echo) {
-	a.serviceProvider.Controller(ctx).InitRoutes(server) // Initialize routes using the controller
+func (a *App) InitRoutes(ctx context.Context) error {
+	a.serviceProvider.Controller(ctx).InitRoutes(a.server) // Initialize routes using the controller
+	return nil
 }

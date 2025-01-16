@@ -7,7 +7,6 @@ import (
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -18,14 +17,13 @@ var (
 // Registration handles the registration of a new user, hashes their password,
 // and generates access and refresh tokens upon successful registration.
 func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*model.AuthResponse, error) {
+
 	HashedPassword, err := s.authHelper.HashPassword(userInfo.Password)
 	if err != nil {
 		logger.Error("failed to hash password", zap.Error(err))
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
-
 	user := &model.InfoToDb{
-		ID:           uuid.NewString(),
 		Email:        userInfo.Email,
 		HashPassword: HashedPassword,
 		Role:         userInfo.Role,

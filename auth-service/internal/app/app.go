@@ -4,7 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
@@ -45,6 +48,13 @@ func (a *App) Run() error {
 		closer.CloseAll()
 		closer.Wait()
 	}()
+	go func() {
+		log.Println("pprof server is running on :6060")
+		if err := http.ListenAndServe(":6060", nil); err != nil {
+			log.Fatalf("failed to start pprof server: %v", err)
+		}
+	}()
+
 	err := a.RunGRPCServer()
 	if err != nil {
 		logger.Fatal("failed to run grpc server", zap.Error(err))

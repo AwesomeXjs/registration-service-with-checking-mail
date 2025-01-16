@@ -16,8 +16,8 @@ import (
 func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb) (string, error) {
 	builderInsert := squirrel.Insert(TableName).
 		PlaceholderFormat(squirrel.Dollar).
-		Columns(IDColumn, EmailColumn, HashPasswordColumn, RoleColumn).
-		Values(infoToDb.ID, infoToDb.Email, infoToDb.HashPassword, infoToDb.Role).
+		Columns(EmailColumn, HashPasswordColumn, RoleColumn).
+		Values(infoToDb.Email, infoToDb.HashPassword, infoToDb.Role).
 		Suffix(ReturningID)
 
 	query, args, err := builderInsert.ToSql()

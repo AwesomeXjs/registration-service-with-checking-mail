@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"testing"
+	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLogin(t *testing.T) {
+func TestRegistration(t *testing.T) {
 	t.Parallel()
 	level := "info"
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
@@ -28,7 +28,7 @@ func TestLogin(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		req *model.LoginInfo
+		req *model.UserInfo
 	}
 
 	var (
@@ -37,16 +37,24 @@ func TestLogin(t *testing.T) {
 
 		email        = gofakeit.Email()
 		password     = gofakeit.Password(true, true, true, true, false, 8)
+		name         = gofakeit.Name()
+		surname      = gofakeit.LastName()
+		role         = "user"
 		hashPassword = gofakeit.UUID()
 
-		accessToken  = gofakeit.UUID()
-		refreshToken = gofakeit.UUID()
-		userID       = gofakeit.UUID()
-		role         = "user"
+		accessToken  = "access-token"
+		refreshToken = "refresh-token"
+		userID       = "user-id"
 
-		req = &model.LoginInfo{
+		topicRegistration = "registration"
+		timeNow           = time.Now()
+
+		req = &model.UserInfo{
 			Email:    email,
 			Password: password,
+			Name:     name,
+			Surname:  surname,
+			Role:     role,
 		}
 
 		res = &model.AuthResponse{
@@ -55,13 +63,14 @@ func TestLogin(t *testing.T) {
 			UserID:       userID,
 		}
 
-		loginResponse = &model.LoginResponse{
-			UserID:       userID,
+		user = &model.InfoToDb{
+			ID:           userID,
+			Email:        email,
 			HashPassword: hashPassword,
 			Role:         role,
 		}
 
-		repositoryError = fmt.Errorf("repository error")
+		//repositoryError = fmt.Errorf("repository error")
 	)
 
 	defer t.Cleanup(mc.Finish)
@@ -85,13 +94,12 @@ func TestLogin(t *testing.T) {
 			err:  nil,
 			IRepositoryMock: func(mc *minimock.Controller) repository.IRepository {
 				mock := mocks.NewIRepositoryMock(mc)
-				// задаем поведение мока (все методы сервиса которые вызываются внутри ручки контроллера)
-				mock.LoginMock.Expect(ctx, email).Return(loginResponse, nil)
+				mock.RegistrationMock.Expect(ctx, user).Return(userID, nil)
 				return mock
 			},
 			AuthHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
 				mock := mocks.NewAuthHelperMock(mc)
-				mock.ValidatePasswordMock.Expect(hashPassword, password).Return(true)
+				mock.HashPasswordMock.Expect(password).Return(hashPassword, nil)
 				mock.GenerateAccessTokenMock.Expect(&model.AccessTokenInfo{
 					ID:   userID,
 					Role: role,
@@ -101,53 +109,7 @@ func TestLogin(t *testing.T) {
 			},
 			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
 				mock := mocks.NewIProducerMock(mc)
-				return mock
-			},
-		},
-		{
-			name: "repository error case",
-			args: args{
-				ctx: ctx,
-				req: req,
-			},
-			want: nil,
-			err:  repositoryError,
-			IRepositoryMock: func(mc *minimock.Controller) repository.IRepository {
-				mock := mocks.NewIRepositoryMock(mc)
-				// задаем поведение мока (все методы сервиса которые вызываются внутри ручки контроллера)
-				mock.LoginMock.Expect(ctx, email).Return(nil, repositoryError)
-				return mock
-			},
-			AuthHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
-				mock := mocks.NewAuthHelperMock(mc)
-				return mock
-			},
-			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
-				mock := mocks.NewIProducerMock(mc)
-				return mock
-			},
-		},
-		{
-			name: "validate password error case",
-			args: args{
-				ctx: ctx,
-				req: req,
-			},
-			want: nil,
-			err:  fmt.Errorf("invalid password"),
-			IRepositoryMock: func(mc *minimock.Controller) repository.IRepository {
-				mock := mocks.NewIRepositoryMock(mc)
-				// задаем поведение мока (все методы сервиса которые вызываются внутри ручки контроллера)
-				mock.LoginMock.Expect(ctx, email).Return(loginResponse, nil)
-				return mock
-			},
-			AuthHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
-				mock := mocks.NewAuthHelperMock(mc)
-				mock.ValidatePasswordMock.Expect(hashPassword, password).Return(false)
-				return mock
-			},
-			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
-				mock := mocks.NewIProducerMock(mc)
+				mock.ProduceMock.Expect(email, topicRegistration, userID, timeNow).Return(nil)
 				return mock
 			},
 		},
@@ -163,7 +125,7 @@ func TestLogin(t *testing.T) {
 
 			myService := service.New(IRepoMock, AuthHelperMock, IProducerMock)
 
-			result, err := myService.Login(tt.args.ctx, tt.args.req)
+			result, err := myService.Registration(tt.args.ctx, tt.args.req)
 			require.Equal(t, tt.err, err)
 			require.Equal(t, tt.want, result)
 		})

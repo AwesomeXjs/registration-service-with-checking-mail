@@ -7,7 +7,7 @@ import (
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
-	logger2 "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
@@ -24,7 +24,7 @@ const (
 func TestConfirmEmail(t *testing.T) {
 	t.Parallel()
 	level := info
-	logger2.Init(logger2.GetCore(logger2.GetAtomicLevel(&level)))
+	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
 
 	type IRepositoryMockFunc func(mc *minimock.Controller) repository.IRepository
 	type AuthHelperMockFunc func(mc *minimock.Controller) jwt_manager.AuthHelper
