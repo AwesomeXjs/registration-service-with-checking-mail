@@ -23,12 +23,12 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
             version: v1.60.3
-            args: --config=${{ github.workspace }}/.golangci.pipeline.yaml ./...
+            args: --config=${{ github.workspace }}/auth-service/.golangci.pipeline.yaml ./...
             working-directory: auth-service
 
       - name: Run golangci-lint for Auth-api-gateway service
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.60.3
-          args: --config=${{ github.workspace }}/.golangci.pipeline.yaml ./...
+          args: --config=${{ github.workspace }}/api-gateway-auth/.golangci.pipeline.yaml ./...
           working-directory: api-gateway-auth
