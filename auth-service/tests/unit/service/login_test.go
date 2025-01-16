@@ -42,7 +42,7 @@ func TestLogin(t *testing.T) {
 
 		accessToken  = gofakeit.UUID()
 		refreshToken = gofakeit.UUID()
-		userID       = gofakeit.UUID()
+		userID       = 1
 		role         = "user"
 
 		req = &model.LoginInfo{
@@ -53,7 +53,7 @@ func TestLogin(t *testing.T) {
 		res = &model.AuthResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserID:       userID,
+			UserID:       int64(userID),
 		}
 
 		loginResponse = &model.LoginResponse{

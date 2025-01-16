@@ -25,7 +25,7 @@ type LoginInfo struct {
 // InfoToDb represents the structure used for interacting with the database for user records.
 // It includes fields for the user's ID, Email, HashPassword, Role, and timestamps for record creation and updates.
 type InfoToDb struct {
-	ID           string       `db:"id" json:"id"`
+	ID           int          `db:"id" json:"id"`
 	Email        string       `db:"email" json:"email"`
 	HashPassword string       `db:"hash_password" json:"hash_password"`
 	Role         string       `db:"role" json:"role"`
@@ -36,7 +36,7 @@ type InfoToDb struct {
 // LoginResponse is used to retrieve essential authentication details from the database.
 // It contains the user's ID, hashed password, and role information.
 type LoginResponse struct {
-	UserID       string `db:"id"`
+	UserID       int    `db:"id"`
 	HashPassword string `db:"hash_password"`
 	Role         string `db:"role"`
 }

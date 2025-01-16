@@ -45,7 +45,7 @@ func (a *AuthClient) GenerateAccessToken(info *model.AccessTokenInfo) (string, e
 
 // GenerateRefreshToken creates a new refresh token for a user identified by their user ID.
 // The token will have an expiration time set according to the specified duration.
-func (a *AuthClient) GenerateRefreshToken(userID string) (string, error) {
+func (a *AuthClient) GenerateRefreshToken(userID int) (string, error) {
 	claims := model.UserClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(a.refreshTokenDuration).Unix(),

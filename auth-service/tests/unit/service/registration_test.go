@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"strconv"
 	"testing"
-	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
@@ -44,10 +44,10 @@ func TestRegistration(t *testing.T) {
 
 		accessToken  = "access-token"
 		refreshToken = "refresh-token"
-		userID       = "user-id"
+		userID       = 1
 
 		topicRegistration = "registration"
-		timeNow           = time.Now()
+		//timeNow           = time.Date(2025, 1, 16, 22, 49, 1, 593861534, time.Local)
 
 		req = &model.UserInfo{
 			Email:    email,
@@ -60,11 +60,10 @@ func TestRegistration(t *testing.T) {
 		res = &model.AuthResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserID:       userID,
+			UserID:       int64(userID),
 		}
 
 		user = &model.InfoToDb{
-			ID:           userID,
 			Email:        email,
 			HashPassword: hashPassword,
 			Role:         role,
@@ -109,7 +108,7 @@ func TestRegistration(t *testing.T) {
 			},
 			IProducerMockFunc: func(mc *minimock.Controller) kafka.IProducer {
 				mock := mocks.NewIProducerMock(mc)
-				mock.ProduceMock.Expect(email, topicRegistration, userID, timeNow).Return(nil)
+				mock.ProduceMock.Expect(email, topicRegistration, strconv.Itoa(userID)).Return(nil)
 				return mock
 			},
 		},

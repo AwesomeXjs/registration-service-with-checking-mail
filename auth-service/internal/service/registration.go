@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
-	"time"
+	"strconv"
+
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
@@ -23,19 +25,14 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 		logger.Error("failed to hash password", zap.Error(err))
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
-	user := &model.InfoToDb{
-		Email:        userInfo.Email,
-		HashPassword: HashedPassword,
-		Role:         userInfo.Role,
-	}
 
-	userID, err := s.repo.Registration(ctx, user)
+	userID, err := s.repo.Registration(ctx, converter.FromUserInfoToDbModel(userInfo, HashedPassword))
 	if err != nil {
 		logger.Error("failed to registration", zap.Error(err))
 		return nil, err
 	}
 
-	err = s.kafkaProducer.Produce(user.Email, topicRegistration, user.ID, time.Now())
+	err = s.kafkaProducer.Produce(userInfo.Email, topicRegistration, strconv.Itoa(userID))
 	if err != nil {
 		logger.Error("failed to produce message", zap.Error(err))
 		return nil, fmt.Errorf("failed to produce message: %v", err)
@@ -43,14 +40,14 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 
 	accessToken, err := s.authHelper.GenerateAccessToken(&model.AccessTokenInfo{
 		ID:   userID,
-		Role: user.Role,
+		Role: userInfo.Role,
 	})
 	if err != nil {
 		logger.Error("failed to generate access token", zap.Error(err))
 		return nil, fmt.Errorf("failed to generate access token: %v", err)
 	}
 
-	refreshToken, err := s.authHelper.GenerateRefreshToken(user.ID)
+	refreshToken, err := s.authHelper.GenerateRefreshToken(userID)
 	if err != nil {
 		logger.Error("failed to generate refresh token", zap.Error(err))
 		return nil, fmt.Errorf("failed to generate refresh token: %v", err)
@@ -59,6 +56,6 @@ func (s *Service) Registration(ctx context.Context, userInfo *model.UserInfo) (*
 	return &model.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		UserID:       userID,
+		UserID:       int64(userID),
 	}, nil
 }

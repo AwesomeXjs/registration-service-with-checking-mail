@@ -37,7 +37,7 @@ func TestGetAccessToken(t *testing.T) {
 
 		refreshToken = gofakeit.UUID()
 		accessToken  = gofakeit.UUID()
-		userID       = gofakeit.UUID()
+		userID       = 1
 
 		res = &model.NewPairTokens{
 			AccessToken:  accessToken,

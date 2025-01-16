@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/app"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/grpc_server"
 	logger2 "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
@@ -19,9 +21,8 @@ import (
 
 func TestLogin(t *testing.T) {
 	t.Parallel()
-	level := "info"
 	type IServiceMockFunc func(mc *minimock.Controller) service.IService
-	logger2.Init(logger2.GetCore(logger2.GetAtomicLevel(&level)))
+	logger2.Init(logger2.GetCore(logger2.GetAtomicLevel(app.LogLevel)))
 
 	type args struct {
 		ctx context.Context
@@ -36,7 +37,7 @@ func TestLogin(t *testing.T) {
 
 		accessToken  = gofakeit.UUID()
 		refreshToken = gofakeit.UUID()
-		userID       = gofakeit.UUID()
+		userID       = 1
 
 		req = &authService.LoginRequest{
 			Email:    email,
@@ -46,7 +47,7 @@ func TestLogin(t *testing.T) {
 		res = &authService.LoginResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserId:       userID,
+			UserId:       int64(userID),
 		}
 
 		loginRequest = &model.LoginInfo{
@@ -57,7 +58,7 @@ func TestLogin(t *testing.T) {
 		loginResponse = &model.AuthResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserID:       userID,
+			UserID:       int64(userID),
 		}
 
 		serviceError = fmt.Errorf("service error")

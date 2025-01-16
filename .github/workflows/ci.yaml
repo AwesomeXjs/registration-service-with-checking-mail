@@ -32,3 +32,10 @@ jobs:
           version: v1.60.3
           args: --config=${{ github.workspace }}/api-gateway-auth/.golangci.pipeline.yaml ./...
           working-directory: api-gateway-auth
+
+      - name: Run golangci-lint for mail service
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60.3
+          args: --config=${{ github.workspace }}/mail-checking-service/.golangci.pipeline.yaml ./...
+          working-directory: mail-checking-service

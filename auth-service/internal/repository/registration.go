@@ -13,7 +13,7 @@ import (
 )
 
 // Registration inserts a new user into the database and returns the user ID.
-func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb) (string, error) {
+func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb) (int, error) {
 	builderInsert := squirrel.Insert(TableName).
 		PlaceholderFormat(squirrel.Dollar).
 		Columns(EmailColumn, HashPasswordColumn, RoleColumn).
@@ -23,7 +23,7 @@ func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb)
 	query, args, err := builderInsert.ToSql()
 	if err != nil {
 		logger.Error("failed to build insert query", zap.Error(err))
-		return "", fmt.Errorf("failed to build insert query: %v", err)
+		return 0, fmt.Errorf("failed to build insert query: %v", err)
 	}
 
 	q := db.Query{
@@ -31,16 +31,16 @@ func (r *Repository) Registration(ctx context.Context, infoToDb *model.InfoToDb)
 		QueryRaw: query,
 	}
 
-	var ID string
+	var ID int
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&ID)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			logger.Warn("email already registered", zap.Error(err))
-			return "", fmt.Errorf("email already registered")
+			return 0, fmt.Errorf("email already registered")
 		}
 
 		logger.Error("failed to register user", zap.Error(err))
-		return "", fmt.Errorf("failed to register user: %v", err)
+		return 0, fmt.Errorf("failed to register user: %v", err)
 	}
 
 	return ID, nil

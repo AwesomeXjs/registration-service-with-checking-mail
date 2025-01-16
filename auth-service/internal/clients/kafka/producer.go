@@ -16,12 +16,12 @@ const (
 )
 
 // Produce sends a message with a key and timestamp to the specified Kafka topic.
-func (p *Producer) Produce(message, topic, key string, timestamp time.Time) error {
+func (p *Producer) Produce(message, topic, key string) error {
 	kafkaMessage := &kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          []byte(message),
 		Key:            []byte(key),
-		Timestamp:      timestamp,
+		Timestamp:      time.Now(),
 	}
 	kafkaChan := make(chan kafka.Event)
 

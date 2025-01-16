@@ -45,6 +45,6 @@ func (s *Service) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model
 	return &model.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		UserID:       result.UserID,
+		UserID:       int64(result.UserID),
 	}, nil
 }

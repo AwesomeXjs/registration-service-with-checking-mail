@@ -15,12 +15,7 @@ import (
 func (c *GrpcServer) Registration(ctx context.Context, req *authService.RegistrationRequest) (*authService.RegistrationResponse, error) {
 	logger.Debug("registration", zap.Any("req", req))
 
-	err := validator.Validate(ctx,
-		validator.ValidateName(req.GetName()),
-		validator.ValidateRole(req.GetRole()),
-		validator.ValidateEmail(req.GetEmail()),
-		validator.ValidatePassword(req.GetPassword()),
-		validator.ValidateSurname(req.GetSurname()))
+	err := ValidateUserData(ctx, req)
 	if err != nil {
 		logger.Info("failed to validate", zap.Error(err))
 		return nil, err
@@ -35,4 +30,15 @@ func (c *GrpcServer) Registration(ctx context.Context, req *authService.Registra
 	logger.Debug("new pair tokens: ", zap.Any("tokens", res))
 
 	return converter.ToProtoFromRegResponse(res), nil
+}
+
+// ValidateUserData validates the user registration request data.
+func ValidateUserData(ctx context.Context, req *authService.RegistrationRequest) error {
+	return validator.Validate(ctx,
+		validator.ValidateName(req.GetName()),
+		validator.ValidateRole(req.GetRole()),
+		validator.ValidateEmail(req.GetEmail()),
+		validator.ValidatePassword(req.GetPassword()),
+		validator.ValidateSurname(req.GetSurname()),
+	)
 }

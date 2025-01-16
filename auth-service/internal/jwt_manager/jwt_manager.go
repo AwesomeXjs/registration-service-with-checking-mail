@@ -13,7 +13,7 @@ type AuthHelper interface {
 	// GenerateRefreshToken creates a new refresh token for a user,
 	// identified by their user ID. Returns the refresh token as a
 	// string or an error if the operation fails.
-	GenerateRefreshToken(userID string) (string, error)
+	GenerateRefreshToken(userID int) (string, error)
 
 	// VerifyToken checks the validity of the provided token and
 	// returns the associated user claims if the token is valid.

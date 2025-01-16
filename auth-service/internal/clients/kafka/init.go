@@ -3,7 +3,6 @@ package kafka
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
@@ -11,7 +10,7 @@ import (
 // IProducer defines an interface for a Kafka producer with methods for sending messages and closing.
 type IProducer interface {
 	// Produce sends a message to a specified Kafka topic.
-	Produce(message, topic, key string, timestamp time.Time) error
+	Produce(message, topic, key string) error
 
 	// Close gracefully shuts down the producer and flushes pending messages.
 	Close() error

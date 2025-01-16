@@ -40,7 +40,7 @@ const (
 type IRepository interface {
 	// Registration saves a new user's registration information to the database.
 	// It returns the user's ID upon successful registration or an error if the operation fails.
-	Registration(ctx context.Context, registrationRequest *model.InfoToDb) (string, error)
+	Registration(ctx context.Context, registrationRequest *model.InfoToDb) (int, error)
 
 	// Login retrieves a user's login information based on their email.
 	// It returns a LoginResponse containing the user's credentials or an error if the operation fails.
@@ -48,7 +48,7 @@ type IRepository interface {
 
 	// GetAccessToken fetches access token information for a user identified by their user ID.
 	// It returns the AccessTokenInfo struct containing relevant token details or an error if the operation fails.
-	GetAccessToken(ctx context.Context, userID string) (*model.AccessTokenInfo, error)
+	GetAccessToken(ctx context.Context, userID int) (*model.AccessTokenInfo, error)
 
 	// UpdatePassword updates the user's password in the database.
 	// It takes a UpdatePassDb struct with the user's email and new hashed password,

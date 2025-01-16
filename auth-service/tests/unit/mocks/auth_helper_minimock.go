@@ -2,7 +2,7 @@
 
 package mocks
 
-//go:generate minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/utils/auth_helper.AuthHelper -o auth_helper_minimock.go -n AuthHelperMock -p mocks
+//go:generate minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager.AuthHelper -o auth_helper_minimock.go -n AuthHelperMock -p mocks
 
 import (
 	"sync"
@@ -13,7 +13,7 @@ import (
 	"github.com/gojuno/minimock/v3"
 )
 
-// AuthHelperMock implements mm_auth_helper.AuthHelper
+// AuthHelperMock implements mm_jwt_manager.AuthHelper
 type AuthHelperMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
@@ -25,9 +25,9 @@ type AuthHelperMock struct {
 	beforeGenerateAccessTokenCounter uint64
 	GenerateAccessTokenMock          mAuthHelperMockGenerateAccessToken
 
-	funcGenerateRefreshToken          func(userID string) (s1 string, err error)
+	funcGenerateRefreshToken          func(userID int) (s1 string, err error)
 	funcGenerateRefreshTokenOrigin    string
-	inspectFuncGenerateRefreshToken   func(userID string)
+	inspectFuncGenerateRefreshToken   func(userID int)
 	afterGenerateRefreshTokenCounter  uint64
 	beforeGenerateRefreshTokenCounter uint64
 	GenerateRefreshTokenMock          mAuthHelperMockGenerateRefreshToken
@@ -54,7 +54,7 @@ type AuthHelperMock struct {
 	VerifyTokenMock          mAuthHelperMockVerifyToken
 }
 
-// NewAuthHelperMock returns a mock for mm_auth_helper.AuthHelper
+// NewAuthHelperMock returns a mock for mm_jwt_manager.AuthHelper
 func NewAuthHelperMock(t minimock.Tester) *AuthHelperMock {
 	m := &AuthHelperMock{t: t}
 
@@ -269,7 +269,7 @@ func (mmGenerateAccessToken *mAuthHelperMockGenerateAccessToken) invocationsDone
 	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
 }
 
-// GenerateAccessToken implements mm_auth_helper.AuthHelper
+// GenerateAccessToken implements mm_jwt_manager.AuthHelper
 func (mmGenerateAccessToken *AuthHelperMock) GenerateAccessToken(info *model.AccessTokenInfo) (s1 string, err error) {
 	mm_atomic.AddUint64(&mmGenerateAccessToken.beforeGenerateAccessTokenCounter, 1)
 	defer mm_atomic.AddUint64(&mmGenerateAccessToken.afterGenerateAccessTokenCounter, 1)
@@ -420,12 +420,12 @@ type AuthHelperMockGenerateRefreshTokenExpectation struct {
 
 // AuthHelperMockGenerateRefreshTokenParams contains parameters of the AuthHelper.GenerateRefreshToken
 type AuthHelperMockGenerateRefreshTokenParams struct {
-	userID string
+	userID int
 }
 
 // AuthHelperMockGenerateRefreshTokenParamPtrs contains pointers to parameters of the AuthHelper.GenerateRefreshToken
 type AuthHelperMockGenerateRefreshTokenParamPtrs struct {
-	userID *string
+	userID *int
 }
 
 // AuthHelperMockGenerateRefreshTokenResults contains results of the AuthHelper.GenerateRefreshToken
@@ -451,7 +451,7 @@ func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Optional() *m
 }
 
 // Expect sets up expected params for AuthHelper.GenerateRefreshToken
-func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Expect(userID string) *mAuthHelperMockGenerateRefreshToken {
+func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Expect(userID int) *mAuthHelperMockGenerateRefreshToken {
 	if mmGenerateRefreshToken.mock.funcGenerateRefreshToken != nil {
 		mmGenerateRefreshToken.mock.t.Fatalf("AuthHelperMock.GenerateRefreshToken mock is already set by Set")
 	}
@@ -476,7 +476,7 @@ func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Expect(userID
 }
 
 // ExpectUserIDParam1 sets up expected param userID for AuthHelper.GenerateRefreshToken
-func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) ExpectUserIDParam1(userID string) *mAuthHelperMockGenerateRefreshToken {
+func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) ExpectUserIDParam1(userID int) *mAuthHelperMockGenerateRefreshToken {
 	if mmGenerateRefreshToken.mock.funcGenerateRefreshToken != nil {
 		mmGenerateRefreshToken.mock.t.Fatalf("AuthHelperMock.GenerateRefreshToken mock is already set by Set")
 	}
@@ -499,7 +499,7 @@ func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) ExpectUserIDP
 }
 
 // Inspect accepts an inspector function that has same arguments as the AuthHelper.GenerateRefreshToken
-func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Inspect(f func(userID string)) *mAuthHelperMockGenerateRefreshToken {
+func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Inspect(f func(userID int)) *mAuthHelperMockGenerateRefreshToken {
 	if mmGenerateRefreshToken.mock.inspectFuncGenerateRefreshToken != nil {
 		mmGenerateRefreshToken.mock.t.Fatalf("Inspect function is already set for AuthHelperMock.GenerateRefreshToken")
 	}
@@ -524,7 +524,7 @@ func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Return(s1 str
 }
 
 // Set uses given function f to mock the AuthHelper.GenerateRefreshToken method
-func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Set(f func(userID string) (s1 string, err error)) *AuthHelperMock {
+func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Set(f func(userID int) (s1 string, err error)) *AuthHelperMock {
 	if mmGenerateRefreshToken.defaultExpectation != nil {
 		mmGenerateRefreshToken.mock.t.Fatalf("Default expectation is already set for the AuthHelper.GenerateRefreshToken method")
 	}
@@ -540,7 +540,7 @@ func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) Set(f func(us
 
 // When sets expectation for the AuthHelper.GenerateRefreshToken which will trigger the result defined by the following
 // Then helper
-func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) When(userID string) *AuthHelperMockGenerateRefreshTokenExpectation {
+func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) When(userID int) *AuthHelperMockGenerateRefreshTokenExpectation {
 	if mmGenerateRefreshToken.mock.funcGenerateRefreshToken != nil {
 		mmGenerateRefreshToken.mock.t.Fatalf("AuthHelperMock.GenerateRefreshToken mock is already set by Set")
 	}
@@ -581,8 +581,8 @@ func (mmGenerateRefreshToken *mAuthHelperMockGenerateRefreshToken) invocationsDo
 	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
 }
 
-// GenerateRefreshToken implements mm_auth_helper.AuthHelper
-func (mmGenerateRefreshToken *AuthHelperMock) GenerateRefreshToken(userID string) (s1 string, err error) {
+// GenerateRefreshToken implements mm_jwt_manager.AuthHelper
+func (mmGenerateRefreshToken *AuthHelperMock) GenerateRefreshToken(userID int) (s1 string, err error) {
 	mm_atomic.AddUint64(&mmGenerateRefreshToken.beforeGenerateRefreshTokenCounter, 1)
 	defer mm_atomic.AddUint64(&mmGenerateRefreshToken.afterGenerateRefreshTokenCounter, 1)
 
@@ -893,7 +893,7 @@ func (mmHashPassword *mAuthHelperMockHashPassword) invocationsDone() bool {
 	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
 }
 
-// HashPassword implements mm_auth_helper.AuthHelper
+// HashPassword implements mm_jwt_manager.AuthHelper
 func (mmHashPassword *AuthHelperMock) HashPassword(password string) (s1 string, err error) {
 	mm_atomic.AddUint64(&mmHashPassword.beforeHashPasswordCounter, 1)
 	defer mm_atomic.AddUint64(&mmHashPassword.afterHashPasswordCounter, 1)
@@ -1230,7 +1230,7 @@ func (mmValidatePassword *mAuthHelperMockValidatePassword) invocationsDone() boo
 	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
 }
 
-// ValidatePassword implements mm_auth_helper.AuthHelper
+// ValidatePassword implements mm_jwt_manager.AuthHelper
 func (mmValidatePassword *AuthHelperMock) ValidatePassword(hashedPassword string, candidatePassword string) (b1 bool) {
 	mm_atomic.AddUint64(&mmValidatePassword.beforeValidatePasswordCounter, 1)
 	defer mm_atomic.AddUint64(&mmValidatePassword.afterValidatePasswordCounter, 1)
@@ -1547,7 +1547,7 @@ func (mmVerifyToken *mAuthHelperMockVerifyToken) invocationsDone() bool {
 	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
 }
 
-// VerifyToken implements mm_auth_helper.AuthHelper
+// VerifyToken implements mm_jwt_manager.AuthHelper
 func (mmVerifyToken *AuthHelperMock) VerifyToken(token string) (up1 *model.UserClaims, err error) {
 	mm_atomic.AddUint64(&mmVerifyToken.beforeVerifyTokenCounter, 1)
 	defer mm_atomic.AddUint64(&mmVerifyToken.afterVerifyTokenCounter, 1)

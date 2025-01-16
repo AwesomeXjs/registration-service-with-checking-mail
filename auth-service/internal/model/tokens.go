@@ -5,7 +5,7 @@ import "github.com/golang-jwt/jwt"
 // AccessTokenInfo holds information extracted from the access token,
 // including the user's ID and role. This is used for authorization checks.
 type AccessTokenInfo struct {
-	ID   string `db:"id"`
+	ID   int    `db:"id"`
 	Role string `db:"role"`
 }
 
@@ -15,7 +15,7 @@ type AccessTokenInfo struct {
 type AuthResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
-	UserID       string `json:"userId"`
+	UserID       int64  `json:"userId"`
 }
 
 // UserClaims extends the standard JWT claims to include custom fields
@@ -24,7 +24,7 @@ type AuthResponse struct {
 type UserClaims struct {
 	jwt.StandardClaims
 	Role string
-	ID   string
+	ID   int
 }
 
 // NewPairTokens holds a new set of access and refresh tokens.

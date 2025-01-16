@@ -31,7 +31,7 @@ message RegistrationRequest {
 message RegistrationResponse {
   string accessToken = 1;
   string refreshToken = 2;
-  string userId = 3;
+  int64 userId = 3;
 }
 
 message LoginRequest {
@@ -42,7 +42,7 @@ message LoginRequest {
 message LoginResponse {
   string accessToken = 1;
   string refreshToken = 2;
-  string userId = 3;
+  int64 userId = 3;
 }
 
 message ValidateTokenRequest {

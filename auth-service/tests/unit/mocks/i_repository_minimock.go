@@ -26,9 +26,9 @@ type IRepositoryMock struct {
 	beforeConfirmEmailCounter uint64
 	ConfirmEmailMock          mIRepositoryMockConfirmEmail
 
-	funcGetAccessToken          func(ctx context.Context, userID string) (ap1 *model.AccessTokenInfo, err error)
+	funcGetAccessToken          func(ctx context.Context, userID int) (ap1 *model.AccessTokenInfo, err error)
 	funcGetAccessTokenOrigin    string
-	inspectFuncGetAccessToken   func(ctx context.Context, userID string)
+	inspectFuncGetAccessToken   func(ctx context.Context, userID int)
 	afterGetAccessTokenCounter  uint64
 	beforeGetAccessTokenCounter uint64
 	GetAccessTokenMock          mIRepositoryMockGetAccessToken
@@ -40,7 +40,7 @@ type IRepositoryMock struct {
 	beforeLoginCounter uint64
 	LoginMock          mIRepositoryMockLogin
 
-	funcRegistration          func(ctx context.Context, registrationRequest *model.InfoToDb) (s1 string, err error)
+	funcRegistration          func(ctx context.Context, registrationRequest *model.InfoToDb) (i1 int, err error)
 	funcRegistrationOrigin    string
 	inspectFuncRegistration   func(ctx context.Context, registrationRequest *model.InfoToDb)
 	afterRegistrationCounter  uint64
@@ -452,13 +452,13 @@ type IRepositoryMockGetAccessTokenExpectation struct {
 // IRepositoryMockGetAccessTokenParams contains parameters of the IRepository.GetAccessToken
 type IRepositoryMockGetAccessTokenParams struct {
 	ctx    context.Context
-	userID string
+	userID int
 }
 
 // IRepositoryMockGetAccessTokenParamPtrs contains pointers to parameters of the IRepository.GetAccessToken
 type IRepositoryMockGetAccessTokenParamPtrs struct {
 	ctx    *context.Context
-	userID *string
+	userID *int
 }
 
 // IRepositoryMockGetAccessTokenResults contains results of the IRepository.GetAccessToken
@@ -485,7 +485,7 @@ func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Optional() *mIRepository
 }
 
 // Expect sets up expected params for IRepository.GetAccessToken
-func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Expect(ctx context.Context, userID string) *mIRepositoryMockGetAccessToken {
+func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Expect(ctx context.Context, userID int) *mIRepositoryMockGetAccessToken {
 	if mmGetAccessToken.mock.funcGetAccessToken != nil {
 		mmGetAccessToken.mock.t.Fatalf("IRepositoryMock.GetAccessToken mock is already set by Set")
 	}
@@ -533,7 +533,7 @@ func (mmGetAccessToken *mIRepositoryMockGetAccessToken) ExpectCtxParam1(ctx cont
 }
 
 // ExpectUserIDParam2 sets up expected param userID for IRepository.GetAccessToken
-func (mmGetAccessToken *mIRepositoryMockGetAccessToken) ExpectUserIDParam2(userID string) *mIRepositoryMockGetAccessToken {
+func (mmGetAccessToken *mIRepositoryMockGetAccessToken) ExpectUserIDParam2(userID int) *mIRepositoryMockGetAccessToken {
 	if mmGetAccessToken.mock.funcGetAccessToken != nil {
 		mmGetAccessToken.mock.t.Fatalf("IRepositoryMock.GetAccessToken mock is already set by Set")
 	}
@@ -556,7 +556,7 @@ func (mmGetAccessToken *mIRepositoryMockGetAccessToken) ExpectUserIDParam2(userI
 }
 
 // Inspect accepts an inspector function that has same arguments as the IRepository.GetAccessToken
-func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Inspect(f func(ctx context.Context, userID string)) *mIRepositoryMockGetAccessToken {
+func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Inspect(f func(ctx context.Context, userID int)) *mIRepositoryMockGetAccessToken {
 	if mmGetAccessToken.mock.inspectFuncGetAccessToken != nil {
 		mmGetAccessToken.mock.t.Fatalf("Inspect function is already set for IRepositoryMock.GetAccessToken")
 	}
@@ -581,7 +581,7 @@ func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Return(ap1 *model.Access
 }
 
 // Set uses given function f to mock the IRepository.GetAccessToken method
-func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Set(f func(ctx context.Context, userID string) (ap1 *model.AccessTokenInfo, err error)) *IRepositoryMock {
+func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Set(f func(ctx context.Context, userID int) (ap1 *model.AccessTokenInfo, err error)) *IRepositoryMock {
 	if mmGetAccessToken.defaultExpectation != nil {
 		mmGetAccessToken.mock.t.Fatalf("Default expectation is already set for the IRepository.GetAccessToken method")
 	}
@@ -597,7 +597,7 @@ func (mmGetAccessToken *mIRepositoryMockGetAccessToken) Set(f func(ctx context.C
 
 // When sets expectation for the IRepository.GetAccessToken which will trigger the result defined by the following
 // Then helper
-func (mmGetAccessToken *mIRepositoryMockGetAccessToken) When(ctx context.Context, userID string) *IRepositoryMockGetAccessTokenExpectation {
+func (mmGetAccessToken *mIRepositoryMockGetAccessToken) When(ctx context.Context, userID int) *IRepositoryMockGetAccessTokenExpectation {
 	if mmGetAccessToken.mock.funcGetAccessToken != nil {
 		mmGetAccessToken.mock.t.Fatalf("IRepositoryMock.GetAccessToken mock is already set by Set")
 	}
@@ -639,7 +639,7 @@ func (mmGetAccessToken *mIRepositoryMockGetAccessToken) invocationsDone() bool {
 }
 
 // GetAccessToken implements mm_repository.IRepository
-func (mmGetAccessToken *IRepositoryMock) GetAccessToken(ctx context.Context, userID string) (ap1 *model.AccessTokenInfo, err error) {
+func (mmGetAccessToken *IRepositoryMock) GetAccessToken(ctx context.Context, userID int) (ap1 *model.AccessTokenInfo, err error) {
 	mm_atomic.AddUint64(&mmGetAccessToken.beforeGetAccessTokenCounter, 1)
 	defer mm_atomic.AddUint64(&mmGetAccessToken.afterGetAccessTokenCounter, 1)
 
@@ -1149,7 +1149,7 @@ type IRepositoryMockRegistrationParamPtrs struct {
 
 // IRepositoryMockRegistrationResults contains results of the IRepository.Registration
 type IRepositoryMockRegistrationResults struct {
-	s1  string
+	i1  int
 	err error
 }
 
@@ -1253,7 +1253,7 @@ func (mmRegistration *mIRepositoryMockRegistration) Inspect(f func(ctx context.C
 }
 
 // Return sets up results that will be returned by IRepository.Registration
-func (mmRegistration *mIRepositoryMockRegistration) Return(s1 string, err error) *IRepositoryMock {
+func (mmRegistration *mIRepositoryMockRegistration) Return(i1 int, err error) *IRepositoryMock {
 	if mmRegistration.mock.funcRegistration != nil {
 		mmRegistration.mock.t.Fatalf("IRepositoryMock.Registration mock is already set by Set")
 	}
@@ -1261,13 +1261,13 @@ func (mmRegistration *mIRepositoryMockRegistration) Return(s1 string, err error)
 	if mmRegistration.defaultExpectation == nil {
 		mmRegistration.defaultExpectation = &IRepositoryMockRegistrationExpectation{mock: mmRegistration.mock}
 	}
-	mmRegistration.defaultExpectation.results = &IRepositoryMockRegistrationResults{s1, err}
+	mmRegistration.defaultExpectation.results = &IRepositoryMockRegistrationResults{i1, err}
 	mmRegistration.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
 	return mmRegistration.mock
 }
 
 // Set uses given function f to mock the IRepository.Registration method
-func (mmRegistration *mIRepositoryMockRegistration) Set(f func(ctx context.Context, registrationRequest *model.InfoToDb) (s1 string, err error)) *IRepositoryMock {
+func (mmRegistration *mIRepositoryMockRegistration) Set(f func(ctx context.Context, registrationRequest *model.InfoToDb) (i1 int, err error)) *IRepositoryMock {
 	if mmRegistration.defaultExpectation != nil {
 		mmRegistration.mock.t.Fatalf("Default expectation is already set for the IRepository.Registration method")
 	}
@@ -1298,8 +1298,8 @@ func (mmRegistration *mIRepositoryMockRegistration) When(ctx context.Context, re
 }
 
 // Then sets up IRepository.Registration return parameters for the expectation previously defined by the When method
-func (e *IRepositoryMockRegistrationExpectation) Then(s1 string, err error) *IRepositoryMock {
-	e.results = &IRepositoryMockRegistrationResults{s1, err}
+func (e *IRepositoryMockRegistrationExpectation) Then(i1 int, err error) *IRepositoryMock {
+	e.results = &IRepositoryMockRegistrationResults{i1, err}
 	return e.mock
 }
 
@@ -1325,7 +1325,7 @@ func (mmRegistration *mIRepositoryMockRegistration) invocationsDone() bool {
 }
 
 // Registration implements mm_repository.IRepository
-func (mmRegistration *IRepositoryMock) Registration(ctx context.Context, registrationRequest *model.InfoToDb) (s1 string, err error) {
+func (mmRegistration *IRepositoryMock) Registration(ctx context.Context, registrationRequest *model.InfoToDb) (i1 int, err error) {
 	mm_atomic.AddUint64(&mmRegistration.beforeRegistrationCounter, 1)
 	defer mm_atomic.AddUint64(&mmRegistration.afterRegistrationCounter, 1)
 
@@ -1345,7 +1345,7 @@ func (mmRegistration *IRepositoryMock) Registration(ctx context.Context, registr
 	for _, e := range mmRegistration.RegistrationMock.expectations {
 		if minimock.Equal(*e.params, mm_params) {
 			mm_atomic.AddUint64(&e.Counter, 1)
-			return e.results.s1, e.results.err
+			return e.results.i1, e.results.err
 		}
 	}
 
@@ -1377,7 +1377,7 @@ func (mmRegistration *IRepositoryMock) Registration(ctx context.Context, registr
 		if mm_results == nil {
 			mmRegistration.t.Fatal("No results are set for the IRepositoryMock.Registration")
 		}
-		return (*mm_results).s1, (*mm_results).err
+		return (*mm_results).i1, (*mm_results).err
 	}
 	if mmRegistration.funcRegistration != nil {
 		return mmRegistration.funcRegistration(ctx, registrationRequest)

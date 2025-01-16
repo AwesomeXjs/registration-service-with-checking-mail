@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
@@ -16,10 +17,9 @@ import (
 // It first attempts to get the user's role from Redis.
 // If the role is not found in Redis, it queries the database to retrieve it.
 // The role is then cached in Redis for future access.
-func (r *Repository) GetAccessToken(ctx context.Context, userID string) (*model.AccessTokenInfo, error) {
-	logger.Debug("getting userID in repository", zap.String("USER_ID", userID))
+func (r *Repository) GetAccessToken(ctx context.Context, userID int) (*model.AccessTokenInfo, error) {
 
-	val, err := r.redisClient.Get(ctx, userID+" for role")
+	val, err := r.redisClient.Get(ctx, strconv.Itoa(userID)+" for role")
 	if nil == err {
 		return &model.AccessTokenInfo{
 			ID:   userID,
@@ -51,7 +51,7 @@ func (r *Repository) GetAccessToken(ctx context.Context, userID string) (*model.
 		return nil, fmt.Errorf("failed to get role from db: %v", err)
 	}
 
-	err = r.redisClient.Set(ctx, userID+" for role", role, 24*time.Hour)
+	err = r.redisClient.Set(ctx, strconv.Itoa(userID)+" for role", role, 24*time.Hour)
 	if err != nil {
 		logger.Error("failed to set role in redis", zap.Error(err))
 		return nil, fmt.Errorf("failed to set role in redis: %v", err)
