@@ -7,7 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
-	_ "net/http/pprof"
+	_ "net/http/pprof" // Import the pprof package
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
@@ -49,6 +49,7 @@ func (a *App) Run() error {
 		closer.Wait()
 	}()
 	go func() {
+
 		log.Println("pprof server is running on :6060")
 		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Fatalf("failed to start pprof server: %v", err)

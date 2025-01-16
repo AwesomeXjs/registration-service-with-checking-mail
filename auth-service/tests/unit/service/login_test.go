@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/app"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
@@ -19,8 +21,7 @@ import (
 
 func TestLogin(t *testing.T) {
 	t.Parallel()
-	level := "info"
-	logger.Init(logger.GetCore(logger.GetAtomicLevel(&level)))
+	logger.Init(logger.GetCore(logger.GetAtomicLevel(app.LogLevel)))
 
 	type IRepositoryMockFunc func(mc *minimock.Controller) repository.IRepository
 	type AuthHelperMockFunc func(mc *minimock.Controller) jwt_manager.AuthHelper

@@ -9,16 +9,19 @@ import (
 	"go.uber.org/zap"
 )
 
+// AuthClient implements IAuthClient for interacting with AuthService via gRPC.
 type AuthClient struct {
-	authClient authService.AuthV1Client
+	authClient authService.AuthV1Client // gRPC client for AuthService
 }
 
+// NewAuthClient creates and returns a new AuthClient instance.
 func NewAuthClient(authClient authService.AuthV1Client) IAuthClient {
 	return &AuthClient{
 		authClient: authClient,
 	}
 }
 
+// ConfirmEmail sends a request to confirm the provided email address.
 func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
 	_, err := a.authClient.ConfirmEmail(ctx, &authService.ConfirmEmailRequest{
 		Email: email,
@@ -30,6 +33,7 @@ func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
 	return nil
 }
 
+// ValidateToken sends a request to validate the provided access token.
 func (a *AuthClient) ValidateToken(ctx context.Context, accessToken string) error {
 	_, err := a.authClient.ValidateToken(ctx, &authService.ValidateTokenRequest{
 		AccessToken: accessToken,
@@ -40,5 +44,4 @@ func (a *AuthClient) ValidateToken(ctx context.Context, accessToken string) erro
 	}
 
 	return nil
-
 }
