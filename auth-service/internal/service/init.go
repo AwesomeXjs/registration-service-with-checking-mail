@@ -18,7 +18,9 @@ type Service struct {
 // New creates a new Service instance with the given repository.
 func New(repo *repository.Repository,
 	authHelper jwt_manager.AuthHelper,
-	tx db.TxManager, producer kafka.IProducer, db db.Client) *Service {
+	tx db.TxManager,
+	producer kafka.IProducer,
+	db db.Client) *Service {
 	return &Service{
 		Auth: auth.New(repo, authHelper, tx),
 		Event: eventSender.New(

@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/sony/gobreaker"
+
 	ratelimiter "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/rate_limiter"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
@@ -23,6 +25,10 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+)
+
+const (
+	serviceName = "auth-service"
 )
 
 var (
@@ -121,6 +127,7 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
 				interceptors.NewRateLimitInterceptor(rateLimiter).Unary,
+				interceptors.NewCircuitBreaker(GetCircuitBreakerConfig()).Unary,
 				interceptors.LogInterceptor),
 		))
 	reflection.Register(a.grpcServer)
@@ -157,4 +164,25 @@ func GetSchedulerPeriod() time.Duration {
 		log.Fatalf("failed to get outbox scheduler period: %v", err)
 	}
 	return time.Duration(period) * time.Millisecond
+}
+
+// GetCircuitBreakerConfig initializes and returns a configured Circuit Breaker for the auth-service.
+// The Circuit Breaker trips when the failure ratio exceeds 60%, with a timeout of 5 seconds for resetting.
+func GetCircuitBreakerConfig() *gobreaker.CircuitBreaker {
+	const mark = "App.app.GetCircuitBreakerConfig"
+
+	cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		Name:        serviceName,
+		MaxRequests: 3,
+		Timeout:     5 * time.Second,
+		ReadyToTrip: func(counts gobreaker.Counts) bool {
+			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+			return failureRatio >= 0.6
+		},
+		OnStateChange: func(name string, from, to gobreaker.State) {
+			logger.Warn("circuit breaker state changed", mark, zap.String("name", name), zap.String("from", from.String()), zap.String("to", to.String()))
+		},
+	})
+
+	return cb
 }

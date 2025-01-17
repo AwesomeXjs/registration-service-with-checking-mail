@@ -137,7 +137,18 @@ grpc-load-test:
 		--import-paths vendor.protogen \
 		--call auth_v1.AuthV1.GetAccessToken  \
 		--data '{"refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzcyMDkyMTYsIlJvbGUiOiIiLCJJRCI6MTh9.OhEmTxP3WPIH_RQ-0YIqUjysPS2Ibbco68nGD8HBYV4"}' \
-		--rps 1500 \
+		--rps 90 \
+		--total 9000 \
+		--insecure \
+		localhost:50051
+
+grpc-load-test-errors:
+	${LOCAL_BIN}/ghz \
+		--proto api/auth_v1/auth.proto \
+		--import-paths vendor.protogen \
+		--call auth_v1.AuthV1.GetAccessToken  \
+		--data '{"refreshToken": "eyJhbGciOiJIUzI1NiIsInkpXVCJ9.eyJleHAiOjE3MzcyMDkyMTYsIlJvbGUiOiIiLCJJRCI6MTh9.OhEmTxP3WPIH_RQ-0YIqUjysPS2Ibbco68nGD8HBYV4"}' \
+		--rps 90 \
 		--total 9000 \
 		--insecure \
 		localhost:50051
