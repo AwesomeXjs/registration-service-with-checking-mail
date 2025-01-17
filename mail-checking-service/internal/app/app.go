@@ -7,11 +7,12 @@ import (
 	"net"
 	"sync"
 
-	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/interceptors"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

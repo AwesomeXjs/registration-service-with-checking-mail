@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
