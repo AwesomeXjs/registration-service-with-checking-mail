@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/db"
 	"github.com/georgysavva/scany/pgxscan"
@@ -33,6 +34,9 @@ func NewDB(dbc *pgxpool.Pool) db.DB {
 
 // ScanOneContext executes a query and scans a single row into the destination.
 func (p *pg) ScanOneContext(ctx context.Context, dest interface{}, q db.Query, args ...interface{}) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
 	row, err := p.QueryContext(ctx, q, args...)
 	if err != nil {
 		return err
@@ -43,6 +47,9 @@ func (p *pg) ScanOneContext(ctx context.Context, dest interface{}, q db.Query, a
 
 // ScanAllContext executes a query and scans all rows into the destination.
 func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q db.Query, args ...interface{}) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
 	rows, err := p.QueryContext(ctx, q, args...)
 	if err != nil {
 		return err
@@ -58,21 +65,31 @@ func (p *pg) ExecContext(ctx context.Context, q db.Query, args ...interface{}) (
 		return tx.Exec(ctx, q.QueryRaw, args...)
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
 	return p.dbc.Exec(ctx, q.QueryRaw, args...)
 }
 
 // QueryContext executes a query and returns multiple rows.
 func (p *pg) QueryContext(ctx context.Context, q db.Query, args ...interface{}) (pgx.Rows, error) {
+
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
 		return tx.Query(ctx, q.QueryRaw, args...)
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
 
 	return p.dbc.Query(ctx, q.QueryRaw, args...)
 }
 
 // QueryRowContext executes a query and returns a single row.
 func (p *pg) QueryRowContext(ctx context.Context, q db.Query, args ...interface{}) pgx.Row {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
 		return tx.QueryRow(ctx, q.QueryRaw, args...)
@@ -98,5 +115,6 @@ func (p *pg) Close() {
 
 // MakeContextTx creates a new context with the given transaction.
 func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
+
 	return context.WithValue(ctx, TxKey, tx)
 }
