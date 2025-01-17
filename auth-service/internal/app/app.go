@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"time"
 
+	ratelimiter "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/rate_limiter"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/closer"
@@ -113,9 +115,12 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
 
+	rateLimiter := ratelimiter.NewTokenBucketLimiter(ctx, 100, time.Second)
+
 	a.grpcServer = grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
+				interceptors.NewRateLimitInterceptor(rateLimiter).Unary,
 				interceptors.LogInterceptor),
 		))
 	reflection.Register(a.grpcServer)
