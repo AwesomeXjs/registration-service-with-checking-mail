@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
+	"go.uber.org/zap"
 )
 
 // Constants for environment variable names for Redis configuration.
@@ -25,9 +28,13 @@ type redisConfig struct {
 
 // NewRedisConfig creates a new RedisConfig instance by reading environment variables.
 func NewRedisConfig() (IRedisConfig, error) {
+
+	const mark = "Clients.Redis.NewRedisConfig"
+
 	port := os.Getenv(PortEnvName)
 	host := os.Getenv(HostEnvName)
 	if len(port) == 0 || len(host) == 0 {
+		logger.Error("failed to get redis host", mark, zap.String("redis host", HostEnvName), zap.String("redis port", PortEnvName))
 		return nil, fmt.Errorf("REDIS_PORT or REDIS_HOST is not set")
 	}
 

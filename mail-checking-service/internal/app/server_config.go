@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -37,15 +37,18 @@ func (g *grpcConfig) GetAddress() string {
 // NewGRPCConfig creates a new GRPCConfig instance by reading the host and port from environment variables.
 // It returns an error if either value is not set.
 func NewGRPCConfig() (IGRPCConfigs, error) {
+
+	const mark = "app.serverConfig.NewGRPCConfig"
+
 	host := os.Getenv(GrpcHost)
 	if len(host) == 0 {
-		logger.Error("failed to get grpc host", zap.String("grpc host", GrpcHost))
+		logger.Error("failed to get grpc host", mark, zap.String("grpc host", GrpcHost))
 		return nil, fmt.Errorf("env %s is empty", GrpcHost)
 	}
 
 	port := os.Getenv(GrpcPort)
 	if len(port) == 0 {
-		logger.Error("failed to get grpc port", zap.String("grpc port", GrpcPort))
+		logger.Error("failed to get grpc port", mark, zap.String("grpc port", GrpcPort))
 		return nil, fmt.Errorf("env %s is empty", GrpcPort)
 	}
 

@@ -9,7 +9,7 @@ import (
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/interceptors"
-	logger2 "github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/joho/godotenv"
@@ -35,16 +35,22 @@ type App struct {
 
 // New creates a new instance of App and initializes its dependencies.
 func New(ctx context.Context) (*App, error) {
+
+	const mark = "App.app.New"
+
 	app := &App{}
 	err := app.InitDeps(ctx)
 	if err != nil {
-		logger2.Fatal("failed to init deps", zap.Error(err))
+		logger.Fatal("failed to init deps", mark, zap.Error(err))
 	}
 	return app, nil
 }
 
 // Run starts the gRPC server and ensures proper resource cleanup.
 func (a *App) Run(ctx context.Context) error {
+
+	const mark = "App.app.Run"
+
 	defer func() {
 		closer.CloseAll()
 		closer.Wait()
@@ -57,7 +63,7 @@ func (a *App) Run(ctx context.Context) error {
 		defer wg.Done()
 		err := a.RunGRPSServer()
 		if err != nil {
-			logger2.Fatal("failed to run grpc server", zap.Error(err))
+			logger.Fatal("failed to run grpc server", mark, zap.Error(err))
 		}
 	}()
 
@@ -89,6 +95,9 @@ func (a *App) Run(ctx context.Context) error {
 
 // InitDeps initializes all dependencies required by the App.
 func (a *App) InitDeps(ctx context.Context) error {
+
+	const mark = "App.app.InitDeps"
+
 	inits := []func(context.Context) error{
 		a.InitConfig,
 		a.initServiceProvider,
@@ -96,7 +105,7 @@ func (a *App) InitDeps(ctx context.Context) error {
 	}
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
-			logger2.Fatal("failed to init deps", zap.Error(err))
+			logger.Fatal("failed to init deps", mark, zap.Error(err))
 		}
 	}
 	return nil
@@ -104,9 +113,12 @@ func (a *App) InitDeps(ctx context.Context) error {
 
 // InitConfig loads environment variables from the specified path.
 func (a *App) InitConfig(_ context.Context) error {
+
+	const mark = "App.app.InitConfig"
+
 	err := godotenv.Load(EnvPath)
 	if err != nil {
-		logger2.Error("Error loading .env file", zap.String("path", EnvPath))
+		logger.Error("Error loading .env file", mark, zap.String("path", EnvPath))
 		return fmt.Errorf("error loading .env file: %v", err)
 	}
 	return nil
@@ -121,7 +133,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 // initGrpcServer initializes the gRPC server and configures logging.
 func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
-	logger2.Init(logger2.GetCore(logger2.GetAtomicLevel(LogLevel)))
+	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
 
 	a.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
@@ -135,15 +147,18 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 
 // RunGRPSServer starts the gRPC server and listens on the configured address.
 func (a *App) RunGRPSServer() error {
-	logger2.Info("starting grpc server on " + a.serviceProvider.GRPCConfig().GetAddress())
+
+	const mark = "App.app.RunGRPSServer"
+
+	logger.Info("starting grpc server on "+a.serviceProvider.GRPCConfig().GetAddress(), mark)
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().GetAddress())
 	if err != nil {
-		logger2.Fatal("failed to listen grpc", zap.Error(err))
+		logger.Fatal("failed to listen grpc", mark, zap.Error(err))
 	}
 
 	err = a.grpcServer.Serve(list)
 	if err != nil {
-		logger2.Fatal("failed to serve grpc", zap.Error(err))
+		logger.Fatal("failed to serve grpc", mark, zap.Error(err))
 	}
 
 	return nil

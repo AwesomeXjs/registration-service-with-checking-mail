@@ -11,7 +11,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis/go_redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/grpc_server"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -44,10 +44,13 @@ func newServiceProvider() *serviceProvider {
 
 // GRPCConfig initializes and returns the gRPC configuration if not already set.
 func (s *serviceProvider) GRPCConfig() IGRPCConfigs {
+
+	const mark = "App.ServiceProvider.GRPCConfig"
+
 	if s.grpcConfig == nil {
 		cfg, err := NewGRPCConfig()
 		if err != nil {
-			logger.Fatal("failed to get grpc config", zap.Error(err))
+			logger.Fatal("failed to get grpc config", mark, zap.Error(err))
 		}
 		s.grpcConfig = cfg
 	}
@@ -55,10 +58,13 @@ func (s *serviceProvider) GRPCConfig() IGRPCConfigs {
 }
 
 func (s *serviceProvider) MailConfig() mail.IMailConfig {
+
+	const mark = "App.ServiceProvider.MailConfig"
+
 	if s.emailConfig == nil {
 		cfg, err := mail.NewMailConfig()
 		if err != nil {
-			logger.Warn("failed to get email config", zap.Error(err))
+			logger.Warn("failed to get email config", mark, zap.Error(err))
 		}
 		s.emailConfig = cfg
 	}
@@ -66,10 +72,13 @@ func (s *serviceProvider) MailConfig() mail.IMailConfig {
 }
 
 func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
+
+	const mark = "App.ServiceProvider.KafkaConfig"
+
 	if s.kafkaConfig == nil {
 		cfg, err := kafka.NewKafkaConfig()
 		if err != nil {
-			logger.Fatal("failed to get kafka config", zap.Error(err))
+			logger.Fatal("failed to get kafka config", mark, zap.Error(err))
 		}
 		s.kafkaConfig = cfg
 	}
@@ -77,10 +86,13 @@ func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
 }
 
 func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
+
+	const mark = "App.ServiceProvider.RedisConfig"
+
 	if s.redisConfig == nil {
 		cfg, err := redis.NewRedisConfig()
 		if err != nil {
-			logger.Fatal("failed to get redis config", zap.Error(err))
+			logger.Fatal("failed to get redis config", mark, zap.Error(err))
 		}
 		s.redisConfig = cfg
 	}
@@ -88,10 +100,13 @@ func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
 }
 
 func (s *serviceProvider) AuthClientConfig() grpc_auth_client.IAuthClientConfig {
+
+	const mark = "App.ServiceProvider.AuthClientConfig"
+
 	if s.authClientConfig == nil {
 		cfg, err := grpc_auth_client.NewAuthClientConfig()
 		if err != nil {
-			logger.Fatal("failed to get grpc config", zap.Error(err))
+			logger.Fatal("failed to get grpc config", mark, zap.Error(err))
 		}
 		s.authClientConfig = cfg
 	}
@@ -99,13 +114,16 @@ func (s *serviceProvider) AuthClientConfig() grpc_auth_client.IAuthClientConfig 
 }
 
 func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
+
+	const mark = "App.ServiceProvider.RedisClient"
+
 	if s.redisClient == nil {
 		redisClient := go_redis.NewGoRedisClient(s.RedisConfig())
 		closer.Add(redisClient.Client.Close)
 
 		err := redisClient.Client.Ping(ctx).Err()
 		if err != nil {
-			logger.Error("Failed to connect to redis", zap.Error(err))
+			logger.Error("Failed to connect to redis", mark, zap.Error(err))
 		}
 
 		s.redisClient = redisClient
@@ -123,10 +141,13 @@ func (s *serviceProvider) MailClient() mail.IMailClient {
 }
 
 func (s *serviceProvider) AuthClient() grpc_auth_client.IAuthClient {
+
+	const mark = "App.ServiceProvider.AuthClient"
+
 	if s.authClient == nil {
 		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			logger.Fatal(err.Error())
+			logger.Fatal(err.Error(), mark)
 		}
 		closer.Add(conn.Close)
 
@@ -152,11 +173,14 @@ func (s *serviceProvider) KafkaHandler(ctx context.Context) kafka.IKafkaHandler 
 }
 
 func (s *serviceProvider) KafkaConsumer(ctx context.Context, number int) *kafka.Consumer {
+
+	const mark = "App.ServiceProvider.KafkaConsumer"
+
 	if s.kafkaConsumer == nil {
 		consumer, err := kafka.NewConsumer(s.KafkaHandler(ctx),
 			s.KafkaConfig().Address(), topicName, "mail", number)
 		if err != nil {
-			logger.Fatal("failed to get kafka consumer", zap.Error(err))
+			logger.Fatal("failed to get kafka consumer", mark, zap.Error(err))
 		}
 		s.kafkaConsumer = consumer
 

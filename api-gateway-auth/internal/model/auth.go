@@ -12,7 +12,7 @@ type LoginRequest struct {
 // containing the generated access token and the user ID.
 type LoginResponse struct {
 	AccessToken string `json:"accessToken"`
-	UserID      string `json:"userId"`
+	UserID      int64  `json:"userId"`
 }
 
 // RegistrationRequest represents the structure for a registration request,
@@ -33,7 +33,7 @@ type RegistrationRequest struct {
 // containing the generated access token and the user ID.
 type RegistrationResponse struct {
 	AccessToken string `json:"accessToken"`
-	UserID      string `json:"userId"`
+	UserID      int64  `json:"userId"`
 }
 
 // UpdatePasswordRequest represents the structure for a password update request,

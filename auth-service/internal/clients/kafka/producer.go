@@ -4,6 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+	"go.uber.org/zap"
+
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 
@@ -17,6 +20,8 @@ const (
 
 // Produce sends a message with a key and timestamp to the specified Kafka topic.
 func (p *Producer) Produce(message, topic, key string) error {
+	const mark = "Cients.Kafka.Producer"
+
 	kafkaMessage := &kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          []byte(message),
@@ -26,6 +31,7 @@ func (p *Producer) Produce(message, topic, key string) error {
 	kafkaChan := make(chan kafka.Event)
 
 	if err := p.producer.Produce(kafkaMessage, kafkaChan); err != nil {
+		logger.Error("failed to produce event", mark, zap.Error(err))
 		return err
 	}
 

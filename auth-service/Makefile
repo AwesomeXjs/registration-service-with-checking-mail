@@ -1,3 +1,4 @@
+include .env
 LOCAL_BIN:=$(CURDIR)/bin
 
 run:
@@ -88,11 +89,12 @@ generate-auth-api:
 
 
 LOCAL_MIGRATION_DIR=$(CURDIR)/internal/migrations
-#LOCAL_MIGRATION_DSN="host=localhost port=$(PG_PORT) dbname=$(PG_DATABASE_NAME) user=$(PG_USER) password=$(PG_PASSWORD) sslmode=disable"
+LOCAL_MIGRATION_DSN="host=localhost port=5432 dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
 
 # migrations
 local-migration-status:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
+	${LOCAL_BIN}/goose ${LOCAL_MIGRATION_DSN} status
+	#${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
 
 local-migration-up:
 	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
@@ -101,7 +103,7 @@ local-migration-down:
 	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
 
 init-migration:
-	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create create_users_table sql
+	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create create_tables sql
 
 
 # mocks

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/app"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -17,15 +17,18 @@ import (
 // @in header
 // @name Authorization
 func main() {
+
+	const mark = "Cmd.Main"
+
 	ctx := context.Background()
 
 	myApp, err := app.New(ctx)
 	if err != nil {
-		logger.Fatal("failed to init app", zap.Error(err))
+		logger.Fatal("failed to init app", mark, zap.Error(err))
 	}
 
 	err = myApp.Run()
 	if err != nil {
-		logger.Fatal("failed to run app", zap.Error(err))
+		logger.Fatal("failed to run app", mark, zap.Error(err))
 	}
 }

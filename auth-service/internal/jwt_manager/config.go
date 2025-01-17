@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+
 	"go.uber.org/zap"
 )
 
@@ -19,20 +20,22 @@ type AuthConfig struct {
 
 // NewAuthConfig creates a new AuthConfig instance by reading environment variables.
 func NewAuthConfig() (*AuthConfig, error) {
+	const mark = "jwt_manager.NewAuthConfig"
+
 	secretKey := os.Getenv("SECRET_KEY")
 	if len(secretKey) == 0 {
-		logger.Error("failed to get secret key", zap.String("secret key", "SECRET_KEY"))
+		logger.Error("failed to get secret key", mark, zap.String("secret key", "SECRET_KEY"))
 		return nil, fmt.Errorf("env %s is empty", "SECRET_KEY")
 	}
 
 	refreshTokenDuration, err := strconv.Atoi(os.Getenv("REFRESH_TOKEN_DURATION"))
 	if err != nil {
-		logger.Error("failed to get refresh token duration", zap.Error(err))
+		logger.Error("failed to get refresh token duration", mark, zap.Error(err))
 		return nil, fmt.Errorf("env %s is empty", "REFRESH_TOKEN_DURATION")
 	}
 	accessTokenDuration, err := strconv.Atoi(os.Getenv("ACCESS_TOKEN_DURATION"))
 	if err != nil {
-		logger.Error("failed to get access token duration", zap.Error(err))
+		logger.Error("failed to get access token duration", mark, zap.Error(err))
 		return nil, fmt.Errorf("env %s is empty", "ACCESS_TOKEN_DURATION")
 	}
 

@@ -3,17 +3,19 @@ package app
 import (
 	"context"
 
-	"github.com/AwesomeXjs/libs/pkg/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/db/pg"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis/go_redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/grpc_server"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/db/pg"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/db/transaction"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+
 	"go.uber.org/zap"
 )
 
@@ -27,14 +29,15 @@ type serviceProvider struct {
 
 	// clients
 	dbClient      db.Client
+	txManager     db.TxManager
 	authHelper    jwt_manager.AuthHelper
 	redisClient   redis.IRedis
 	kafkaProducer kafka.IProducer
 
 	// layers
 	grpcServer *grpc_server.GrpcServer
-	service    service.IService
-	repository repository.IRepository
+	service    *service.Service
+	repository *repository.Repository
 }
 
 // newServiceProvider creates a new instance of serviceProvider.
@@ -44,10 +47,12 @@ func newServiceProvider() *serviceProvider {
 
 // PGConfig initializes and returns the PostgresSQL configuration if not already set.
 func (s *serviceProvider) PGConfig() db.PGConfig {
+	const mark = "App.ServiceProvider.PGConfig"
+
 	if s.pgConfig == nil {
 		cfg, err := db.NewPgConfig()
 		if err != nil {
-			logger.Fatal("failed to get pg config", zap.Error(err))
+			logger.Fatal("failed to get pg config", mark, zap.Error(err))
 		}
 		s.pgConfig = cfg
 	}
@@ -56,10 +61,12 @@ func (s *serviceProvider) PGConfig() db.PGConfig {
 
 // GRPCConfig initializes and returns the gRPC configuration if not already set.
 func (s *serviceProvider) GRPCConfig() GRPCConfig {
+	const mark = "App.ServiceProvider.GRPCConfig"
+
 	if s.grpcConfig == nil {
 		cfg, err := NewGrpcConfig()
 		if err != nil {
-			logger.Fatal("failed to get grpc config", zap.Error(err))
+			logger.Fatal("failed to get grpc config", mark, zap.Error(err))
 		}
 		s.grpcConfig = cfg
 	}
@@ -68,10 +75,12 @@ func (s *serviceProvider) GRPCConfig() GRPCConfig {
 
 // RedisConfig retrieves the Redis configuration, initializing it if necessary.
 func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
+	const mark = "App.ServiceProvider.RedisConfig"
+
 	if s.redisConfig == nil {
 		cfg, err := redis.NewRedisConfig()
 		if err != nil {
-			logger.Fatal("failed to get redis config", zap.Error(err))
+			logger.Fatal("failed to get redis config", mark, zap.Error(err))
 		}
 		s.redisConfig = cfg
 	}
@@ -79,10 +88,12 @@ func (s *serviceProvider) RedisConfig() redis.IRedisConfig {
 }
 
 func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
+	const mark = "App.ServiceProvider.KafkaConfig"
+
 	if s.kafkaConfig == nil {
 		cfg, err := kafka.NewKafkaConfig()
 		if err != nil {
-			logger.Fatal("failed to get kafka config", zap.Error(err))
+			logger.Fatal("failed to get kafka config", mark, zap.Error(err))
 		}
 		s.kafkaConfig = cfg
 	}
@@ -93,16 +104,18 @@ func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
 // DBClient initializes and returns the database client if not already created.
 // It also pings the database to ensure the connection is valid.
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
+	const mark = "App.ServiceProvider.DBClient"
+
 	if s.dbClient == nil {
 		cfg := s.PGConfig()
 		dbc, err := pg.New(ctx, cfg.GetDSN())
 		if err != nil {
-			logger.Fatal("failed to get db client", zap.Error(err))
+			logger.Fatal("failed to get db client", mark, zap.Error(err))
 		}
 
 		err = dbc.DB().Ping(ctx)
 		if err != nil {
-			logger.Fatal("failed to ping db", zap.Error(err))
+			logger.Fatal("failed to ping db", mark, zap.Error(err))
 		}
 
 		closer.Add(dbc.Close) // Ensures the database client is closed on shutdown
@@ -111,16 +124,25 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
+func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
+	if s.txManager == nil {
+		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
+	}
+	return s.txManager
+}
+
 // RedisClient initializes and returns the Redis client if not already created.
 // It also pings Redis to ensure the connection is valid.
 func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
+	const mark = "App.ServiceProvider.RedisClient"
+
 	if s.redisClient == nil {
 		redisClient := go_redis.NewGoRedisClient(s.RedisConfig())
 		closer.Add(redisClient.Client.Close)
 
 		err := redisClient.Client.Ping(ctx).Err()
 		if err != nil {
-			logger.Error("Failed to connect to redis", zap.Error(err))
+			logger.Error("Failed to connect to redis", mark, zap.Error(err))
 		}
 
 		s.redisClient = redisClient
@@ -133,10 +155,12 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 // In case of an error while creating the producer, the function logs a fatal error and stops execution.
 // It also adds the producer's Close method to "closer" to ensure proper cleanup when done.
 func (s *serviceProvider) KafkaProducer() kafka.IProducer {
+	const mark = "App.ServiceProvider.KafkaProducer"
+
 	if s.kafkaProducer == nil {
 		producer, err := kafka.NewProducer(s.KafkaConfig().Address())
 		if err != nil {
-			logger.Fatal("failed to create kafka producer", zap.Error(err))
+			logger.Fatal("failed to create kafka producer", mark, zap.Error(err))
 		}
 		closer.Add(producer.Close)
 		s.kafkaProducer = producer
@@ -146,10 +170,12 @@ func (s *serviceProvider) KafkaProducer() kafka.IProducer {
 
 // AuthHelper initializes and returns the authentication helper if not already created.
 func (s *serviceProvider) AuthHelper() jwt_manager.AuthHelper {
+	const mark = "App.ServiceProvider.AuthHelper"
+
 	if s.authHelper == nil {
 		cfg, err := jwt_manager.NewAuthConfig()
 		if err != nil {
-			logger.Fatal("failed to get auth config", zap.Error(err))
+			logger.Fatal("failed to get auth config", mark, zap.Error(err))
 		}
 
 		s.authHelper = jwt_manager.New(cfg.GetSecretKey(), cfg.GetRefreshTokenDuration(), cfg.GetAccessTokenDuration())
@@ -158,7 +184,7 @@ func (s *serviceProvider) AuthHelper() jwt_manager.AuthHelper {
 }
 
 // Repository initializes and returns the repository layer for database operations.
-func (s *serviceProvider) Repository(ctx context.Context) repository.IRepository {
+func (s *serviceProvider) Repository(ctx context.Context) *repository.Repository {
 	if s.repository == nil {
 		s.repository = repository.New(s.DBClient(ctx), s.RedisClient(ctx))
 	}
@@ -166,9 +192,13 @@ func (s *serviceProvider) Repository(ctx context.Context) repository.IRepository
 }
 
 // Service initializes and returns the service layer for core business logic.
-func (s *serviceProvider) Service(ctx context.Context) service.IService {
+func (s *serviceProvider) Service(ctx context.Context) *service.Service {
 	if s.service == nil {
-		s.service = service.New(s.Repository(ctx), s.AuthHelper(), s.KafkaProducer())
+		s.service = service.New(s.Repository(ctx),
+			s.AuthHelper(),
+			s.TxManager(ctx),
+			s.KafkaProducer(),
+			s.DBClient(ctx))
 	}
 	return s.service
 }

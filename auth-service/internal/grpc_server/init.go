@@ -10,12 +10,12 @@ import (
 // for the gRPC server methods, allowing customization where needed.
 type GrpcServer struct {
 	authService.UnimplementedAuthV1Server
-	svc service.IService
+	svc *service.Service
 }
 
 // New creates a new instance of Controller with the provided service.
 // The service is used to manage authentication-related operations.
-func New(svc service.IService) *GrpcServer {
+func New(svc *service.Service) *GrpcServer {
 	return &GrpcServer{
 		svc: svc,
 	}

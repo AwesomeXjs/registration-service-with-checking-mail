@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+
 	"go.uber.org/zap"
 )
 
@@ -36,19 +37,21 @@ type kafkaConfig struct {
 // - KafkaConfig: An instance of kafkaConfig if all environment variables are set correctly.
 // - error: An error if any of the required environment variables are missing.
 func NewKafkaConfig() (IKafkaConfig, error) {
+	const mark = "Clients.Kafka.KafkaConfig"
+
 	kafka1 := os.Getenv(FirstKafka)
 	if len(kafka1) == 0 {
-		logger.Error("failed to get kafka host", zap.String("kafka host", FirstKafka))
+		logger.Error("failed to get kafka host", mark, zap.String("kafka host", FirstKafka))
 		return nil, fmt.Errorf("KAFKA_1 is not set")
 	}
 	kafka2 := os.Getenv(SecondKafka)
 	if len(kafka2) == 0 {
-		logger.Error("failed to get kafka host", zap.String("kafka host", SecondKafka))
+		logger.Error("failed to get kafka host", mark, zap.String("kafka host", SecondKafka))
 		return nil, fmt.Errorf("KAFKA_2 is not set")
 	}
 	kafka3 := os.Getenv(ThirdKafka3)
 	if len(kafka3) == 0 {
-		logger.Error("failed to get kafka host", zap.String("kafka host", ThirdKafka3))
+		logger.Error("failed to get kafka host", mark, zap.String("kafka host", ThirdKafka3))
 		return nil, fmt.Errorf("KAFKA_3 is not set")
 	}
 

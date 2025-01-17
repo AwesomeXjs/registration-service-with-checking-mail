@@ -6,7 +6,7 @@ toolchain go1.22.9
 
 require (
 	github.com/AwesomeXjs/libs v1.0.1
-	github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241125070822-def98ad69583
+	github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20250116180124-c944bb06e716
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.12.0

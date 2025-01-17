@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -30,17 +30,20 @@ type MailClientConfig struct {
 
 // NewMailClient creates a new AuthClient from environment variables.
 func NewMailClient() (IMailClientConfig, error) {
+
+	const mark = "Client.grpc_auth_client.NewAuthClient"
+
 	// Retrieve the Auth service host from environment variables.
 	host := os.Getenv(AuthHost)
 	if len(host) == 0 {
-		logger.Error("failed to get mail host", zap.String("mail host", AuthHost))
+		logger.Error("failed to get mail host", mark, zap.String("mail host", AuthHost))
 		return nil, fmt.Errorf("env %s is empty", AuthHost)
 	}
 
 	// Retrieve the Auth service port from environment variables.
 	port := os.Getenv(AuthPort)
 	if len(port) == 0 {
-		logger.Error("failed to get mail port", zap.String("mail port", AuthPort))
+		logger.Error("failed to get mail port", mark, zap.String("mail port", AuthPort))
 		return nil, fmt.Errorf("env %s is empty", AuthPort)
 	}
 

@@ -4,30 +4,35 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/validator"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/validator"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"go.uber.org/zap"
 )
 
 // Registration handles user registration requests and returns a registration response.
-func (c *GrpcServer) Registration(ctx context.Context, req *authService.RegistrationRequest) (*authService.RegistrationResponse, error) {
-	logger.Debug("registration", zap.Any("req", req))
+func (c *GrpcServer) Registration(ctx context.Context,
+	req *authService.RegistrationRequest) (*authService.RegistrationResponse, error) {
+
+	const mark = "GrpcServer.Registration"
+
+	logger.Debug("registration", mark, zap.Any("req", req))
 
 	err := ValidateUserData(ctx, req)
 	if err != nil {
-		logger.Info("failed to validate", zap.Error(err))
+		logger.Info("failed to validate", mark, zap.Error(err))
 		return nil, err
 	}
 
-	res, err := c.svc.Registration(ctx, converter.ToInfoFromProto(req))
+	res, err := c.svc.Auth.Registration(ctx, converter.ToInfoFromProto(req))
 	if err != nil {
-		logger.Error(err.Error(), zap.Any("req", req))
+		logger.Error(err.Error(), mark, zap.Any("req", req))
 		return nil, fmt.Errorf("failed to registration: %v", err)
 	}
 
-	logger.Debug("new pair tokens: ", zap.Any("tokens", res))
+	logger.Debug("new pair tokens: ", mark, zap.Any("tokens", res))
 
 	return converter.ToProtoFromRegResponse(res), nil
 }

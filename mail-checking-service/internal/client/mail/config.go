@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -40,27 +40,30 @@ type MyMailConfig struct {
 // NewMailConfig creates a new instance of MailConfig by loading values from environment variables.
 // Returns an error if any required environment variable is missing or invalid.
 func NewMailConfig() (IMailConfig, error) {
+
+	const mark = "Client.mail.NewMailConfig"
+
 	host := os.Getenv(MyMailHost)
 	if len(host) == 0 {
-		logger.Error("failed to get mail host", zap.String("mail host", MyMailHost))
+		logger.Error("failed to get mail host", mark, zap.String("mail host", MyMailHost))
 		return nil, fmt.Errorf("failed to get mail host")
 	}
 
 	port, err := strconv.Atoi(os.Getenv(MyMailPort))
 	if err != nil {
-		logger.Error("failed to get mail port", zap.String("mail port", MyMailPort))
+		logger.Error("failed to get mail port", mark, zap.String("mail port", MyMailPort))
 		return nil, fmt.Errorf("failed to get mail port")
 	}
 
 	user := os.Getenv(MyMailUser)
 	if len(user) == 0 {
-		logger.Error("failed to get mail user", zap.String("mail user", MyMailUser))
+		logger.Error("failed to get mail user", mark, zap.String("mail user", MyMailUser))
 		return nil, fmt.Errorf("failed to get mail user")
 	}
 
 	pass := os.Getenv(MyMailPass)
 	if len(pass) == 0 {
-		logger.Error("failed to get mail pass", zap.String("mail pass", MyMailPass))
+		logger.Error("failed to get mail pass", mark, zap.String("mail pass", MyMailPass))
 		return nil, fmt.Errorf("failed to get mail pass")
 	}
 

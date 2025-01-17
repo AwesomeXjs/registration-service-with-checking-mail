@@ -8,8 +8,8 @@ import (
 	"net/http/pprof"
 
 	"github.com/AwesomeXjs/libs/pkg/closer"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/asaskevich/govalidator"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -33,30 +33,39 @@ type App struct {
 
 // New creates and initializes the App with dependencies.
 func New(ctx context.Context) (*App, error) {
+
+	const mark = "App.app.New"
+
 	app := &App{}
 	err := app.InitDeps(ctx)
 	if err != nil {
 		// Fatal log in case of failure during dependency initialization
-		logger.Fatal("failed to init deps", zap.Error(err))
+		logger.Fatal("failed to init deps", mark, zap.Error(err))
 	}
 	return app, nil
 }
 
 // Run starts the HTTP server and handles cleanup on shutdown.
 func (a *App) Run() error {
+
+	const mark = "App.app.Run"
+
 	defer func() {
 		closer.CloseAll() // Close all services/resources
 		closer.Wait()     // Wait for all services to close
 	}()
 	err := a.runHTTPServer() // Run the HTTP server
 	if err != nil {
-		logger.Fatal("failed to run http server", zap.Error(err))
+		logger.Fatal("failed to run http server", mark, zap.Error(err))
 	}
 	return nil
 }
 
 // InitDeps initializes the application's dependencies.
 func (a *App) InitDeps(ctx context.Context) error {
+
+	const mark = "App.app.InitDeps"
+
 	inits := []func(context.Context) error{
 		a.InitConfig,          // Initialize config
 		a.InitEchoServer,      // Initialize Echo server
@@ -66,7 +75,7 @@ func (a *App) InitDeps(ctx context.Context) error {
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
 			// Log fatal error if any dependency initialization fails
-			logger.Fatal("failed to init deps", zap.Error(err))
+			logger.Fatal("failed to init deps", mark, zap.Error(err))
 		}
 	}
 	return nil
@@ -74,9 +83,12 @@ func (a *App) InitDeps(ctx context.Context) error {
 
 // InitConfig loads environment variables for the application.
 func (a *App) InitConfig(_ context.Context) error {
+
+	const mark = "App.app.InitConfig"
+
 	err := godotenv.Load(EnvPath)
 	if err != nil {
-		logger.Error("Error loading .env file", zap.String("path", EnvPath))
+		logger.Error("Error loading .env file", mark, zap.String("path", EnvPath))
 		return fmt.Errorf("error loading .env file: %v", err)
 	}
 	return err
@@ -128,8 +140,11 @@ func (a *App) InitEchoServer(_ context.Context) error {
 
 // runHTTPServer starts the Echo server and listens for requests.
 func (a *App) runHTTPServer() error {
-	logger.Info("server listening at %v", zap.String("start", a.serviceProvider.HTTPConfig().Address())) // Log the server address
-	return a.server.Start(a.serviceProvider.HTTPConfig().Address())                                      // Start the server at the configured address
+
+	const mark = "App.app.runHTTPServer"
+
+	logger.Info("server listening at %v", mark, zap.String("start", a.serviceProvider.HTTPConfig().Address())) // Log the server address
+	return a.server.Start(a.serviceProvider.HTTPConfig().Address())                                            // Start the server at the configured address
 }
 
 // InitRoutes sets up the application routes.

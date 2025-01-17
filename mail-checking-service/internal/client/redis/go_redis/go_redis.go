@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/goccy/go-json"
 	goRedis "github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -62,16 +62,19 @@ func (g *GoRedisClient) SetObject(ctx context.Context, key string, value interfa
 // unmarshals it into the provided value parameter. If retrieval or unmarshaling fails,
 // an error is returned.
 func (g *GoRedisClient) GetObject(ctx context.Context, key string, value any) error {
+
+	const mark = "Client.Redis.GoRedis.GetObject"
+
 	val, err := g.Client.Get(ctx, key).Result() // Retrieve the value from Redis
 	if err != nil {
 		return fmt.Errorf("failed to get note from redis: %v", err) // Return an error if retrieval fails
 	}
-	logger.Debug("get note from redis", zap.String("val", val)) // Log the retrieved value for debugging
+	logger.Debug("get note from redis", mark, zap.String("val", val)) // Log the retrieved value for debugging
 
 	if err = json.Unmarshal([]byte(val), &value); err != nil {
 		return fmt.Errorf("failed to unmarshal note: %v", err) // Return an error if unmarshaling fails
 	}
-	logger.Debug("unmarshal note", zap.Any("value", value)) // Log the unmarshaled value for debugging
+	logger.Debug("unmarshal note", mark, zap.Any("value", value)) // Log the unmarshaled value for debugging
 	return nil
 }
 

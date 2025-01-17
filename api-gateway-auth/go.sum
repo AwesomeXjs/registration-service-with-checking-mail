@@ -4,6 +4,8 @@ github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.
 github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241124162449-060342e26f4b/go.mod h1:t2sTRnFdKw9WbGsJY0iZTXSkgTlfuyGRaD6qjehbPFY=
 github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241125070822-def98ad69583 h1:oMOjGx33EcS027f3uESX+2U2irAz9BgVhFfcMSoJgTc=
 github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20241125070822-def98ad69583/go.mod h1:t2sTRnFdKw9WbGsJY0iZTXSkgTlfuyGRaD6qjehbPFY=
+github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20250116180124-c944bb06e716 h1:zL8nwQl8QjGzEJdK/GNgORP34FdN0V6rXls0ULGO3is=
+github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service v0.0.0-20250116180124-c944bb06e716/go.mod h1:t2sTRnFdKw9WbGsJY0iZTXSkgTlfuyGRaD6qjehbPFY=
 github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service v0.0.0-20241125070822-def98ad69583 h1:qdeIwfHtXhLRQu4oHRfDomZz5gLNcUVI35rmbMUun6M=
 github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service v0.0.0-20241125070822-def98ad69583/go.mod h1:HKxvFcyLZn8ey1Tc9z50b0gPdneb0nXsDjAO/pgy4Po=
 github.com/BurntSushi/toml v1.4.0 h1:kuoIxZQy2WRRk1pttg9asf+WVv6tWQuBNVmK8+nqPr0=

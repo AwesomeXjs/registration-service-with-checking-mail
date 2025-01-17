@@ -3,7 +3,7 @@ package response
 import (
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )
@@ -20,6 +20,9 @@ type Response struct {
 // RespHelper is a utility function to send JSON responses.
 // It accepts the HTTP context, a status code, a message, and detailed information to send in the response.
 func RespHelper(ctx echo.Context, statusCode int, message, detail string) error {
+
+	const mark = "Response.RespHelper"
+
 	// Construct the response object using the provided parameters.
 	err := ctx.JSON(statusCode, Response{
 		Title:   message,
@@ -30,7 +33,7 @@ func RespHelper(ctx echo.Context, statusCode int, message, detail string) error 
 
 	// If there's an error in writing the response, log it and return the error.
 	if err != nil {
-		logger.Info("failed to write response", zap.String("error", err.Error()))
+		logger.Info("failed to write response", mark, zap.String("error", err.Error()))
 		return err
 	}
 

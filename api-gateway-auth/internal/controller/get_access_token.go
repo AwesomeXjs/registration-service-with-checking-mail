@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )
@@ -27,16 +27,19 @@ const (
 // @Failure 500 {object} response.Response
 // @Router /api/v1/get-access-token [get]
 func (c *Controller) GetAccessToken(ctx echo.Context) error {
+
+	const mark = "Controller.GetAccessToken"
+
 	refreshToken, err := c.hh.GetRefreshTokenFromCookie(ctx, RefreshTokenKey)
 	if err != nil {
-		logger.Error("failed to get refresh token from cookie", zap.Error(err))
+		logger.Error("failed to get refresh token from cookie", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
-	logger.Debug("get refresh token", zap.String("REFRESH_TOKEN", refreshToken))
+	logger.Debug("get refresh token", mark, zap.String("REFRESH_TOKEN", refreshToken))
 
 	refreshToken, accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), refreshToken)
 	if err != nil {
-		logger.Error("failed to get access token", zap.Error(err))
+		logger.Error("failed to get access token", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
 	}
 

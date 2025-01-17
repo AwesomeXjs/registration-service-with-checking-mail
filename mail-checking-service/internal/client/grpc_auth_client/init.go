@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -23,11 +23,14 @@ func NewAuthClient(authClient authService.AuthV1Client) IAuthClient {
 
 // ConfirmEmail sends a request to confirm the provided email address.
 func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
+
+	const mark = "Client.grpc_auth_client.ConfirmEmail"
+
 	_, err := a.authClient.ConfirmEmail(ctx, &authService.ConfirmEmailRequest{
 		Email: email,
 	})
 	if err != nil {
-		logger.Error("failed to confirm email", zap.Error(err))
+		logger.Error("failed to confirm email", mark, zap.Error(err))
 		return fmt.Errorf("failed to confirm email: %v", err)
 	}
 	return nil
@@ -35,11 +38,14 @@ func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
 
 // ValidateToken sends a request to validate the provided access token.
 func (a *AuthClient) ValidateToken(ctx context.Context, accessToken string) error {
+
+	const mark = "Client.grpc_auth_client.ValidateToken"
+
 	_, err := a.authClient.ValidateToken(ctx, &authService.ValidateTokenRequest{
 		AccessToken: accessToken,
 	})
 	if err != nil {
-		logger.Error("failed to validate token", zap.Error(err))
+		logger.Error("failed to validate token", mark, zap.Error(err))
 		return fmt.Errorf("failed to validate token: %v", err)
 	}
 

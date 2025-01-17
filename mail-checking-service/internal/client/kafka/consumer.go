@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"go.uber.org/zap"
 )
@@ -59,6 +59,8 @@ func NewConsumer(handler IKafkaHandler, addresses []string, topic string, consum
 // Start begins consuming messages from Kafka and processing them using the provided handler.
 // - `ctx`: The context for controlling the lifecycle of the consumer.
 func (c *Consumer) Start(ctx context.Context) {
+	const mark = "Client.Kafka.Consumer.Start"
+
 	for {
 		if c.stop {
 			break // Stop consuming messages if the consumer is stopped.
@@ -75,7 +77,7 @@ func (c *Consumer) Start(ctx context.Context) {
 
 		// Handle the Kafka message using the provided handler.
 		if err = c.handler.HandleMessage(ctx, kafkaMsg.Value, kafkaMsg.TopicPartition.Offset, c.consumerNumber); err != nil {
-			logger.Warn("failed to handle message", zap.Error(err))
+			logger.Warn("failed to handle message", mark, zap.Error(err))
 		}
 
 		// Store the message's offset to ensure it can be committed later.

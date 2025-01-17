@@ -6,6 +6,10 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
+
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 )
 
 // HeaderHelper provides methods for working with authentication tokens in cookies and headers.
@@ -20,16 +24,19 @@ func New() *HeaderHelper {
 // GetRefreshTokenFromCookie retrieves the refresh token from the cookie.
 // Returns an error if the token is missing or invalid.
 func (h HeaderHelper) GetRefreshTokenFromCookie(c echo.Context, key string) (string, error) {
+
+	const mark = "HeadersManager.GetRefreshTokenFromCookie"
+
 	cookie, err := c.Cookie(key)
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			return "", c.JSON(http.StatusUnauthorized, map[string]string{
-				"message": "No refresh token found",
-			})
+			logger.Error("failed to get refresh token from cookie", mark, zap.Error(err))
+			return "", response.RespHelper(c, http.StatusUnauthorized, "Unauthorized", err.Error())
 		}
 		return "", err
 	}
 	if cookie.Value == "" {
+		logger.Error("no refresh token found", mark, zap.Error(err))
 		return "", errors.New("no refresh token found")
 	}
 

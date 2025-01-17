@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -26,27 +26,30 @@ import (
 // @Failure 500 {object} response.Response
 // @Router /api/v1/login [post]
 func (c *Controller) Login(ctx echo.Context) error {
+
+	const mark = "Controller.Login"
+
 	var Request model.LoginRequest
 	err := ctx.Bind(&Request)
 	if err != nil {
-		logger.Error("failed to bind request", zap.Error(err))
+		logger.Error("failed to bind request", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
-	logger.Debug("login request: ", zap.Any("request", Request))
+	logger.Debug("login request: ", mark, zap.Any("request", Request))
 
 	_, err = govalidator.ValidateStruct(Request)
 	if err != nil {
-		logger.Warn("failed to validate struct", zap.Error(err))
+		logger.Warn("failed to validate struct", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
 	result, refreshToken, err := c.authClient.Login(ctx.Request().Context(), &Request)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid password") {
-			logger.Warn("failed to login", zap.Error(err))
+			logger.Warn("failed to login", mark, zap.Error(err))
 			return response.RespHelper(ctx, http.StatusBadRequest, "Bad request", "invalid password")
 		}
-		logger.Error("failed to login", zap.Error(err))
+		logger.Error("failed to login", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())
 	}
 	c.hh.SetRefreshTokenInCookie(ctx, RefreshTokenKey, refreshToken)

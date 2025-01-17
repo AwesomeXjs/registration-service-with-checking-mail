@@ -7,7 +7,7 @@ import (
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/mail"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/redis"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -48,13 +48,19 @@ func NewKafkaHandler(redisClient redis.IRedis, mailClient mail.IMailClient) IKaf
 // - offset: The Kafka offset of the message.
 // - consumerNumber: The identifier for the consumer processing the message.
 // Returns an error if processing fails.
-func (h *Handler) HandleMessage(ctx context.Context, kafkaMsg []byte, offset kafka.Offset, consumerNumber int) error {
+func (h *Handler) HandleMessage(ctx context.Context,
+	kafkaMsg []byte,
+	offset kafka.Offset,
+	consumerNumber int) error {
+
+	const mark = "Client.Kafka.Handlers.HandleMessage"
+
 	// Generate a unique verification code.
 	code := uuid.NewString()
 
 	// Send the code via email to the recipient specified in the Kafka message.
 	if err := h.mailClient.SendEmail(ctx, string(kafkaMsg), "Verification Code", fmt.Sprintf("Your code is: %s", code)); err != nil {
-		logger.Warn("failed to send verification code", zap.String("code", code), zap.String("email", string(kafkaMsg)), zap.Error(err))
+		logger.Warn("failed to send verification code", mark, zap.String("code", code), zap.String("email", string(kafkaMsg)), zap.Error(err))
 	}
 
 	// Store the verification code in Redis with a 1-hour expiration.
@@ -63,7 +69,7 @@ func (h *Handler) HandleMessage(ctx context.Context, kafkaMsg []byte, offset kaf
 	}
 
 	// Log the successful message processing.
-	logger.Info("message received",
+	logger.Info("message received", mark,
 		zap.Int("consumer", consumerNumber),
 		zap.String("message", string(kafkaMsg)),
 		zap.Int64("offset", int64(offset)),

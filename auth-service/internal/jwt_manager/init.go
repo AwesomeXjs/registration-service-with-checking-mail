@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/golang-jwt/jwt"
 	"go.uber.org/zap"
@@ -79,9 +80,11 @@ func (a *AuthClient) VerifyToken(token string) (*model.UserClaims, error) {
 // HashPassword generates a hashed version of the provided password using bcrypt.
 // It returns the hashed password as a string or an error if the hashing fails.
 func (a *AuthClient) HashPassword(password string) (string, error) {
+	const mark = "JwtManager.Init.HashPassword"
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		logger.Error("failed to hash password", zap.Error(err))
+		logger.Error("failed to hash password", mark, zap.Error(err))
 		return "", err
 	}
 	return string(hashedPassword), nil

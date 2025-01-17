@@ -7,13 +7,16 @@ import (
 	"log"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // Import the pprof package
+	_ "net/http/pprof" // pprof package
+	"os"
+	"strconv"
+	"time"
 
-	"github.com/AwesomeXjs/libs/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/logger"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/closer"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -34,31 +37,37 @@ type App struct {
 
 // New creates a new instance of App and initializes its dependencies.
 func New(ctx context.Context) (*App, error) {
+	const mark = "App.app.New"
+
 	app := &App{}
 	err := app.InitDeps(ctx)
 	if err != nil {
-		logger.Fatal("failed to init deps", zap.Error(err))
+		logger.Fatal("failed to init deps", mark, zap.Error(err))
 	}
 	return app, nil
 }
 
 // Run starts the gRPC server and ensures proper resource cleanup.
-func (a *App) Run() error {
+func (a *App) Run(ctx context.Context) error {
+	const mark = "App.app.Run"
+
 	defer func() {
 		closer.CloseAll()
 		closer.Wait()
 	}()
 	go func() {
-
 		log.Println("pprof server is running on :6060")
 		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Fatalf("failed to start pprof server: %v", err)
 		}
 	}()
 
+	// outbox scheduler
+	a.serviceProvider.Service(ctx).Event.Start(ctx, GetSchedulerPeriod())
+
 	err := a.RunGRPCServer()
 	if err != nil {
-		logger.Fatal("failed to run grpc server", zap.Error(err))
+		logger.Fatal("failed to run grpc server", mark, zap.Error(err))
 	}
 
 	return nil
@@ -66,6 +75,8 @@ func (a *App) Run() error {
 
 // InitDeps initializes all dependencies required by the App.
 func (a *App) InitDeps(ctx context.Context) error {
+	const mark = "App.app.InitDeps"
+
 	inits := []func(context.Context) error{
 		a.InitConfig,
 		a.initServiceProvider,
@@ -73,7 +84,7 @@ func (a *App) InitDeps(ctx context.Context) error {
 	}
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
-			logger.Fatal("failed to init deps", zap.Error(err))
+			logger.Fatal("failed to init deps", mark, zap.Error(err))
 		}
 	}
 	return nil
@@ -81,9 +92,11 @@ func (a *App) InitDeps(ctx context.Context) error {
 
 // InitConfig loads environment variables from the specified path.
 func (a *App) InitConfig(_ context.Context) error {
+	const mark = "App.app.InitConfig"
+
 	err := godotenv.Load(envPath)
 	if err != nil {
-		logger.Error("Error loading .env file", zap.String("path", envPath))
+		logger.Error("Error loading .env file", mark, zap.String("path", envPath))
 		return fmt.Errorf("error loading .env file: %v", err)
 	}
 	return nil
@@ -102,7 +115,7 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 
 	a.grpcServer = grpc.NewServer(
 		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
+			grpcMiddleware.ChainUnaryServer(
 				interceptors.LogInterceptor),
 		))
 	reflection.Register(a.grpcServer)
@@ -113,16 +126,30 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 
 // RunGRPCServer starts the gRPC server and listens on the configured address.
 func (a *App) RunGRPCServer() error {
-	logger.Info("starting grpc server on " + a.serviceProvider.GRPCConfig().GetAddress())
+	const mark = "App.app.RunGRPCServer"
+
+	logger.Info("starting grpc server on "+a.serviceProvider.GRPCConfig().GetAddress(), mark)
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().GetAddress())
 	if err != nil {
-		logger.Fatal("failed to listen grpc", zap.Error(err))
+		logger.Fatal("failed to listen grpc", mark, zap.Error(err))
 	}
 
 	err = a.grpcServer.Serve(list)
 	if err != nil {
-		logger.Fatal("failed to serve grpc", zap.Error(err))
+		logger.Fatal("failed to serve grpc", mark, zap.Error(err))
 	}
 
 	return nil
+}
+
+// GetSchedulerPeriod returns the period for the outbox scheduler in milliseconds.
+func GetSchedulerPeriod() time.Duration {
+	const mark = "App.app.GetSchedulerPeriod"
+
+	period, err := strconv.Atoi(os.Getenv("OUTBOX_SCHEDULER_PERIOD"))
+	if err != nil {
+		logger.Error("failed to get outbox scheduler period", mark, zap.Error(err))
+		log.Fatalf("failed to get outbox scheduler period: %v", err)
+	}
+	return time.Duration(period) * time.Millisecond
 }
