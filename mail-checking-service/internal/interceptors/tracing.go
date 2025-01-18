@@ -18,11 +18,9 @@ const traceIDKey = "x-trace-id"
 // The method also captures errors and response information, annotating the span accordingly.
 func ServerTracing(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
-	// создаем отметку
 	span, ctx := opentracing.StartSpanFromContext(ctx, info.FullMethod)
 	defer span.Finish()
 
-	// кастуем к типу SpanContext и если ok - делаем что надо
 	spanContext, ok := span.Context().(jaeger.SpanContext)
 	if ok {
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(traceIDKey, spanContext.TraceID().String()))

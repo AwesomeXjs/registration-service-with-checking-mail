@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/metrics"
-	"github.com/opentracing/opentracing-go"
-
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/metrics"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -29,12 +27,7 @@ func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
 
 	const mark = "Client.grpc_auth_client.ConfirmEmail"
 
-	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "ConfirmEmail")
-	defer span.Finish()
-
-	span.SetTag("email", email)
-
-	_, err := a.authClient.ConfirmEmail(contextWithTrace, &authService.ConfirmEmailRequest{
+	_, err := a.authClient.ConfirmEmail(ctx, &authService.ConfirmEmailRequest{
 		Email: email,
 	})
 	if err != nil {
@@ -51,13 +44,7 @@ func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
 func (a *AuthClient) ValidateToken(ctx context.Context, accessToken string) error {
 
 	const mark = "Client.grpc_auth_client.ValidateToken"
-
-	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "Validate token")
-	defer span.Finish()
-
-	span.SetTag("email", accessToken)
-
-	_, err := a.authClient.ValidateToken(contextWithTrace, &authService.ValidateTokenRequest{
+	_, err := a.authClient.ValidateToken(ctx, &authService.ValidateTokenRequest{
 		AccessToken: accessToken,
 	})
 	if err != nil {

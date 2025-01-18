@@ -149,11 +149,11 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
+				otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 				interceptors.NewRateLimitInterceptor(rateLimiter).Unary,
 				interceptors.NewCircuitBreaker(GetCircuitBreakerConfig()).Unary,
 				interceptors.LogInterceptor,
 				interceptors.MetricsInterceptor,
-				otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 				interceptors.ServerTracing,
 			),
 		))

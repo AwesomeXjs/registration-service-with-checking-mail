@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/metrics"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/grpc_auth_client"
@@ -164,7 +166,9 @@ func (s *serviceProvider) AuthClient() grpc_auth_client.IAuthClient {
 	const mark = "App.ServiceProvider.AuthClient"
 
 	if s.authClient == nil {
-		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(s.AuthClientConfig().Address(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())))
 		if err != nil {
 			logger.Fatal(err.Error(), mark)
 		}
