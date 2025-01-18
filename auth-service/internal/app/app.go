@@ -154,7 +154,6 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 				interceptors.NewCircuitBreaker(GetCircuitBreakerConfig()).Unary,
 				interceptors.LogInterceptor,
 				interceptors.MetricsInterceptor,
-				interceptors.ServerTracing,
 			),
 		))
 	reflection.Register(a.grpcServer)

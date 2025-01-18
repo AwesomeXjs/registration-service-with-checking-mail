@@ -159,8 +159,7 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 			otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 			interceptors.LogInterceptor,
 			interceptors.MetricsInterceptor,
-			interceptors.ServerTracing),
-	))
+		)))
 	reflection.Register(a.grpcServer)
 	mail_v1.RegisterMailV1Server(a.grpcServer, a.serviceProvider.GrpcServer(ctx))
 
