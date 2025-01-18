@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/tracing"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 
@@ -21,7 +22,8 @@ import (
 
 const (
 	// EnvPath is the path to the .env file that contains environment variables.
-	EnvPath = ".env"
+	EnvPath     = ".env"
+	serviceName = "api-gateway-auth"
 )
 
 // logLevel is a command-line flag for specifying the log level.
@@ -125,6 +127,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) InitEchoServer(_ context.Context) error {
 	flag.Parse()                                                 // Parse command-line flags
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(logLevel))) // Initialize logger with the specified log level
+	tracing.Init(serviceName)
 
 	// Custom validator for role enumeration
 	govalidator.TagMap["role_enum"] = govalidator.Validator(func(str string) bool {
@@ -132,9 +135,8 @@ func (a *App) InitEchoServer(_ context.Context) error {
 		return govalidator.IsIn(str, validRoles...)
 	})
 
-	a.server = echo.New() // Create a new Echo server
+	a.server = echo.New()
 
-	// Добавляем pprof
 	a.server.GET("/debug/pprof/*", echo.WrapHandler(http.DefaultServeMux))
 	a.server.GET("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
 	a.server.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
@@ -145,6 +147,8 @@ func (a *App) InitEchoServer(_ context.Context) error {
 	a.server.Use(middleware.Recover()) // Middleware for recovering from panics
 	a.server.Use(middlewares.Logger)   // Custom logging middleware
 	a.server.Use(middlewares.MetricsInterceptor)
+	a.server.Use(middlewares.Tracing)
+
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:8080"},                                           // Allow CORS from this origin
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE}, // Allowed HTTP methods

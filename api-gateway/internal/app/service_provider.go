@@ -12,6 +12,8 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -105,7 +107,9 @@ func (s *serviceProvider) GrpcAuthClient(_ context.Context) grpc_auth_client.Aut
 	const mark = "App.ServiceProvider.GrpcAuthClient"
 
 	if s.authClient == nil {
-		conn, err := grpc.NewClient(s.AuthClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(s.AuthClientConfig().Address(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())))
 		if err != nil {
 			logger.Fatal(err.Error(), mark)
 		}
@@ -122,7 +126,9 @@ func (s *serviceProvider) MailClient() mail_client.MailClient {
 	const mark = "App.ServiceProvider.MailClient"
 
 	if s.mailClient == nil {
-		conn, err := grpc.NewClient(s.MailClientConfig().Address(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(s.MailClientConfig().Address(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())))
 		if err != nil {
 			logger.Fatal(err.Error(), mark)
 		}

@@ -13,7 +13,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/tracing"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/joho/godotenv"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sony/gobreaker"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -139,6 +142,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
+	tracing.Init(serviceName)
 
 	rateLimiter := ratelimiter.NewTokenBucketLimiter(ctx, 1000, time.Second)
 
@@ -148,7 +152,10 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 				interceptors.NewRateLimitInterceptor(rateLimiter).Unary,
 				interceptors.NewCircuitBreaker(GetCircuitBreakerConfig()).Unary,
 				interceptors.LogInterceptor,
-				interceptors.MetricsInterceptor),
+				interceptors.MetricsInterceptor,
+				otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
+				interceptors.ServerTracing,
+			),
 		))
 	reflection.Register(a.grpcServer)
 	authService.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GrpcServer(ctx))

@@ -9,6 +9,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -43,7 +44,12 @@ func (c *Controller) Login(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	result, refreshToken, err := c.authClient.Login(ctx.Request().Context(), &Request)
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx.Request().Context(), "Login")
+	defer span.Finish()
+
+	span.SetTag("email", Request.Email)
+
+	result, refreshToken, err := c.authClient.Login(contextWithTrace, &Request)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid password") {
 			logger.Warn("failed to login", mark, zap.Error(err))

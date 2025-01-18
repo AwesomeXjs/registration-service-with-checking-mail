@@ -6,6 +6,7 @@ import (
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
+	"github.com/opentracing/opentracing-go"
 
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -33,7 +34,12 @@ func (c *GrpcServer) CheckUniqueCode(ctx context.Context, req *mail_v1.CheckUniq
 		return nil, fmt.Errorf("failed to validate token: %v", err)
 	}
 
-	err = c.authClient.ConfirmEmail(ctx, req.GetEmail())
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "confirm mail")
+	defer span.Finish()
+
+	span.SetTag("email", req.GetEmail())
+
+	err = c.authClient.ConfirmEmail(contextWithTrace, req.GetEmail())
 	if err != nil {
 		logger.Error("failed to confirm email", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to confirm email: %v", err)

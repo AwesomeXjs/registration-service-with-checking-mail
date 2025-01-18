@@ -8,6 +8,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -42,7 +43,12 @@ func (c *Controller) Registration(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	result, refreshToken, err := c.authClient.Registration(ctx.Request().Context(), &Request)
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx.Request().Context(), "Registration")
+	defer span.Finish()
+
+	span.SetTag("email", Request.Email)
+
+	result, refreshToken, err := c.authClient.Registration(contextWithTrace, &Request)
 	if err != nil {
 		logger.Error("failed to register", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusBadRequest, "Bad Request", err.Error())

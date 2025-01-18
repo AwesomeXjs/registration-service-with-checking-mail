@@ -9,10 +9,13 @@ import (
 	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/interceptors"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/tracing"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -21,7 +24,8 @@ import (
 )
 
 const (
-	EnvPath = ".env" // EnvPath - contains path to .env file
+	EnvPath     = ".env" // EnvPath - contains path to .env file
+	serviceName = "mail-checking-service"
 )
 
 var (
@@ -148,11 +152,14 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
+	tracing.Init(serviceName)
 
 	a.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
+			otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 			interceptors.LogInterceptor,
-			interceptors.MetricsInterceptor),
+			interceptors.MetricsInterceptor,
+			interceptors.ServerTracing),
 	))
 	reflection.Register(a.grpcServer)
 	mail_v1.RegisterMailV1Server(a.grpcServer, a.serviceProvider.GrpcServer(ctx))
