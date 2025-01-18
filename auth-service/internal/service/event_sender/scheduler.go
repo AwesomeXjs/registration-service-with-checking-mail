@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/metrics"
+
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 
@@ -93,6 +95,7 @@ func SendEvents(data []model.EventData, s *Sender) []int {
 			logger.Error("failed to produce event", mark, zap.Error(err))
 			continue
 		}
+		metrics.IncVerificationCounter()
 		successIDs = append(successIDs, event.ID)
 	}
 	return successIDs

@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 5s # Как часто обрабатывать метрики
+  evaluation_interval: 5s # Как часто вычислять правила агрегации и алертинга
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: "metrics"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "auth-service"
+    static_configs:
+      - targets: ["host.docker.internal:2112"]
+
+  - job_name: "api-gateway"
+    static_configs:
+      - targets: [ "host.docker.internal:2113" ]
+
+  - job_name: "mail-checking-service"
+    static_configs:
+      - targets: ["host.docker.internal:2114"]
+
+  - job_name: "postgresql-exporter"
+    static_configs:
+      - targets: [ "pg-exporter:9187" ]
+

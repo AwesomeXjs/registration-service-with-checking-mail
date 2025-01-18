@@ -7,6 +7,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/client/mail_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/controller"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/headers_manager"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/metrics"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
@@ -23,6 +24,7 @@ type serviceProvider struct {
 	httpConfig       IHTTPConfig
 	authClientConfig grpc_auth_client.IAuthClientConfig
 	mailClientConfig mail_client.IMailClientConfig
+	prometheusConfig metrics.PrometheusConfig
 
 	// clients
 	authClient   grpc_auth_client.AuthClient
@@ -66,6 +68,21 @@ func (s *serviceProvider) AuthClientConfig() grpc_auth_client.IAuthClientConfig 
 		s.authClientConfig = cfg
 	}
 	return s.authClientConfig
+}
+
+func (s *serviceProvider) PrometheusConfig() metrics.PrometheusConfig {
+
+	const mark = "App.ServiceProvider.PrometheusConfig"
+
+	if s.prometheusConfig == nil {
+		cfg, err := metrics.NewPrometheusConfig()
+		if err != nil {
+			logger.Fatal("failed to get metrics config", mark, zap.Error(err))
+		}
+		s.prometheusConfig = cfg
+	}
+
+	return s.prometheusConfig
 }
 
 func (s *serviceProvider) MailClientConfig() mail_client.IMailClientConfig {

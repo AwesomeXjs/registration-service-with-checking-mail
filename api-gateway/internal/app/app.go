@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/pprof"
+	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/closer"
@@ -30,6 +31,7 @@ var logLevel = flag.String("l", "info", "log level")
 type App struct {
 	serviceProvider *serviceProvider
 	server          *echo.Echo
+	prometheus      *http.Server
 }
 
 // New creates and initializes the App with dependencies.
@@ -55,10 +57,26 @@ func (a *App) Run() error {
 		closer.CloseAll() // Close all services/resources
 		closer.Wait()     // Wait for all services to close
 	}()
-	err := a.runHTTPServer() // Run the HTTP server
-	if err != nil {
-		logger.Fatal("failed to run http server", mark, zap.Error(err))
-	}
+	wg := &sync.WaitGroup{}
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		err := a.runPrometheus()
+		if err != nil {
+			logger.Fatal("failed to run metrics", mark, zap.Error(err))
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		err := a.runHTTPServer() // Run the HTTP server
+		if err != nil {
+			logger.Fatal("failed to run http server", mark, zap.Error(err))
+		}
+	}()
+	wg.Wait()
+
 	return nil
 }
 
@@ -72,6 +90,8 @@ func (a *App) InitDeps(ctx context.Context) error {
 		a.InitEchoServer,      // Initialize Echo server
 		a.initServiceProvider, // Initialize service provider
 		a.InitRoutes,
+		a.initPrometheus,
+		a.initMetrics,
 	}
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
@@ -124,6 +144,7 @@ func (a *App) InitEchoServer(_ context.Context) error {
 
 	a.server.Use(middleware.Recover()) // Middleware for recovering from panics
 	a.server.Use(middlewares.Logger)   // Custom logging middleware
+	a.server.Use(middlewares.MetricsInterceptor)
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:8080"},                                           // Allow CORS from this origin
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE}, // Allowed HTTP methods

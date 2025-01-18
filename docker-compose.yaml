@@ -2,6 +2,8 @@ volumes:
   postgres_volume:
   redis-data:
   redis-mail:
+  prometheus_data:
+  grafana_data:
 
 services:
   pg-auth-service:
@@ -13,6 +15,13 @@ services:
       - postgres_volume:/var/lib/postgresql/data
     env_file:
       - auth-service/.env
+  pg-exporter:
+    image: wrouesnel/postgres_exporter:v0.8.0
+    restart: unless-stopped
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "host=pg-auth-service port=5432 dbname=postgres user=postgres password=postgres sslmode=disable"
 
   migrator-auth-service:
     build:
@@ -116,6 +125,34 @@ services:
       - "6385:6379"
     volumes:
       - redis-mail:/data
+
+  prometheus:
+    image: prom/prometheus:v2.37.9
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./metrics/alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus
+
+  grafana:
+      image: grafana/grafana-oss:10.0.3
+      ports:
+        - "3000:3000"
+      volumes:
+        - grafana_data:/var/lib/grafana
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686" # web
+      - "14268:14268"
+      - "9411:9411"
+
 networks:
     kafka-net:
       driver: bridge

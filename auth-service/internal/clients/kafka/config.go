@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
-
 	"go.uber.org/zap"
+
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
 )
 
 // Kafka environment variable keys.

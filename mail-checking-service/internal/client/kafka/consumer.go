@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/metrics"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"go.uber.org/zap"
@@ -74,6 +76,8 @@ func (c *Consumer) Start(ctx context.Context) {
 		if kafkaMsg == nil {
 			continue // Skip processing if the message is nil.
 		}
+
+		metrics.IncKafkaEventCounter()
 
 		// Handle the Kafka message using the provided handler.
 		if err = c.handler.HandleMessage(ctx, kafkaMsg.Value, kafkaMsg.TopicPartition.Offset, c.consumerNumber); err != nil {

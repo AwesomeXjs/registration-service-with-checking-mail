@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/metrics"
+
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"go.uber.org/zap"
@@ -33,6 +35,9 @@ func (a *AuthClient) ConfirmEmail(ctx context.Context, email string) error {
 		logger.Error("failed to confirm email", mark, zap.Error(err))
 		return fmt.Errorf("failed to confirm email: %v", err)
 	}
+
+	metrics.IncSuccessVerificationCounter()
+
 	return nil
 }
 

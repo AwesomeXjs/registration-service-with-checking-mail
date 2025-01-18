@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"net/http"
 	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/interceptors"
@@ -32,6 +33,7 @@ var (
 type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
+	prometheus      *http.Server
 }
 
 // New creates a new instance of App and initializes its dependencies.
@@ -59,7 +61,16 @@ func (a *App) Run(ctx context.Context) error {
 
 	wg := &sync.WaitGroup{}
 
-	wg.Add(4)
+	wg.Add(5)
+
+	go func() {
+		defer wg.Done()
+		err := a.runPrometheus()
+		if err != nil {
+			logger.Fatal("failed to run metrics", mark, zap.Error(err))
+		}
+	}()
+
 	go func() {
 		defer wg.Done()
 		err := a.RunGRPSServer()
@@ -103,6 +114,8 @@ func (a *App) InitDeps(ctx context.Context) error {
 		a.InitConfig,
 		a.initServiceProvider,
 		a.initGrpcServer,
+		a.initPrometheus,
+		a.initMetrics,
 	}
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
@@ -138,7 +151,8 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 
 	a.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
-			interceptors.LogInterceptor),
+			interceptors.LogInterceptor,
+			interceptors.MetricsInterceptor),
 	))
 	reflection.Register(a.grpcServer)
 	mail_v1.RegisterMailV1Server(a.grpcServer, a.serviceProvider.GrpcServer(ctx))

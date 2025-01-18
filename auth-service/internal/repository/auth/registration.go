@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/metrics"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
@@ -46,6 +48,8 @@ func (a *RepositoryAuth) Registration(ctx context.Context, infoToDb *model.InfoT
 		logger.Error("failed to register user", mark, zap.Error(err))
 		return 0, fmt.Errorf("failed to register user: %v", err)
 	}
+
+	metrics.IncRegistrationCounter()
 
 	return ID, nil
 }

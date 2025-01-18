@@ -30,9 +30,9 @@ get-deps:
 	go get go.uber.org/zap # logger
 	go get go.uber.org/zap/zapcore # logger
 	go get github.com/natefinch/lumberjack # logger config (for Zap)
-	go get github.com/prometheus/client_golang/prometheus # prometheus
-	go get github.com/prometheus/client_golang/prometheus/promauto # prometheus
-	go get github.com/prometheus/client_golang/prometheus/promhttp@v1.20.4 # prometheus
+	go get github.com/prometheus/client_golang/prometheus # metrics
+	go get github.com/prometheus/client_golang/prometheus/promauto # metrics
+	go get github.com/prometheus/client_golang/prometheus/promhttp@v1.20.4 # metrics
 	go get github.com/opentracing/opentracing-go # opentracing
 	go get github.com/opentracing/opentracing-go/ext # opentracing
 	go get github.com/uber/jaeger-client-go # tracing

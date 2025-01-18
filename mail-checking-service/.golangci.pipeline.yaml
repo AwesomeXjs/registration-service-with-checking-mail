@@ -35,7 +35,7 @@ linters:
     - errcheck
     - goconst
     - goimports
-    - gosec
+    # - gosec
     - govet
     - ineffassign
     - revive

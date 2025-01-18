@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/metrics"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis/go_redis"
@@ -22,10 +24,11 @@ import (
 // serviceProvider struct holds configurations and instances needed to set up and manage services.
 type serviceProvider struct {
 	// configs
-	pgConfig    db.PGConfig
-	grpcConfig  GRPCConfig
-	redisConfig redis.IRedisConfig
-	kafkaConfig kafka.IKafkaConfig
+	pgConfig         db.PGConfig
+	grpcConfig       GRPCConfig
+	redisConfig      redis.IRedisConfig
+	kafkaConfig      kafka.IKafkaConfig
+	prometheusConfig metrics.PrometheusConfig
 
 	// clients
 	dbClient      db.Client
@@ -99,6 +102,21 @@ func (s *serviceProvider) KafkaConfig() kafka.IKafkaConfig {
 	}
 	return s.kafkaConfig
 
+}
+
+func (s *serviceProvider) PrometheusConfig() metrics.PrometheusConfig {
+
+	const mark = "App.ServiceProvider.PrometheusConfig"
+
+	if s.prometheusConfig == nil {
+		cfg, err := metrics.NewPrometheusConfig()
+		if err != nil {
+			logger.Fatal("failed to get metrics config", mark, zap.Error(err))
+		}
+		s.prometheusConfig = cfg
+	}
+
+	return s.prometheusConfig
 }
 
 // DBClient initializes and returns the database client if not already created.

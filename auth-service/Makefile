@@ -45,9 +45,9 @@ get-deps:
 	go get go.uber.org/zap # logger
 	go get go.uber.org/zap/zapcore # logger
 	go get github.com/natefinch/lumberjack # logger config (for Zap)
-	go get github.com/prometheus/client_golang/prometheus # prometheus
-	go get github.com/prometheus/client_golang/prometheus/promauto # prometheus
-	go get github.com/prometheus/client_golang/prometheus/promhttp@v1.20.4 # prometheus
+	go get github.com/prometheus/client_golang/prometheus # metrics
+	go get github.com/prometheus/client_golang/prometheus/promauto # metrics
+	go get github.com/prometheus/client_golang/prometheus/promhttp@v1.20.4 # metrics
 	go get github.com/opentracing/opentracing-go # opentracing
 	go get github.com/opentracing/opentracing-go/ext # opentracing
 	go get github.com/uber/jaeger-client-go # tracing
@@ -135,10 +135,10 @@ grpc-load-test:
 	${LOCAL_BIN}/ghz \
 		--proto api/auth_v1/auth.proto \
 		--import-paths vendor.protogen \
-		--call auth_v1.AuthV1.GetAccessToken  \
-		--data '{"refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzcyMDkyMTYsIlJvbGUiOiIiLCJJRCI6MTh9.OhEmTxP3WPIH_RQ-0YIqUjysPS2Ibbco68nGD8HBYV4"}' \
-		--rps 90 \
-		--total 9000 \
+		--call auth_v1.AuthV1.Login  \
+		--data '{"email": "string@mail.com","password": "string"}' \
+		--rps 500 \
+		--total 90000\
 		--insecure \
 		localhost:50051
 
@@ -146,9 +146,9 @@ grpc-load-test-errors:
 	${LOCAL_BIN}/ghz \
 		--proto api/auth_v1/auth.proto \
 		--import-paths vendor.protogen \
-		--call auth_v1.AuthV1.GetAccessToken  \
-		--data '{"refreshToken": "eyJhbGciOiJIUzI1NiIsInkpXVCJ9.eyJleHAiOjE3MzcyMDkyMTYsIlJvbGUiOiIiLCJJRCI6MTh9.OhEmTxP3WPIH_RQ-0YIqUjysPS2Ibbco68nGD8HBYV4"}' \
-		--rps 90 \
-		--total 9000 \
+		--call auth_v1.AuthV1.Login  \
+		--data '{"email": "string@mail.com","password": "string"}' \
+		--rps 1500 \
+		--total 90000\
 		--insecure \
 		localhost:50051

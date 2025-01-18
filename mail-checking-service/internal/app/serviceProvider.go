@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/metrics"
+
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/grpc_auth_client"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/client/kafka"
@@ -28,6 +30,7 @@ type serviceProvider struct {
 	redisConfig      redis.IRedisConfig
 	emailConfig      mail.IMailConfig
 	authClientConfig grpc_auth_client.IAuthClientConfig
+	prometheusConfig metrics.PrometheusConfig
 
 	kafkaConsumer *kafka.Consumer
 	redisClient   redis.IRedis
@@ -130,6 +133,21 @@ func (s *serviceProvider) RedisClient(ctx context.Context) redis.IRedis {
 		s.redisClient = redisClient
 	}
 	return s.redisClient
+}
+
+func (s *serviceProvider) PrometheusConfig() metrics.PrometheusConfig {
+
+	const mark = "App.ServiceProvider.PrometheusConfig"
+
+	if s.prometheusConfig == nil {
+		cfg, err := metrics.NewPrometheusConfig()
+		if err != nil {
+			logger.Fatal("failed to get metrics config", mark, zap.Error(err))
+		}
+		s.prometheusConfig = cfg
+	}
+
+	return s.prometheusConfig
 }
 
 func (s *serviceProvider) MailClient() mail.IMailClient {

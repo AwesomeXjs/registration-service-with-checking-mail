@@ -1,0 +1,39 @@
+groups:
+  - name: alerts
+    rules:
+      - alert: TargetIsDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: medium
+        annotations:
+          summary: "The Target {{ $labels.job }} is down"
+          description: "{{ $labels.job }}/{{ $labels.service }}/{{ $labels.instance }} is down"
+  - name: golden-metrics
+    rules:
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(auth_service_space_grpc_auth_service_response_time_second_bucket[5m])) by (le)) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+          description: "The 95th percentile latency is above 500ms."
+
+      - alert: HighErrorRate
+        expr: increase(auth_service_space_grpc_auth_service_requests_total{status=~"5.."}[5m]) / increase(auth_service_space_grpc_auth_service_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate"
+          description: "More than 5% of requests are failing."
+
+      - alert: HighSaturation
+        expr: process_cpu_seconds_total{mode="idle"} < 0.2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU saturation"
+          description: "Idle CPU is less than 20%."

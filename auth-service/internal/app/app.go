@@ -10,21 +10,21 @@ import (
 	_ "net/http/pprof" // pprof package
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/sony/gobreaker"
-
-	ratelimiter "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/rate_limiter"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/interceptors"
+	ratelimiter "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/rate_limiter"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/joho/godotenv"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 const (
@@ -41,6 +41,7 @@ var (
 type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
+	prometheus      *http.Server
 }
 
 // New creates a new instance of App and initializes its dependencies.
@@ -63,21 +64,37 @@ func (a *App) Run(ctx context.Context) error {
 		closer.CloseAll()
 		closer.Wait()
 	}()
+
+	// outbox scheduler
+	a.serviceProvider.Service(ctx).Event.Start(ctx, GetSchedulerPeriod())
+
+	wg := &sync.WaitGroup{}
+	wg.Add(3)
+
 	go func() {
-		log.Println("pprof server is running on :6060")
+		defer wg.Wait()
+		logger.Info("starting pprof server on :6060", mark)
 		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Fatalf("failed to start pprof server: %v", err)
 		}
 	}()
 
-	// outbox scheduler
-	a.serviceProvider.Service(ctx).Event.Start(ctx, GetSchedulerPeriod())
+	go func() {
+		defer wg.Done()
+		err := a.runPrometheus()
+		if err != nil {
+			logger.Fatal("failed to run metrics", mark, zap.Error(err))
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		err := a.RunGRPCServer()
+		if err != nil {
+			logger.Fatal("failed to run grpc server", mark, zap.Error(err))
+		}
+	}()
 
-	err := a.RunGRPCServer()
-	if err != nil {
-		logger.Fatal("failed to run grpc server", mark, zap.Error(err))
-	}
-
+	wg.Wait()
 	return nil
 }
 
@@ -89,6 +106,8 @@ func (a *App) InitDeps(ctx context.Context) error {
 		a.InitConfig,
 		a.initServiceProvider,
 		a.initGrpcServer,
+		a.initPrometheus,
+		a.initMetrics,
 	}
 	for _, fun := range inits {
 		if err := fun(ctx); err != nil {
@@ -121,14 +140,15 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
 
-	rateLimiter := ratelimiter.NewTokenBucketLimiter(ctx, 100, time.Second)
+	rateLimiter := ratelimiter.NewTokenBucketLimiter(ctx, 1000, time.Second)
 
 	a.grpcServer = grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
 				interceptors.NewRateLimitInterceptor(rateLimiter).Unary,
 				interceptors.NewCircuitBreaker(GetCircuitBreakerConfig()).Unary,
-				interceptors.LogInterceptor),
+				interceptors.LogInterceptor,
+				interceptors.MetricsInterceptor),
 		))
 	reflection.Register(a.grpcServer)
 	authService.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GrpcServer(ctx))
