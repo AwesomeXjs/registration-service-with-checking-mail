@@ -19,19 +19,19 @@ func (s *ServiceAuth) Login(ctx context.Context, loginInfo *model.LoginInfo) (*m
 
 	logger.Debug("get data in service", mark, zap.Any("loginInfo", loginInfo))
 
-	result, err := s.repo.Auth.Login(ctx, loginInfo.Email)
+	result, err := s.Repo.Auth.Login(ctx, loginInfo.Email)
 	if err != nil {
 		logger.Error("failed to login", mark, zap.Error(err))
 		return nil, err
 	}
 
-	ok := s.authHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
+	ok := s.AuthHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
 	if !ok {
 		logger.Error("invalid password", mark, zap.Error(err))
 		return nil, fmt.Errorf("invalid password")
 	}
 
-	accessToken, err := s.authHelper.GenerateAccessToken(&model.AccessTokenInfo{
+	accessToken, err := s.AuthHelper.GenerateAccessToken(&model.AccessTokenInfo{
 		ID:   result.UserID,
 		Role: result.Role,
 	})
@@ -40,7 +40,7 @@ func (s *ServiceAuth) Login(ctx context.Context, loginInfo *model.LoginInfo) (*m
 		return nil, fmt.Errorf("failed to generate access token: %v", err)
 	}
 
-	refreshToken, err := s.authHelper.GenerateRefreshToken(result.UserID)
+	refreshToken, err := s.AuthHelper.GenerateRefreshToken(result.UserID)
 	if err != nil {
 		logger.Error("failed to generate refresh token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to generate refresh token: %v", err)

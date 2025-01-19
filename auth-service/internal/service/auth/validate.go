@@ -16,7 +16,7 @@ func (s *ServiceAuth) ValidateToken(_ context.Context, accessToken string) (bool
 
 	logger.Debug("get access token in service", mark, zap.String("ACCESS_TOKEN", accessToken))
 
-	_, err := s.authHelper.VerifyToken(accessToken)
+	_, err := s.AuthHelper.VerifyToken(accessToken)
 	if err != nil {
 		logger.Error("failed to verify token", mark, zap.Error(err))
 		return false, fmt.Errorf("failed to verify token: %v", err)

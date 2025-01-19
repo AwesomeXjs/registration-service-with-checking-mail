@@ -114,6 +114,7 @@ mocks:
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth.IServiceAuth -o tests/unit/mocks -s "_minimock.go"
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager.AuthHelper -o tests/unit/mocks -s "_minimock.go"
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka.IProducer -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/db.TxManager -o tests/unit/mocks -s "_minimock.go"
 
 test:
 	go clean -testcache

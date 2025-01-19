@@ -18,12 +18,12 @@ func (s *ServiceAuth) UpdatePassword(ctx context.Context, updatePassInfo *model.
 
 	logger.Debug("get data in service", mark, zap.Any("updatePassInfo", updatePassInfo))
 
-	hashPassword, err := s.authHelper.HashPassword(updatePassInfo.NewPassword)
+	hashPassword, err := s.AuthHelper.HashPassword(updatePassInfo.NewPassword)
 	if err != nil {
 		logger.Error("failed to hash password", mark, zap.Error(err))
 		return fmt.Errorf("failed to hash password: %v", err)
 	}
-	err = s.repo.Auth.UpdatePassword(ctx, converter.FromUpdatePassInfoToDbPassInfo(updatePassInfo, hashPassword))
+	err = s.Repo.Auth.UpdatePassword(ctx, converter.FromUpdatePassInfoToDbPassInfo(updatePassInfo, hashPassword))
 	if err != nil {
 		logger.Error("failed to update password", mark, zap.Error(err))
 		return fmt.Errorf("failed to update password: %v", err)

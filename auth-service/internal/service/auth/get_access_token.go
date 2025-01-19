@@ -17,24 +17,24 @@ func (s *ServiceAuth) GetAccessToken(ctx context.Context, refreshToken string) (
 
 	logger.Debug("getting refresh token on service", mark, zap.String("REFRESH_TOKEN", refreshToken))
 
-	claims, err := s.authHelper.VerifyToken(refreshToken)
+	claims, err := s.AuthHelper.VerifyToken(refreshToken)
 	if err != nil {
 		logger.Error("failed to verify token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to verify token: %v", err)
 	}
 
-	info, err := s.repo.Auth.GetAccessToken(ctx, claims.ID)
+	info, err := s.Repo.Auth.GetAccessToken(ctx, claims.ID)
 	if err != nil {
 		logger.Error("failed to get access token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to get access token: %v", err)
 	}
-	access, err := s.authHelper.GenerateAccessToken(info)
+	access, err := s.AuthHelper.GenerateAccessToken(info)
 	if err != nil {
 		logger.Error("failed to generate access token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to generate access token: %v", err)
 	}
 
-	refresh, err := s.authHelper.GenerateRefreshToken(info.ID)
+	refresh, err := s.AuthHelper.GenerateRefreshToken(info.ID)
 	if err != nil {
 		logger.Error("failed to generate refresh token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to generate refresh token: %v", err)

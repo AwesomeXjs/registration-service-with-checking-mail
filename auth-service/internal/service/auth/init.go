@@ -39,16 +39,16 @@ type IServiceAuth interface {
 
 // ServiceAuth provides authentication-related services, including repository interactions, JWT management, and transaction management.
 type ServiceAuth struct {
-	repo       *repository.Repository // Repository for accessing user data and authentication information.
-	authHelper jwt_manager.AuthHelper // Helper for handling JWT token creation and validation.
-	tx         db.TxManager           // Transaction manager for managing database transactions.
+	Repo       *repository.Repository
+	AuthHelper jwt_manager.AuthHelper
+	Tx         db.TxManager
 }
 
 // New creates a new instance of AuthService with the provided repository, JWT helper, and transaction manager.
 func New(repo *repository.Repository, authHelper jwt_manager.AuthHelper, tx db.TxManager) IServiceAuth {
 	return &ServiceAuth{
-		repo:       repo,
-		authHelper: authHelper,
-		tx:         tx,
+		Repo:       repo,
+		AuthHelper: authHelper,
+		Tx:         tx,
 	}
 }

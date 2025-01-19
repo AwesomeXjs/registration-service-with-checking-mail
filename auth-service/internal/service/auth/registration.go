@@ -24,16 +24,16 @@ func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo
 
 	const mark = "Service.Auth.Registration"
 
-	HashedPassword, err := s.authHelper.HashPassword(userInfo.Password)
+	HashedPassword, err := s.AuthHelper.HashPassword(userInfo.Password)
 	if err != nil {
 		logger.Error("failed to hash password", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
 	var UserID int
-	err = s.tx.ReadCommitted(ctx, func(ctx context.Context) error {
+	err = s.Tx.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error
-		UserID, errTx = s.repo.Auth.Registration(ctx, converter.FromUserInfoToDbModel(userInfo, HashedPassword))
+		UserID, errTx = s.Repo.Auth.Registration(ctx, converter.FromUserInfoToDbModel(userInfo, HashedPassword))
 		if errTx != nil {
 			logger.Error("failed to registration", mark, zap.Error(err))
 			return errTx
@@ -45,7 +45,7 @@ func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo
 			return errTx
 		}
 
-		errTx = s.repo.Event.SendEvent(ctx, converter.ToModelSendEvent(topicRegistration, payload))
+		errTx = s.Repo.Event.SendEvent(ctx, converter.ToModelSendEvent(topicRegistration, payload))
 		if errTx != nil {
 			logger.Error("failed to send event", mark, zap.Error(err))
 			return errTx
@@ -59,13 +59,13 @@ func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo
 		return nil, err
 	}
 
-	accessToken, err := s.authHelper.GenerateAccessToken(converter.ToModelAccessTokenInfo(UserID, userInfo))
+	accessToken, err := s.AuthHelper.GenerateAccessToken(converter.ToModelAccessTokenInfo(UserID, userInfo))
 	if err != nil {
 		logger.Error("failed to generate access token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to generate access token: %v", err)
 	}
 
-	refreshToken, err := s.authHelper.GenerateRefreshToken(UserID)
+	refreshToken, err := s.AuthHelper.GenerateRefreshToken(UserID)
 	if err != nil {
 		logger.Error("failed to generate refresh token", mark, zap.Error(err))
 		return nil, fmt.Errorf("failed to generate refresh token: %v", err)
