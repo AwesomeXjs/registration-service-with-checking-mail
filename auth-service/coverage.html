@@ -67,7 +67,7 @@
 				
 				<option value="file5">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/redis/go_redis/go_redis.go (0.0%)</option>
 				
-				<option value="file6">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter/auth.go (0.0%)</option>
+				<option value="file6">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter/auth.go (100.0%)</option>
 				
 				<option value="file7">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter/event.go (0.0%)</option>
 				
@@ -139,7 +139,7 @@
 				
 				<option value="file41">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/login.go (0.0%)</option>
 				
-				<option value="file42">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/registration.go (0.0%)</option>
+				<option value="file42">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/registration.go (57.6%)</option>
 				
 				<option value="file43">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/update_password.go (0.0%)</option>
 				
@@ -876,7 +876,7 @@ import "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-servi
 
 // ToModelAuthResponse converts access and refresh tokens along with user ID
 // into an AuthResponse model.
-func ToModelAuthResponse(accessToken, refreshToken string, UserID int) *model.AuthResponse <span class="cov0" title="0">{
+func ToModelAuthResponse(accessToken, refreshToken string, UserID int) *model.AuthResponse <span class="cov6" title="5">{
         return &amp;model.AuthResponse{
                 AccessToken:  accessToken,
                 RefreshToken: refreshToken,
@@ -886,7 +886,7 @@ func ToModelAuthResponse(accessToken, refreshToken string, UserID int) *model.Au
 
 // ToModelAccessTokenInfo converts user ID and user information into an
 // AccessTokenInfo model.
-func ToModelAccessTokenInfo(userID int, userInfo *model.UserInfo) *model.AccessTokenInfo <span class="cov0" title="0">{
+func ToModelAccessTokenInfo(userID int, userInfo *model.UserInfo) *model.AccessTokenInfo <span class="cov10" title="15">{
         return &amp;model.AccessTokenInfo{
                 ID:   userID,
                 Role: userInfo.Role,
@@ -2313,7 +2313,7 @@ import (
 // ConfirmEmail is a service method that handles the email confirmation process.
 // It calls the repository layer to update the email verification status.
 func (s *ServiceAuth) ConfirmEmail(ctx context.Context, mail string) error <span class="cov0" title="0">{
-        return s.repo.Auth.ConfirmEmail(ctx, mail)
+        return s.Repo.Auth.ConfirmEmail(ctx, mail)
 }</span>
 </pre>
 		
@@ -2336,24 +2336,24 @@ func (s *ServiceAuth) GetAccessToken(ctx context.Context, refreshToken string) (
 
         logger.Debug("getting refresh token on service", mark, zap.String("REFRESH_TOKEN", refreshToken))
 
-        claims, err := s.authHelper.VerifyToken(refreshToken)
+        claims, err := s.AuthHelper.VerifyToken(refreshToken)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to verify token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to verify token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">info, err := s.repo.Auth.GetAccessToken(ctx, claims.ID)
+        <span class="cov0" title="0">info, err := s.Repo.Auth.GetAccessToken(ctx, claims.ID)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to get access token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to get access token: %v", err)
         }</span>
-        <span class="cov0" title="0">access, err := s.authHelper.GenerateAccessToken(info)
+        <span class="cov0" title="0">access, err := s.AuthHelper.GenerateAccessToken(info)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to generate access token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate access token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">refresh, err := s.authHelper.GenerateRefreshToken(info.ID)
+        <span class="cov0" title="0">refresh, err := s.AuthHelper.GenerateRefreshToken(info.ID)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to generate refresh token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate refresh token: %v", err)
@@ -2404,17 +2404,17 @@ type IServiceAuth interface {
 
 // ServiceAuth provides authentication-related services, including repository interactions, JWT management, and transaction management.
 type ServiceAuth struct {
-        repo       *repository.Repository // Repository for accessing user data and authentication information.
-        authHelper jwt_manager.AuthHelper // Helper for handling JWT token creation and validation.
-        tx         db.TxManager           // Transaction manager for managing database transactions.
+        Repo       *repository.Repository
+        AuthHelper jwt_manager.AuthHelper
+        Tx         db.TxManager
 }
 
 // New creates a new instance of AuthService with the provided repository, JWT helper, and transaction manager.
 func New(repo *repository.Repository, authHelper jwt_manager.AuthHelper, tx db.TxManager) IServiceAuth <span class="cov0" title="0">{
         return &amp;ServiceAuth{
-                repo:       repo,
-                authHelper: authHelper,
-                tx:         tx,
+                Repo:       repo,
+                AuthHelper: authHelper,
+                Tx:         tx,
         }
 }</span>
 </pre>
@@ -2440,19 +2440,19 @@ func (s *ServiceAuth) Login(ctx context.Context, loginInfo *model.LoginInfo) (*m
 
         logger.Debug("get data in service", mark, zap.Any("loginInfo", loginInfo))
 
-        result, err := s.repo.Auth.Login(ctx, loginInfo.Email)
+        result, err := s.Repo.Auth.Login(ctx, loginInfo.Email)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to login", mark, zap.Error(err))
                 return nil, err
         }</span>
 
-        <span class="cov0" title="0">ok := s.authHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
+        <span class="cov0" title="0">ok := s.AuthHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
         if !ok </span><span class="cov0" title="0">{
                 logger.Error("invalid password", mark, zap.Error(err))
                 return nil, fmt.Errorf("invalid password")
         }</span>
 
-        <span class="cov0" title="0">accessToken, err := s.authHelper.GenerateAccessToken(&amp;model.AccessTokenInfo{
+        <span class="cov0" title="0">accessToken, err := s.AuthHelper.GenerateAccessToken(&amp;model.AccessTokenInfo{
                 ID:   result.UserID,
                 Role: result.Role,
         })
@@ -2461,7 +2461,7 @@ func (s *ServiceAuth) Login(ctx context.Context, loginInfo *model.LoginInfo) (*m
                 return nil, fmt.Errorf("failed to generate access token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">refreshToken, err := s.authHelper.GenerateRefreshToken(result.UserID)
+        <span class="cov0" title="0">refreshToken, err := s.AuthHelper.GenerateRefreshToken(result.UserID)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to generate refresh token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate refresh token: %v", err)
@@ -2495,20 +2495,20 @@ var (
 
 // Registration handles the registration of a new user, hashes their password,
 // and generates access and refresh tokens upon successful registration.
-func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo) (*model.AuthResponse, error) <span class="cov0" title="0">{
+func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo) (*model.AuthResponse, error) <span class="cov10" title="25">{
 
         const mark = "Service.Auth.Registration"
 
-        HashedPassword, err := s.authHelper.HashPassword(userInfo.Password)
-        if err != nil </span><span class="cov0" title="0">{
+        HashedPassword, err := s.AuthHelper.HashPassword(userInfo.Password)
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to hash password", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to hash password: %v", err)
         }</span>
 
-        <span class="cov0" title="0">var UserID int
-        err = s.tx.ReadCommitted(ctx, func(ctx context.Context) error </span><span class="cov0" title="0">{
+        <span class="cov9" title="20">var UserID int
+        err = s.Tx.ReadCommitted(ctx, func(ctx context.Context) error </span><span class="cov0" title="0">{
                 var errTx error
-                UserID, errTx = s.repo.Auth.Registration(ctx, converter.FromUserInfoToDbModel(userInfo, HashedPassword))
+                UserID, errTx = s.Repo.Auth.Registration(ctx, converter.FromUserInfoToDbModel(userInfo, HashedPassword))
                 if errTx != nil </span><span class="cov0" title="0">{
                         logger.Error("failed to registration", mark, zap.Error(err))
                         return errTx
@@ -2520,7 +2520,7 @@ func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo
                         return errTx
                 }</span>
 
-                <span class="cov0" title="0">errTx = s.repo.Event.SendEvent(ctx, converter.ToModelSendEvent(topicRegistration, payload))
+                <span class="cov0" title="0">errTx = s.Repo.Event.SendEvent(ctx, converter.ToModelSendEvent(topicRegistration, payload))
                 if errTx != nil </span><span class="cov0" title="0">{
                         logger.Error("failed to send event", mark, zap.Error(err))
                         return errTx
@@ -2529,24 +2529,24 @@ func (s *ServiceAuth) Registration(ctx context.Context, userInfo *model.UserInfo
                 <span class="cov0" title="0">return nil</span>
         })
 
-        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+        <span class="cov9" title="20">if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to registration", mark, zap.Error(err))
                 return nil, err
         }</span>
 
-        <span class="cov0" title="0">accessToken, err := s.authHelper.GenerateAccessToken(converter.ToModelAccessTokenInfo(UserID, userInfo))
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="15">accessToken, err := s.AuthHelper.GenerateAccessToken(converter.ToModelAccessTokenInfo(UserID, userInfo))
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to generate access token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate access token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">refreshToken, err := s.authHelper.GenerateRefreshToken(UserID)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov7" title="10">refreshToken, err := s.AuthHelper.GenerateRefreshToken(UserID)
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to generate refresh token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate refresh token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">return converter.ToModelAuthResponse(accessToken, refreshToken, UserID), nil</span>
+        <span class="cov5" title="5">return converter.ToModelAuthResponse(accessToken, refreshToken, UserID), nil</span>
 }
 </pre>
 		
@@ -2570,12 +2570,12 @@ func (s *ServiceAuth) UpdatePassword(ctx context.Context, updatePassInfo *model.
 
         logger.Debug("get data in service", mark, zap.Any("updatePassInfo", updatePassInfo))
 
-        hashPassword, err := s.authHelper.HashPassword(updatePassInfo.NewPassword)
+        hashPassword, err := s.AuthHelper.HashPassword(updatePassInfo.NewPassword)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to hash password", mark, zap.Error(err))
                 return fmt.Errorf("failed to hash password: %v", err)
         }</span>
-        <span class="cov0" title="0">err = s.repo.Auth.UpdatePassword(ctx, converter.FromUpdatePassInfoToDbPassInfo(updatePassInfo, hashPassword))
+        <span class="cov0" title="0">err = s.Repo.Auth.UpdatePassword(ctx, converter.FromUpdatePassInfoToDbPassInfo(updatePassInfo, hashPassword))
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to update password", mark, zap.Error(err))
                 return fmt.Errorf("failed to update password: %v", err)
@@ -2604,7 +2604,7 @@ func (s *ServiceAuth) ValidateToken(_ context.Context, accessToken string) (bool
 
         logger.Debug("get access token in service", mark, zap.String("ACCESS_TOKEN", accessToken))
 
-        _, err := s.authHelper.VerifyToken(accessToken)
+        _, err := s.AuthHelper.VerifyToken(accessToken)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Error("failed to verify token", mark, zap.Error(err))
                 return false, fmt.Errorf("failed to verify token: %v", err)

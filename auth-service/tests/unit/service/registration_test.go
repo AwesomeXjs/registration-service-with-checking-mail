@@ -2,9 +2,10 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/app"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository"
@@ -12,6 +13,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository/events"
 	serviceAuth "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/db"
+	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/tests/unit/mocks"
 	"github.com/brianvoe/gofakeit"
 	"github.com/gojuno/minimock/v3"
@@ -20,6 +22,7 @@ import (
 
 func TestRegistration(t *testing.T) {
 	t.Parallel()
+	logger.Init(logger.GetCore(logger.GetAtomicLevel(app.LogLevel)))
 
 	type IRepositoryMockFunc func(mc *minimock.Controller) auth.IRepositoryAuth
 	type TxManagerMockFunc func(mc *minimock.Controller) db.TxManager
@@ -40,7 +43,6 @@ func TestRegistration(t *testing.T) {
 		name     = gofakeit.Name()
 		surname  = gofakeit.LastName()
 		role     = "user"
-		userID   = 1
 
 		accessToken  = gofakeit.UUID()
 		refreshToken = gofakeit.UUID()
@@ -56,8 +58,10 @@ func TestRegistration(t *testing.T) {
 		res = &model.AuthResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			UserID:       int64(userID),
+			UserID:       int64(0),
 		}
+
+		someError = fmt.Errorf("some error")
 	)
 
 	defer t.Cleanup(mc.Finish)
@@ -83,23 +87,140 @@ func TestRegistration(t *testing.T) {
 			jwtHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
 				mock := mocks.NewAuthHelperMock(mc)
 				mock.HashPasswordMock.Expect(password).Return(password, nil)
-				mock.GenerateAccessTokenMock.Expect(converter.ToModelAccessTokenInfo(userID, req)).Return(accessToken, nil)
-				mock.GenerateRefreshTokenMock.Expect(userID).Return(refreshToken, nil)
+				mock.GenerateAccessTokenMock.Expect(&model.AccessTokenInfo{
+					ID:   0,
+					Role: role,
+				}).Return(accessToken, nil)
+				mock.GenerateRefreshTokenMock.Expect(0).Return(refreshToken, nil)
 				return mock
 			},
 			txMock: func(mc *minimock.Controller) db.TxManager {
 				mock := mocks.NewTxManagerMock(mc)
-				mock.ReadCommittedMock.Expect(ctx, func(ctx context.Context) error { return nil }).Return(nil)
+				mock.ReadCommittedMock.Return(nil)
 				return mock
 			},
 			authRepoMock: func(mc *minimock.Controller) auth.IRepositoryAuth {
 				mock := mocks.NewIRepositoryAuthMock(mc)
-				mock.RegistrationMock.Expect(ctx, converter.FromUserInfoToDbModel(req, password)).Return(userID, nil)
 				return mock
 			},
 			eventRepoMock: func(mc *minimock.Controller) events.IEventRepository {
 				mock := mocks.NewIEventRepositoryMock(mc)
-				mock.SendEventMock.Expect(ctx, converter.ToModelSendEvent("registration", []byte{1})).Return(nil)
+				return mock
+			},
+		},
+		{
+			name: "transaction failed",
+			args: args{
+				ctx: ctx,
+				req: req,
+			},
+			want: nil,
+			err:  someError,
+			jwtHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
+				mock := mocks.NewAuthHelperMock(mc)
+				mock.HashPasswordMock.Expect(password).Return(password, nil)
+				return mock
+			},
+			txMock: func(mc *minimock.Controller) db.TxManager {
+				mock := mocks.NewTxManagerMock(mc)
+				mock.ReadCommittedMock.Return(someError)
+				return mock
+			},
+			authRepoMock: func(mc *minimock.Controller) auth.IRepositoryAuth {
+				mock := mocks.NewIRepositoryAuthMock(mc)
+				return mock
+			},
+			eventRepoMock: func(mc *minimock.Controller) events.IEventRepository {
+				mock := mocks.NewIEventRepositoryMock(mc)
+				return mock
+			},
+		},
+		{
+			name: "generate access token failed",
+			args: args{
+				ctx: ctx,
+				req: req,
+			},
+			want: nil,
+			err:  fmt.Errorf("failed to generate access token: %s", someError),
+			jwtHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
+				mock := mocks.NewAuthHelperMock(mc)
+				mock.HashPasswordMock.Expect(password).Return(password, nil)
+				mock.GenerateAccessTokenMock.Expect(&model.AccessTokenInfo{
+					ID:   0,
+					Role: role,
+				}).Return(accessToken, someError)
+				return mock
+			},
+			txMock: func(mc *minimock.Controller) db.TxManager {
+				mock := mocks.NewTxManagerMock(mc)
+				mock.ReadCommittedMock.Return(nil)
+				return mock
+			},
+			authRepoMock: func(mc *minimock.Controller) auth.IRepositoryAuth {
+				mock := mocks.NewIRepositoryAuthMock(mc)
+				return mock
+			},
+			eventRepoMock: func(mc *minimock.Controller) events.IEventRepository {
+				mock := mocks.NewIEventRepositoryMock(mc)
+				return mock
+			},
+		},
+		{
+			name: "hash password failed",
+			args: args{
+				ctx: ctx,
+				req: req,
+			},
+			want: nil,
+			err:  fmt.Errorf("failed to hash password: %s", someError),
+			jwtHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
+				mock := mocks.NewAuthHelperMock(mc)
+				mock.HashPasswordMock.Expect(password).Return(password, someError)
+				return mock
+			},
+			txMock: func(mc *minimock.Controller) db.TxManager {
+				mock := mocks.NewTxManagerMock(mc)
+				return mock
+			},
+			authRepoMock: func(mc *minimock.Controller) auth.IRepositoryAuth {
+				mock := mocks.NewIRepositoryAuthMock(mc)
+				return mock
+			},
+			eventRepoMock: func(mc *minimock.Controller) events.IEventRepository {
+				mock := mocks.NewIEventRepositoryMock(mc)
+				return mock
+			},
+		},
+		{
+			name: "failed generate refresh token",
+			args: args{
+				ctx: ctx,
+				req: req,
+			},
+			want: nil,
+			err:  fmt.Errorf("failed to generate refresh token: %s", someError),
+			jwtHelperMock: func(mc *minimock.Controller) jwt_manager.AuthHelper {
+				mock := mocks.NewAuthHelperMock(mc)
+				mock.HashPasswordMock.Expect(password).Return(password, nil)
+				mock.GenerateAccessTokenMock.Expect(&model.AccessTokenInfo{
+					ID:   0,
+					Role: role,
+				}).Return(accessToken, nil)
+				mock.GenerateRefreshTokenMock.Expect(0).Return(refreshToken, someError)
+				return mock
+			},
+			txMock: func(mc *minimock.Controller) db.TxManager {
+				mock := mocks.NewTxManagerMock(mc)
+				mock.ReadCommittedMock.Return(nil)
+				return mock
+			},
+			authRepoMock: func(mc *minimock.Controller) auth.IRepositoryAuth {
+				mock := mocks.NewIRepositoryAuthMock(mc)
+				return mock
+			},
+			eventRepoMock: func(mc *minimock.Controller) events.IEventRepository {
+				mock := mocks.NewIEventRepositoryMock(mc)
 				return mock
 			},
 		},
