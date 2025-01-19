@@ -30,13 +30,10 @@ func (r *RateLimiter) Unary(ctx context.Context,
 	handler grpc.UnaryHandler) (interface{}, error) {
 
 	const mark = "Interceptors.RateLimitInterceptor"
-
-	// Check if the rate limiter allows the request.
 	if !r.rateLimiter.Allow() {
 		logger.Warn("rate limit exceeded", mark)
 		return nil, status.Error(codes.ResourceExhausted, "rate limit exceeded")
 	}
 
-	// Proceed with the request if allowed.
 	return handler(ctx, req)
 }

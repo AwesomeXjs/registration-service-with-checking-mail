@@ -8,6 +8,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	authService "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/auth_v1"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +32,12 @@ func (g *GRPCClient) Registration(ctx context.Context,
 
 	const mark = "Client.grpc_auth_client.Registration"
 
-	result, err := g.authClient.Registration(ctx, converter.FromModelToProtoRegister(request)) // Delegates to the Registration method of the AuthClient.
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "Registration")
+	defer span.Finish()
+
+	span.SetTag("email", request.Email)
+
+	result, err := g.authClient.Registration(contextWithTrace, converter.FromModelToProtoRegister(request)) // Delegates to the Registration method of the AuthClient.
 
 	if err != nil {
 		logger.Error("failed to register user", mark, zap.Error(err))
@@ -47,7 +53,12 @@ func (g *GRPCClient) Login(ctx context.Context, request *model.LoginRequest) (*m
 
 	const mark = "Client.grpc_auth_client.Login"
 
-	result, err := g.authClient.Login(ctx, converter.FromModelToProtoLogin(request)) // Delegates to the Login method of the AuthClient.
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "Login")
+	defer span.Finish()
+
+	span.SetTag("email", request.Email)
+
+	result, err := g.authClient.Login(contextWithTrace, converter.FromModelToProtoLogin(request)) // Delegates to the Login method of the AuthClient.
 	if err != nil {
 		logger.Error("failed to login", mark, zap.Error(err))
 		return nil, "", fmt.Errorf("failed to login user: %v", err)
@@ -62,7 +73,12 @@ func (g *GRPCClient) ValidateToken(ctx context.Context, accessToken string) erro
 
 	const mark = "Client.grpc_auth_client.ValidateToken"
 
-	_, err := g.authClient.ValidateToken(ctx, converter.ToProtoValidateToken(accessToken))
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "ValidateToken")
+	defer span.Finish()
+
+	span.SetTag("access_token", accessToken)
+
+	_, err := g.authClient.ValidateToken(contextWithTrace, converter.ToProtoValidateToken(accessToken))
 	if err != nil {
 		logger.Error("failed to validate token", mark, zap.Error(err))
 		return fmt.Errorf("failed to validate token: %v", err)
@@ -76,7 +92,12 @@ func (g *GRPCClient) GetAccessToken(ctx context.Context, refreshToken string) (s
 
 	const mark = "Client.grpc_auth_client.GetAccessToken"
 
-	result, err := g.authClient.GetAccessToken(ctx, converter.FromModelToProtoGetAccessToken(refreshToken)) // Delegates to the GetAccessToken method of the AuthClient.
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "GetAccessToken")
+	defer span.Finish()
+
+	span.SetTag("refresh_token", refreshToken)
+
+	result, err := g.authClient.GetAccessToken(contextWithTrace, converter.FromModelToProtoGetAccessToken(refreshToken)) // Delegates to the GetAccessToken method of the AuthClient.
 	if err != nil {
 		logger.Error("failed to get access token", mark, zap.Error(err))
 		return "", "", fmt.Errorf("failed to get access token: %v", err)
@@ -90,7 +111,12 @@ func (g *GRPCClient) UpdatePassword(ctx context.Context, request *model.UpdatePa
 
 	const mark = "Client.grpc_auth_client.UpdatePassword"
 
-	_, err := g.authClient.UpdatePassword(ctx, converter.FromModelToProtoUpdatePass(request))
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "UpdatePassword")
+	defer span.Finish()
+
+	span.SetTag("access_token", request.Email)
+
+	_, err := g.authClient.UpdatePassword(contextWithTrace, converter.FromModelToProtoUpdatePass(request))
 	if err != nil {
 		logger.Error("failed to update password", mark, zap.Error(err))
 		return fmt.Errorf("failed to update password: %v", err)

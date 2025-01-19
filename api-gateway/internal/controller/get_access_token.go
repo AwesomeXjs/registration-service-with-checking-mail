@@ -6,7 +6,6 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/labstack/echo/v4"
-	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -38,12 +37,7 @@ func (c *Controller) GetAccessToken(ctx echo.Context) error {
 	}
 	logger.Debug("get refresh token", mark, zap.String("REFRESH_TOKEN", refreshToken))
 
-	span, contextWithTrace := opentracing.StartSpanFromContext(ctx.Request().Context(), "GetAccessToken")
-	defer span.Finish()
-
-	span.SetTag("refresh_token", refreshToken)
-
-	refreshToken, accessToken, err := c.authClient.GetAccessToken(contextWithTrace, refreshToken)
+	refreshToken, accessToken, err := c.authClient.GetAccessToken(ctx.Request().Context(), refreshToken)
 	if err != nil {
 		logger.Error("failed to get access token", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())

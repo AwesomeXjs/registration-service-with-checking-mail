@@ -30,12 +30,10 @@ func (c *CircuitBreaker) Unary(ctx context.Context,
 	handler grpc.UnaryHandler) (interface{}, error) {
 	const mark = "Interceptors.CircuitBreakerInterceptor"
 
-	// Execute the handler function within the circuit breaker.
 	res, err := c.cb.Execute(func() (interface{}, error) {
 		return handler(ctx, req)
 	})
 	if err != nil {
-		// Return a specific error if the circuit breaker is open.
 		if err == gobreaker.ErrOpenState {
 			logger.Error("service unavailable", mark, zap.Error(err))
 			return nil, status.Error(codes.Unavailable, "service unavailable")

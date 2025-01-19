@@ -8,6 +8,7 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/model"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -32,8 +33,13 @@ func (g *GRPCMailClient) CheckUniqueCode(ctx context.Context, accessToken string
 
 	const mark = "Client.mail_client.CheckUniqueCode"
 
+	span, contextWithTrace := opentracing.StartSpanFromContext(ctx, "confirm email")
+	defer span.Finish()
+
+	span.SetTag("email", request.Email)
+
 	// Convert the model request to the proto request format and call CheckUniqueCode on the gRPC client.
-	_, err := g.mailClient.CheckUniqueCode(ctx, converter.FromModelToProtoCheckUniqueCode(request, accessToken))
+	_, err := g.mailClient.CheckUniqueCode(contextWithTrace, converter.FromModelToProtoCheckUniqueCode(request, accessToken))
 	if err != nil {
 		// Log the error if the gRPC call fails.
 		logger.Error("failed to check unique code", mark, zap.Error(err))

@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/interceptors"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/internal/tracing"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/logger"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/mail-checking-service/pkg/mail_v1"
@@ -152,7 +151,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) initGrpcServer(ctx context.Context) error {
 	flag.Parse()
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(LogLevel)))
-	tracing.Init(serviceName)
+	a.InitTracing(serviceName)
 
 	a.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(

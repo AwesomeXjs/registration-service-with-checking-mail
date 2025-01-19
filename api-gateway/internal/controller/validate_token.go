@@ -7,7 +7,6 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/response"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/labstack/echo/v4"
-	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -34,12 +33,7 @@ func (c *Controller) ValidateToken(ctx echo.Context) error {
 	}
 	logger.Debug("get access token from header", mark, zap.String("ACCESS_TOKEN", accessToken))
 
-	span, contextWithTrace := opentracing.StartSpanFromContext(ctx.Request().Context(), "ValidateToken")
-	defer span.Finish()
-
-	span.SetTag("access_token", accessToken)
-
-	err = c.authClient.ValidateToken(contextWithTrace, accessToken)
+	err = c.authClient.ValidateToken(ctx.Request().Context(), accessToken)
 	if err != nil {
 		if strings.Contains(err.Error(), "failed to verify") {
 			logger.Warn("failed to validate token", mark, zap.Error(err))

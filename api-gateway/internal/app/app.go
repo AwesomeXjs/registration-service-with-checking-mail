@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
-	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/tracing"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/closer"
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 
@@ -88,9 +87,9 @@ func (a *App) InitDeps(ctx context.Context) error {
 	const mark = "App.app.InitDeps"
 
 	inits := []func(context.Context) error{
-		a.InitConfig,          // Initialize config
-		a.InitEchoServer,      // Initialize Echo server
-		a.initServiceProvider, // Initialize service provider
+		a.InitConfig,
+		a.InitEchoServer,
+		a.initServiceProvider,
 		a.InitRoutes,
 		a.initPrometheus,
 		a.initMetrics,
@@ -127,7 +126,7 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) InitEchoServer(_ context.Context) error {
 	flag.Parse()                                                 // Parse command-line flags
 	logger.Init(logger.GetCore(logger.GetAtomicLevel(logLevel))) // Initialize logger with the specified log level
-	tracing.Init(serviceName)
+	a.InitTracing(serviceName)
 
 	// Custom validator for role enumeration
 	govalidator.TagMap["role_enum"] = govalidator.Validator(func(str string) bool {
@@ -137,21 +136,16 @@ func (a *App) InitEchoServer(_ context.Context) error {
 
 	a.server = echo.New()
 
-	a.server.GET("/debug/pprof/*", echo.WrapHandler(http.DefaultServeMux))
-	a.server.GET("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
-	a.server.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
-	a.server.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
-	a.server.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
-	a.server.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
+	a.InitPprofRoutes()
 
-	a.server.Use(middleware.Recover()) // Middleware for recovering from panics
-	a.server.Use(middlewares.Logger)   // Custom logging middleware
+	a.server.Use(middleware.Recover())
+	a.server.Use(middlewares.Logger)
 	a.server.Use(middlewares.MetricsInterceptor)
 	a.server.Use(middlewares.Tracing)
 
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8080"},                                           // Allow CORS from this origin
-		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE}, // Allowed HTTP methods
+		AllowOrigins: []string{"http://localhost:8080"},
+		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
 			echo.HeaderContentType,
@@ -177,4 +171,14 @@ func (a *App) runHTTPServer() error {
 func (a *App) InitRoutes(ctx context.Context) error {
 	a.serviceProvider.Controller(ctx).InitRoutes(a.server) // Initialize routes using the controller
 	return nil
+}
+
+// InitPprofRoutes initializes routes for pprof debugging endpoints.
+func (a *App) InitPprofRoutes() {
+	a.server.GET("/debug/pprof/*", echo.WrapHandler(http.DefaultServeMux))
+	a.server.GET("/debug/pprof/", echo.WrapHandler(http.HandlerFunc(pprof.Index)))
+	a.server.GET("/debug/pprof/cmdline", echo.WrapHandler(http.HandlerFunc(pprof.Cmdline)))
+	a.server.GET("/debug/pprof/profile", echo.WrapHandler(http.HandlerFunc(pprof.Profile)))
+	a.server.GET("/debug/pprof/symbol", echo.WrapHandler(http.HandlerFunc(pprof.Symbol)))
+	a.server.GET("/debug/pprof/trace", echo.WrapHandler(http.HandlerFunc(pprof.Trace)))
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/pkg/logger"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
-	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -48,12 +47,7 @@ func (c *Controller) ConfirmEmail(ctx echo.Context) error {
 		return response.RespHelper(ctx, http.StatusUnprocessableEntity, "Bad Request", err.Error())
 	}
 
-	span, contextWithTrace := opentracing.StartSpanFromContext(ctx.Request().Context(), "confirm email")
-	defer span.Finish()
-
-	span.SetTag("email", Request.Email)
-
-	err = c.mailClient.CheckUniqueCode(contextWithTrace, accessToken, &Request)
+	err = c.mailClient.CheckUniqueCode(ctx.Request().Context(), accessToken, &Request)
 	if err != nil {
 		logger.Error("failed to check unique code", mark, zap.Error(err))
 		return response.RespHelper(ctx, http.StatusUnauthorized, "Unauthorized", err.Error())
