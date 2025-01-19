@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/pkg/logger"
@@ -14,9 +13,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+const (
+	metricsRoute = "/metrics"
+)
+
 func (a *App) initPrometheus(_ context.Context) error {
 	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle(metricsRoute, promhttp.Handler())
 
 	a.prometheus = &http.Server{
 		Addr:    a.serviceProvider.PrometheusConfig().Address(),
@@ -26,14 +29,20 @@ func (a *App) initPrometheus(_ context.Context) error {
 }
 
 func (a *App) runPrometheus() error {
-	logger.Info("starting prometheus server on "+a.serviceProvider.PrometheusConfig().Address(), "App.app.runPrometheus")
+
+	const mark = "App.app.runPrometheus"
+
+	logger.Info("starting prometheus server on "+a.serviceProvider.PrometheusConfig().Address(), mark)
 	return a.prometheus.ListenAndServe()
 }
 
 func (a *App) initMetrics(ctx context.Context) error {
+
+	const mark = "App.app.initMetrics"
+
 	err := metrics.Init(ctx)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("failed to init metrics", mark, zap.Error(err))
 	}
 	return nil
 }

@@ -108,9 +108,10 @@ init-migration:
 
 # mocks
 mocks:
-	rm -rf tests/mocks && mkdir -p tests/mocks
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository.IRepository -o tests/unit/mocks -s "_minimock.go"
-	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service.IService -o tests/unit/mocks -s "_minimock.go"
+	rm -rf tests/unit/mocks && mkdir -p tests/unit/mocks
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository/auth.IRepositoryAuth -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository/events.IEventRepository -o tests/unit/mocks -s "_minimock.go"
+	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth.IServiceAuth -o tests/unit/mocks -s "_minimock.go"
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/jwt_manager.AuthHelper -o tests/unit/mocks -s "_minimock.go"
 	${LOCAL_BIN}/minimock -i github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/clients/kafka.IProducer -o tests/unit/mocks -s "_minimock.go"
 
@@ -128,7 +129,7 @@ coverage:
 	go tool cover -html=coverage.out -o coverage.html;
 	go tool cover -func=./coverage.out | grep "total";
 	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
-	rm -r tests/unit/controller/logs
+	rm -r tests/unit/server/logs
 	rm -r tests/unit/service/logs
 
 grpc-load-test:
