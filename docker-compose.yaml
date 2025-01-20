@@ -180,7 +180,6 @@ services:
       - "16686:16686"
       - "14250:14250"
       - "14268:14268"
-      - "14250:14250"
     networks:
       - app-net
 
@@ -203,6 +202,9 @@ services:
       - ./api-gateway/prod.env
     networks:
       - app-net
+    environment:
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
 
 
 
@@ -226,6 +228,9 @@ services:
     networks:
         - app-net
         - kafka-net
+    environment:
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
 
   mail-service:
     build: ./mail-checking-service
@@ -247,8 +252,9 @@ services:
     networks:
         - app-net
         - kafka-net
-
-
+    environment:
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
 
 networks:
     kafka-net:
