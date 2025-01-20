@@ -31,7 +31,7 @@
 
 ## Мониторинг и метрики
 
-- **Jaeger UI (Трассировка)**: [http://localhost:16686](http://localhost:16686)
+- **Jaeger UI (Трассировка)**: [http://localhost:16686](http://localhost:16686) (если по какой то причине у вас не будет работать трейсинг в рамках docker-compose, попробуйте поднять сервисы отдельно.)
 - **Grafana UI (Метрики)**: [http://localhost:3000/login](http://localhost:3000/login)
 - **Prometheus UI (Метрики)**: [http://localhost:9090/](http://localhost:9090/)
 
