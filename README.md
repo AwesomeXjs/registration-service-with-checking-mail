@@ -82,7 +82,7 @@
     docker-compose up --build
     ```
    Или
-3. ```bash
+   ```bash
     make compose
     ```
 
