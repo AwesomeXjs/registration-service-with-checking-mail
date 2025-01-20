@@ -12,15 +12,15 @@ scrape_configs:
 
   - job_name: "auth-service"
     static_configs:
-      - targets: ["host.docker.internal:2112"]
+      - targets: ["auth-service:2112"]
 
   - job_name: "api-gateway"
     static_configs:
-      - targets: [ "host.docker.internal:2113" ]
+      - targets: [ "api-gateway:2113" ]
 
   - job_name: "mail-checking-service"
     static_configs:
-      - targets: ["host.docker.internal:2114"]
+      - targets: ["mail-service:2114"]
 
   - job_name: "postgresql-exporter"
     static_configs:

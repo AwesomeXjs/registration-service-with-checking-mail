@@ -656,7 +656,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "c79a124f-2d39-49ea-bfd6-a8c82c520719"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -706,7 +706,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "c79a124f-2d39-49ea-bfd6-a8c82c520719"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "rate(auth_service_space_grpc_auth_service_requests_total[15s])",
@@ -826,7 +826,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "c79a124f-2d39-49ea-bfd6-a8c82c520719"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -876,7 +876,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "c79a124f-2d39-49ea-bfd6-a8c82c520719"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "rate(api_gateway_space_rest_api_gateway_requests_total[15s])",
@@ -913,8 +913,7 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "orange",
@@ -983,7 +982,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "c79a124f-2d39-49ea-bfd6-a8c82c520719"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -995,8 +994,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1033,7 +1031,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "c79a124f-2d39-49ea-bfd6-a8c82c520719"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "rate(mail_service_space_grpc_mail_service_requests_total[15s])",
@@ -1139,6 +1137,6 @@
   "timezone": "",
   "title": "My_Dashboard",
   "uid": "eea-9_sik3",
-  "version": 3,
+  "version": 2,
   "weekStart": ""
 }

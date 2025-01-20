@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/pprof"
+	"os"
 	"sync"
 
 	"github.com/AwesomeXjs/registration-service-with-checking-mail/api-gateway-auth/internal/middlewares"
@@ -143,9 +144,13 @@ func (a *App) InitEchoServer(_ context.Context) error {
 	a.server.Use(middlewares.MetricsInterceptor)
 	a.server.Use(middlewares.Tracing)
 
+	host := os.Getenv(HTTPHost)
+	port := os.Getenv(HTTPPort)
+
 	a.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8080"},
-		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
+		AllowCredentials: true,
+		AllowOrigins:     []string{"http://" + host + ":" + port},
+		AllowMethods:     []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
 			echo.HeaderContentType,

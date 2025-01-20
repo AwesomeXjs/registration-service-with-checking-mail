@@ -15,6 +15,15 @@ services:
       - postgres_volume:/var/lib/postgresql/data
     env_file:
       - auth-service/.env
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+
   pg-exporter:
     image: wrouesnel/postgres_exporter:v0.8.0
     restart: unless-stopped
@@ -22,6 +31,9 @@ services:
       - "9187:9187"
     environment:
       DATA_SOURCE_NAME: "host=pg-auth-service port=5432 dbname=postgres user=postgres password=postgres sslmode=disable"
+
+    networks:
+      - app-net
 
   migrator-auth-service:
     build:
@@ -31,6 +43,9 @@ services:
     environment:
       DB_HOST: pg-auth-service
 
+    networks:
+      - app-net
+
   redis-auth-service:
     image: redis:7.2.5-alpine3.20
     container_name: redis-auth-service
@@ -38,6 +53,8 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    networks:
+      - app-net
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.1
@@ -53,6 +70,7 @@ services:
       ZOOKEEPER_SYNC_LIMIT: 2
     networks:
       - kafka-net
+      - app-net
 
   kafka1:
       image: confluentinc/cp-server:7.7.1
@@ -118,6 +136,7 @@ services:
         - kafka3
       networks:
         - kafka-net
+
   redis-mail-service:
     image: redis:7.2.5-alpine3.20
     container_name: redis-mail-service
@@ -125,6 +144,8 @@ services:
       - "6385:6379"
     volumes:
       - redis-mail:/data
+    networks:
+      - app-net
 
   prometheus:
     image: prom/prometheus:v2.37.9
@@ -134,6 +155,10 @@ services:
       - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./metrics/alerts.yml:/etc/prometheus/alerts.yml
       - prometheus_data:/prometheus
+    networks:
+      - app-net
+
+
 
   grafana:
       image: grafana/grafana-oss:10.0.3
@@ -141,18 +166,103 @@ services:
         - "3000:3000"
       volumes:
         - grafana_data:/var/lib/grafana
+      networks:
+        - app-net
+
 
   jaeger:
-    image: jaegertracing/all-in-one:1.48
+    image: jaegertracing/jaeger:2.0.0
+    container_name: jaeger
     ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
       - "5778:5778"
-      - "16686:16686" # web
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "14250:14250"
       - "14268:14268"
       - "9411:9411"
+    command:
+      - "--set"
+      - "receivers.otlp.protocols.http.endpoint=0.0.0.0:4318"
+      - "--set"
+      - "receivers.otlp.protocols.grpc.endpoint=0.0.0.0:4317"
+    restart: always
+    networks:
+      - app-net
+
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      pg-auth-service:
+        condition: service_healthy
+      kafka-ui:
+        condition: service_started
+      redis-mail-service:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    restart: always
+    env_file:
+      - ./api-gateway/.env
+    networks:
+      - app-net
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+
+
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "50051:50051"
+    depends_on:
+      pg-auth-service:
+        condition: service_healthy
+      kafka-ui:
+        condition: service_started
+      redis-mail-service:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    restart: always
+    env_file:
+      - ./auth-service/.env
+    networks:
+        - app-net
+        - kafka-net
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+
+  mail-service:
+    build: ./mail-checking-service
+    container_name: mail-service
+    ports:
+        - "50052:50052"
+    depends_on:
+        pg-auth-service:
+          condition: service_healthy
+        kafka-ui:
+          condition: service_started
+        redis-mail-service:
+          condition: service_started
+        jaeger:
+          condition: service_started
+    restart: always
+    env_file:
+        - ./mail-checking-service/.env
+    networks:
+        - app-net
+        - kafka-net
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
 
 networks:
     kafka-net:
       driver: bridge
+    app-net:
+    jaeger-net:
