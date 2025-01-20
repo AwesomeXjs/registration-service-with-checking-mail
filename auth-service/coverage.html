@@ -75,7 +75,7 @@
 				
 				<option value="file9">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter/to_proto.go (100.0%)</option>
 				
-				<option value="file10">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter/user.go (0.0%)</option>
+				<option value="file10">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/converter/user.go (50.0%)</option>
 				
 				<option value="file11">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/grpc_server/confirm_email.go (100.0%)</option>
 				
@@ -131,19 +131,19 @@
 				
 				<option value="file37">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/repository/init.go (0.0%)</option>
 				
-				<option value="file38">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/confirm_email.go (0.0%)</option>
+				<option value="file38">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/confirm_email.go (100.0%)</option>
 				
-				<option value="file39">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/get_access_token.go (0.0%)</option>
+				<option value="file39">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/get_access_token.go (100.0%)</option>
 				
 				<option value="file40">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/init.go (0.0%)</option>
 				
-				<option value="file41">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/login.go (0.0%)</option>
+				<option value="file41">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/login.go (100.0%)</option>
 				
 				<option value="file42">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/registration.go (57.6%)</option>
 				
-				<option value="file43">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/update_password.go (0.0%)</option>
+				<option value="file43">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/update_password.go (100.0%)</option>
 				
-				<option value="file44">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/validate.go (0.0%)</option>
+				<option value="file44">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/auth/validate.go (100.0%)</option>
 				
 				<option value="file45">github.com/AwesomeXjs/registration-service-with-checking-mail/auth-service/internal/service/event_sender/scheduler.go (0.0%)</option>
 				
@@ -876,7 +876,7 @@ import "github.com/AwesomeXjs/registration-service-with-checking-mail/auth-servi
 
 // ToModelAuthResponse converts access and refresh tokens along with user ID
 // into an AuthResponse model.
-func ToModelAuthResponse(accessToken, refreshToken string, UserID int) *model.AuthResponse <span class="cov6" title="5">{
+func ToModelAuthResponse(accessToken, refreshToken string, UserID int) *model.AuthResponse <span class="cov8" title="10">{
         return &amp;model.AuthResponse{
                 AccessToken:  accessToken,
                 RefreshToken: refreshToken,
@@ -1013,7 +1013,7 @@ func FromUserInfoToDbModel(info *model.UserInfo, hashedPassword string) *model.I
 }</span>
 
 // FromUpdatePassInfoToDbPassInfo converts UpdatePassInfo and hashed password to UpdatePassDb model.
-func FromUpdatePassInfoToDbPassInfo(info *model.UpdatePassInfo, hashedPassword string) *model.UpdatePassDb <span class="cov0" title="0">{
+func FromUpdatePassInfoToDbPassInfo(info *model.UpdatePassInfo, hashedPassword string) *model.UpdatePassDb <span class="cov10" title="10">{
         return &amp;model.UpdatePassDb{
                 Email:        info.Email,
                 HashPassword: hashedPassword,
@@ -2312,7 +2312,7 @@ import (
 
 // ConfirmEmail is a service method that handles the email confirmation process.
 // It calls the repository layer to update the email verification status.
-func (s *ServiceAuth) ConfirmEmail(ctx context.Context, mail string) error <span class="cov0" title="0">{
+func (s *ServiceAuth) ConfirmEmail(ctx context.Context, mail string) error <span class="cov10" title="10">{
         return s.Repo.Auth.ConfirmEmail(ctx, mail)
 }</span>
 </pre>
@@ -2330,36 +2330,36 @@ import (
 )
 
 // GetAccessToken generates a new access token and refresh token based on the provided refresh token.
-func (s *ServiceAuth) GetAccessToken(ctx context.Context, refreshToken string) (*model.NewPairTokens, error) <span class="cov0" title="0">{
+func (s *ServiceAuth) GetAccessToken(ctx context.Context, refreshToken string) (*model.NewPairTokens, error) <span class="cov10" title="25">{
 
         const mark = "Service.Auth.GetAccessToken"
 
         logger.Debug("getting refresh token on service", mark, zap.String("REFRESH_TOKEN", refreshToken))
 
         claims, err := s.AuthHelper.VerifyToken(refreshToken)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to verify token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to verify token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">info, err := s.Repo.Auth.GetAccessToken(ctx, claims.ID)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov9" title="20">info, err := s.Repo.Auth.GetAccessToken(ctx, claims.ID)
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to get access token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to get access token: %v", err)
         }</span>
-        <span class="cov0" title="0">access, err := s.AuthHelper.GenerateAccessToken(info)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="15">access, err := s.AuthHelper.GenerateAccessToken(info)
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to generate access token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate access token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">refresh, err := s.AuthHelper.GenerateRefreshToken(info.ID)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov7" title="10">refresh, err := s.AuthHelper.GenerateRefreshToken(info.ID)
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to generate refresh token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate refresh token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">return &amp;model.NewPairTokens{AccessToken: access, RefreshToken: refresh}, nil</span>
+        <span class="cov5" title="5">return &amp;model.NewPairTokens{AccessToken: access, RefreshToken: refresh}, nil</span>
 }
 </pre>
 		
@@ -2434,40 +2434,40 @@ import (
 )
 
 // Login authenticates a user with the provided login information and generates access and refresh tokens.
-func (s *ServiceAuth) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model.AuthResponse, error) <span class="cov0" title="0">{
+func (s *ServiceAuth) Login(ctx context.Context, loginInfo *model.LoginInfo) (*model.AuthResponse, error) <span class="cov10" title="25">{
 
         const mark = "Service.Auth.Login"
 
         logger.Debug("get data in service", mark, zap.Any("loginInfo", loginInfo))
 
         result, err := s.Repo.Auth.Login(ctx, loginInfo.Email)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to login", mark, zap.Error(err))
                 return nil, err
         }</span>
 
-        <span class="cov0" title="0">ok := s.AuthHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
-        if !ok </span><span class="cov0" title="0">{
+        <span class="cov9" title="20">ok := s.AuthHelper.ValidatePassword(result.HashPassword, loginInfo.Password)
+        if !ok </span><span class="cov5" title="5">{
                 logger.Error("invalid password", mark, zap.Error(err))
                 return nil, fmt.Errorf("invalid password")
         }</span>
 
-        <span class="cov0" title="0">accessToken, err := s.AuthHelper.GenerateAccessToken(&amp;model.AccessTokenInfo{
+        <span class="cov8" title="15">accessToken, err := s.AuthHelper.GenerateAccessToken(&amp;model.AccessTokenInfo{
                 ID:   result.UserID,
                 Role: result.Role,
         })
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to generate access token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate access token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">refreshToken, err := s.AuthHelper.GenerateRefreshToken(result.UserID)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov7" title="10">refreshToken, err := s.AuthHelper.GenerateRefreshToken(result.UserID)
+        if err != nil </span><span class="cov5" title="5">{
                 logger.Error("failed to generate refresh token", mark, zap.Error(err))
                 return nil, fmt.Errorf("failed to generate refresh token: %v", err)
         }</span>
 
-        <span class="cov0" title="0">logger.Debug("new pair tokens in service: ", mark, zap.Any("tokens", result))
+        <span class="cov5" title="5">logger.Debug("new pair tokens in service: ", mark, zap.Any("tokens", result))
 
         return converter.ToModelAuthResponse(accessToken, refreshToken, result.UserID), nil</span>
 }
@@ -2564,24 +2564,24 @@ import (
 )
 
 // UpdatePassword hashes the new password and updates the user's password in the database.
-func (s *ServiceAuth) UpdatePassword(ctx context.Context, updatePassInfo *model.UpdatePassInfo) error <span class="cov0" title="0">{
+func (s *ServiceAuth) UpdatePassword(ctx context.Context, updatePassInfo *model.UpdatePassInfo) error <span class="cov10" title="15">{
 
         const mark = "Service.Auth.UpdatePassword"
 
         logger.Debug("get data in service", mark, zap.Any("updatePassInfo", updatePassInfo))
 
         hashPassword, err := s.AuthHelper.HashPassword(updatePassInfo.NewPassword)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov6" title="5">{
                 logger.Error("failed to hash password", mark, zap.Error(err))
                 return fmt.Errorf("failed to hash password: %v", err)
         }</span>
-        <span class="cov0" title="0">err = s.Repo.Auth.UpdatePassword(ctx, converter.FromUpdatePassInfoToDbPassInfo(updatePassInfo, hashPassword))
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="10">err = s.Repo.Auth.UpdatePassword(ctx, converter.FromUpdatePassInfoToDbPassInfo(updatePassInfo, hashPassword))
+        if err != nil </span><span class="cov6" title="5">{
                 logger.Error("failed to update password", mark, zap.Error(err))
                 return fmt.Errorf("failed to update password: %v", err)
         }</span>
 
-        <span class="cov0" title="0">logger.Debug("password updated", mark, zap.Any("updatePassInfo", updatePassInfo))
+        <span class="cov6" title="5">logger.Debug("password updated", mark, zap.Any("updatePassInfo", updatePassInfo))
         return nil</span>
 }
 </pre>
@@ -2598,18 +2598,18 @@ import (
 )
 
 // ValidateToken verifies the access token and returns true if valid.
-func (s *ServiceAuth) ValidateToken(_ context.Context, accessToken string) (bool, error) <span class="cov0" title="0">{
+func (s *ServiceAuth) ValidateToken(_ context.Context, accessToken string) (bool, error) <span class="cov10" title="10">{
 
         const mark = "Service.Auth.ValidateToken"
 
         logger.Debug("get access token in service", mark, zap.String("ACCESS_TOKEN", accessToken))
 
         _, err := s.AuthHelper.VerifyToken(accessToken)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov7" title="5">{
                 logger.Error("failed to verify token", mark, zap.Error(err))
                 return false, fmt.Errorf("failed to verify token: %v", err)
         }</span>
-        <span class="cov0" title="0">return true, nil</span>
+        <span class="cov7" title="5">return true, nil</span>
 }
 </pre>
 		

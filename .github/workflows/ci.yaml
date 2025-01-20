@@ -22,9 +22,9 @@ jobs:
       - name: Run golangci-lint for Auth service
         uses: golangci/golangci-lint-action@v6
         with:
-            version: v1.60.3
-            args: --config=${{ github.workspace }}/auth-service/.golangci.pipeline.yaml ./...
-            working-directory: auth-service
+          version: v1.60.3
+          args: --config=${{ github.workspace }}/auth-service/.golangci.pipeline.yaml ./...
+          working-directory: auth-service
 
       - name: Run golangci-lint for Auth-api-gateway service
         uses: golangci/golangci-lint-action@v6
@@ -39,3 +39,20 @@ jobs:
           version: v1.60.3
           args: --config=${{ github.workspace }}/mail-checking-service/.golangci.pipeline.yaml ./...
           working-directory: mail-checking-service
+
+  tests:
+    name: Test Auth Service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.2'
+          cache: false
+
+      - name: Run tests for Auth service
+        working-directory: auth-service
+        run: |
+          go test ./... -v
