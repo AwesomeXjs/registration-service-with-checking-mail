@@ -200,7 +200,7 @@ services:
         condition: service_started
     restart: always
     env_file:
-      - ./api-gateway/.env
+      - ./api-gateway/prod.env
     networks:
       - app-net
 
@@ -222,7 +222,7 @@ services:
         condition: service_started
     restart: always
     env_file:
-      - ./auth-service/.env
+      - ./auth-service/prod.env
     networks:
         - app-net
         - kafka-net
@@ -243,7 +243,7 @@ services:
           condition: service_started
     restart: always
     env_file:
-        - ./mail-checking-service/.env
+        - ./mail-checking-service/prod.env
     networks:
         - app-net
         - kafka-net
