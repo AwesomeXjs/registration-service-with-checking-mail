@@ -171,25 +171,18 @@ services:
 
 
   jaeger:
-    image: jaegertracing/jaeger:2.0.0
-    container_name: jaeger
+    image: jaegertracing/all-in-one:1.48
     ports:
+      - "5775:5775"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
       - "5778:5778"
       - "16686:16686"
-      - "4317:4317"
-      - "4318:4318"
       - "14250:14250"
       - "14268:14268"
-      - "9411:9411"
-    command:
-      - "--set"
-      - "receivers.otlp.protocols.http.endpoint=0.0.0.0:4318"
-      - "--set"
-      - "receivers.otlp.protocols.grpc.endpoint=0.0.0.0:4317"
-    restart: always
+      - "14250:14250"
     networks:
       - app-net
-
 
   api-gateway:
     build: ./api-gateway
@@ -210,8 +203,6 @@ services:
       - ./api-gateway/.env
     networks:
       - app-net
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
 
 
 
@@ -235,8 +226,6 @@ services:
     networks:
         - app-net
         - kafka-net
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
 
   mail-service:
     build: ./mail-checking-service
@@ -258,8 +247,8 @@ services:
     networks:
         - app-net
         - kafka-net
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+
+
 
 networks:
     kafka-net:

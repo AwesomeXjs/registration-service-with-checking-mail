@@ -60,10 +60,6 @@ func (a *App) InitTracing(serviceName string) {
 			Type:  "const",
 			Param: 1,
 		},
-		Reporter: &config.ReporterConfig{
-			LogSpans:          true,
-			CollectorEndpoint: "http://jaeger:4317",
-		},
 	}
 
 	_, err := cfg.InitGlobalTracer(serviceName)
