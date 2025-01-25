@@ -74,7 +74,7 @@ func (a *App) Run(ctx context.Context) error {
 	wg.Add(3)
 
 	go func() {
-		defer wg.Wait()
+		defer wg.Done()
 		logger.Info("starting pprof server on :6060", mark)
 		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Fatalf("failed to start pprof server: %v", err)
